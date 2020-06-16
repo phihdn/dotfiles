@@ -12,6 +12,7 @@ au FileType go set tabstop=4
 call plug#begin("~/.vim/plugged")
   " Plugin Section
   Plug 'dracula/vim'
+  Plug 'morhetz/gruvbox'
   Plug 'scrooloose/nerdtree'
   Plug 'ryanoasis/vim-devicons'
   Plug 'airblade/vim-gitgutter'
@@ -19,11 +20,16 @@ call plug#begin("~/.vim/plugged")
 call plug#end()
 
 " Config Section
-if (has("termguicolors"))
+if exists('+termguicolors')
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
   set termguicolors
 endif
+
+
 syntax enable
-colorscheme dracula
+colorscheme gruvbox
+set background=dark
 
 " NERD tree configuration
 let g:NERDTreeShowHidden = 1
