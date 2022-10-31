@@ -1,0 +1,8 @@
+require("phihdn.plugins-setup")
+require("phihdn.core.options")
+require("phihdn.core.keymaps")
+require("phihdn.core.colorscheme")
+--require("phihdn.plugins.onenord")
+require("phihdn.plugins.comment")
+require("phihdn.plugins.nvim-tree")
+require("phihdn.plugins.lualine")
