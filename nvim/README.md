@@ -1,4 +1,4 @@
-# Windows
+### Windows
 
 ```console
 cmd /c mklink /j "%UserProfile%\AppData\Local\nvim" "%UserProfile%\\.dotfiles\nvim\conf"
@@ -6,7 +6,8 @@ cmd /c mklink /j "%UserProfile%\AppData\Local\nvim" "%UserProfile%\\.dotfiles\nv
 
 ### Telescope fzf
 
-live grep not working -> install `rg` https://github.com/BurntSushi/ripgrep#installation
+live grep not working -> install `rg` <https://github.com/BurntSushi/ripgrep#installation>
+
 ```sh
 brew install ripgrep
 ```
