@@ -8,10 +8,6 @@ function source_if_exists
     end
 end
 
-# VIM MODE (http://dougblack.io/words/zsh-vi-mode.html) -----------------------
-# bindkey -v
-#bindkey '^?' backward-delete-char
-
 set fish_greeting ""
 
 set -gx TERM xterm-256color
