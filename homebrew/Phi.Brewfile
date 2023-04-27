@@ -80,3 +80,5 @@ mas "Slack", id:803453959
 # Fonts
 # -----------------------------------------------------------------------------
 cask "font-jetbrains-mono-nerd-font"
+cask "font-hack-nerd-font"
+cask "font-fira-code-nerd-font"
