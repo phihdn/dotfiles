@@ -15,12 +15,12 @@ env:
 
 font:
   normal:
-    family: "JetBrainsMonoNL Nerd Font"
+    family: "JetBrainsMono Nerd Font"
     style: Medium
   size: 22.0
 
 window:
-  opacity: 0.8
+  opacity: 1
   padding:
     x: 14
     y: 10
@@ -69,5 +69,9 @@ key_bindings:
   - { key: W, mods: Command, chars: "\x02x" } # kill the current pane
   - { key: Z, mods: Command, chars: "\x02z" } # toggle zoom state of the current tmux pane
 
-#import:
-#  - ~/.config/alacritty/aw/current.yml
+import:
+  # uncomment the flavour you want below:
+#  - ~/.config/alacritty/catppuccin/catppuccin-mocha.yml
+  - ~/.config/alacritty/catppuccin/catppuccin-macchiato.yml
+#  - ~/.config/alacritty/catppuccin/catppuccin-frappe.yml
+#  - ~/.config/alacritty/catppuccin/catppuccin-latte.yml
