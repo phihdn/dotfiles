@@ -3,10 +3,12 @@ if status is-interactive
 end
 
 function source_if_exists
-    if test -r "$1"
-        source "$1"
+    if test -r $argv[1]
+        source $argv[1]
     end
 end
+
+source_if_exists $HOME/.env.sh
 
 set fish_greeting ""
 
@@ -18,14 +20,6 @@ set -g fish_prompt_pwd_dir_length 1
 set -g theme_display_user yes
 set -g theme_hide_hostname no
 set -g theme_hostname always
-
-# aliases
-alias ls "ls -p -G"
-alias la "ls -A"
-alias ll "ls -l"
-alias lla "ll -A"
-alias g git
-command -qv nvim && alias vim nvim
 
 set -gx EDITOR nvim
 
@@ -60,5 +54,7 @@ switch (uname)
   case '*'
     source_if_exists $DOTFILES/fish/config-windows.fish
 end
+
+source_if_exists $DOTFILES/fish/alias.fish
 
 starship init fish | source
