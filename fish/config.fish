@@ -1,63 +1,78 @@
-if status is-interactive
-    # Commands to run in interactive sessions can go here
-end
+#!/usr/bin/env fish
+#
+# ███████╗██╗███████╗██╗  ██╗
+# ██╔════╝██║██╔════╝██║  ██║
+# █████╗  ██║███████╗███████║
+# ██╔══╝  ██║╚════██║██╔══██║
+# ██║     ██║███████║██║  ██║
+# ╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝
+# A smart and user-friendly command line
+# https://fishshell.com
+# cSpell:words ajeetdsouza cppflags ldflags pkgconfig pnpm nvim Nord gopath nvimpager ripgreprc ripgrep zoxide joshmedeski sharkdp neovim lucc
 
-function source_if_exists
+#echo "config loading..."
+starship init fish | source # https://starship.rs/
+zoxide init fish | source # 'ajeetdsouza/zoxide'
+
+function safe_source
+	  # func(safe_source) 'only source if file exists'
     if test -r $argv[1]
         source $argv[1]
     end
 end
 
-source_if_exists $HOME/.env.sh
-
-set fish_greeting ""
+safe_source $HOME/.env.sh
 
 set -gx TERM xterm-256color
 
-# theme
-set -g theme_color_scheme terminal-dark
-set -g fish_prompt_pwd_dir_length 1
-set -g theme_display_user yes
-set -g theme_hide_hostname no
-set -g theme_hostname always
+#set -Ux BAT_THEME Nord # 'sharkdp/bat' cat clone
+set -Ux EDITOR nvim # 'neovim/neovim' text editor
+set -Ux VISUAL nvim
+set -Ux fish_greeting # disable fish greeting
+set -Ux LANG en_US.UTF-8
+set -Ux LC_ALL en_US.UTF-8
+set -U FZF_DEFAULT_COMMAND "fd -H -E '.git'"
+#set -Ux NODE_PATH "~/.nvm/versions/node/v16.19.0/bin/node" # 'nvm-sh/nvm'
+#set -gx RIPGREP_CONFIG_PATH "$HOME/.config/rg/ripgreprc"
 
-set -gx EDITOR nvim
 
-set -gx PATH bin $PATH
-set -gx PATH ~/bin $PATH
-set -gx PATH ~/.local/bin $PATH
+# ordered by priority - bottom up
+fish_add_path $HOME/.local/bin
+fish_add_path $HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin
+fish_add_path $HOME/.config/bin # my custom scripts
 
 # NodeJS
 #set -gx PATH node_modules/.bin $PATH
 
 # Go
-set -g GOPATH $HOME/go
-set -g GOROOT /usr/local/go
-set -gx PATH $GOPATH/bin $PATH
-set -gx PATH $GOROOT/bin $PATH
+#set -g GOPATH $HOME/go
+#set -g GOROOT /usr/local/go
+#set -gx PATH $GOPATH/bin $PATH
+#set -gx PATH $GOROOT/bin $PATH
+set -Ux GOPATH (go env GOPATH) # https://go.dev
+set -Ux GOROOT (go env GOROOT)
+fish_add_path $GOPATH/bin
+fish_add_path $GOROOT/bin
 
 # NVM
-function __check_rvm --on-variable PWD --description 'Do nvm stuff'
-  status --is-command-substitution; and return
-
-  if test -f .nvmrc; and test -r .nvmrc;
-    nvm use
-  else
-  end
-end
+#function __check_rvm --on-variable PWD --description 'Do nvm stuff'
+#  status --is-command-substitution; and return
+#
+#  if test -f .nvmrc; and test -r .nvmrc;
+#    nvm use
+#  else
+#  end
+#end
 
 switch (uname)
   case Darwin
-    source_if_exists $DOTFILES/fish/config-osx.fish
+    safe_source $DOTFILES/fish/config-osx.fish
   case Linux
-    source_if_exists $DOTFILES/fish/config-linux.fish
+    safe_source $DOTFILES/fish/config-linux.fish
   case '*'
-    source_if_exists $DOTFILES/fish/config-windows.fish
+    safe_source $DOTFILES/fish/config-windows.fish
 end
 
-source_if_exists $DOTFILES/fish/alias.fish
+safe_source $DOTFILES/fish/alias.fish
 
-fish_add_path $HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin
-
-zoxide init fish | source
-starship init fish | source
+#echo "config loaded"

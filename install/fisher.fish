@@ -22,3 +22,9 @@ curl -sL git.io/fisher | source && fisher install jorgebucaran/fisher
 	or abort 'fisher'
 
 fisher update
+	and success 'plugins'
+	or abort 'plugins'
+
+yes | fish_config theme save "Catppuccin Macchiato"
+	and success 'colorscheme'
+	or abort 'colorscheme'
