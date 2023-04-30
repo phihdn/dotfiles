@@ -57,4 +57,7 @@ end
 
 source_if_exists $DOTFILES/fish/alias.fish
 
+fish_add_path $HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin
+
+zoxide init fish | source
 starship init fish | source
