@@ -15,7 +15,7 @@ starship init fish | source # https://starship.rs/
 zoxide init fish | source # 'ajeetdsouza/zoxide'
 
 function safe_source
-	  # func(safe_source) 'only source if file exists'
+    # func(safe_source) 'only source if file exists'
     if test -r $argv[1]
         source $argv[1]
     end
