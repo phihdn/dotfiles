@@ -15,10 +15,10 @@ starship init fish | source # https://starship.rs/
 zoxide init fish | source # 'ajeetdsouza/zoxide'
 
 function safe_source
-  # func(safe_source) 'only source if file exists'
-  if test -r $argv[1]
-    source $argv[1]
-  end
+    # func(safe_source) 'only source if file exists'
+    if test -r $argv[1]
+        source $argv[1]
+    end
 end
 
 safe_source $HOME/.env.sh
@@ -65,12 +65,12 @@ fish_add_path $GOROOT/bin
 #end
 
 switch (uname)
-  case Darwin
-    safe_source $DOTFILES/fish/config-osx.fish
-  case Linux
-    safe_source $DOTFILES/fish/config-linux.fish
-  case '*'
-    safe_source $DOTFILES/fish/config-windows.fish
+    case Darwin
+        safe_source $DOTFILES/fish/config-osx.fish
+    case Linux
+        safe_source $DOTFILES/fish/config-linux.fish
+    case '*'
+        safe_source $DOTFILES/fish/config-windows.fish
 end
 
 safe_source $DOTFILES/fish/alias.fish
