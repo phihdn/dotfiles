@@ -33,6 +33,7 @@ brew "golang-migrate"
 brew "hugo"
 brew "jq"
 brew "lazydocker"
+brew "lf"
 brew "mosh"
 brew "neofetch"
 brew "neovim", args: ["HEAD"]
