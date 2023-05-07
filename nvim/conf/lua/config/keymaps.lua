@@ -16,9 +16,6 @@ vim.keymap.set({ "n", "v" }, "<leader>j", "J", { noremap = true, desc = "Join li
 -- C-P classic
 vim.keymap.set("n", "<C-P>", "<leader>ff")
 
--- Save file
-vim.keymap.set("n", "<leader>w", "<cmd>w<cr>", { noremap = true, desc = "Save window" })
-
 -- Unmap mappings used by tmux plugin
 -- TODO(vintharas): There's likely a better way to do this.
 vim.keymap.del("n", "<C-h>")
