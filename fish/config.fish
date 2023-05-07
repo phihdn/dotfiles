@@ -10,6 +10,11 @@
 # https://fishshell.com
 # cSpell:words ajeetdsouza cppflags ldflags pkgconfig pnpm nvim Nord gopath nvimpager ripgreprc ripgrep zoxide joshmedeski sharkdp neovim lucc
 
+# -U or --universal Sets a universal variable. The variable will be immediately available to all the user’s fish instances on the machine, and will be persist across restarts of the shell.
+# -f or --function Sets a variable scoped to the executing function. It is erased when the function ends.
+# -l or --local Sets a locally-scoped variable in this block. It is erased when the block ends. Outside of a block, this is the same as --function.
+# -g or --global Sets a globally-scoped variable. Global variables are available to all functions running in the same shell. They can be modified or erased.
+
 #echo "config loading..."
 starship init fish | source # https://starship.rs/
 zoxide init fish | source # 'ajeetdsouza/zoxide'
@@ -43,16 +48,6 @@ fish_add_path $HOME/.config/bin # my custom scripts
 
 # NodeJS
 #set -gx PATH node_modules/.bin $PATH
-
-# Go
-#set -g GOPATH $HOME/go
-#set -g GOROOT /usr/local/go
-#set -gx PATH $GOPATH/bin $PATH
-#set -gx PATH $GOROOT/bin $PATH
-set -Ux GOPATH (go env GOPATH) # https://go.dev
-set -Ux GOROOT (go env GOROOT)
-fish_add_path $GOPATH/bin
-fish_add_path $GOROOT/bin
 
 # NVM
 #function __check_rvm --on-variable PWD --description 'Do nvm stuff'
