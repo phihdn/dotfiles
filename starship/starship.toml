@@ -11,6 +11,8 @@
 # Sets user-defined palette
 palette = "catppuccin_macchiato"
 
+command_timeout = 1000 # default is 500ms
+
 [character]
 success_symbol = "[](blue)"
 error_symbol = "[](red)"
