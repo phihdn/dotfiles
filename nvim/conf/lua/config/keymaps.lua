@@ -5,10 +5,6 @@
 -- exit insert mode with jk
 vim.keymap.set("i", "jk", "<ESC>", { noremap = true, silent = true, desc = "<ESC>" })
 
--- Perusing code faster with K and J
-vim.keymap.set({ "n", "v" }, "K", "5k", { noremap = true, desc = "Up faster" })
-vim.keymap.set({ "n", "v" }, "J", "5j", { noremap = true, desc = "Down faster" })
-
 -- Remap K and J
 vim.keymap.set({ "n", "v" }, "<leader>k", "K", { noremap = true, desc = "Keyword" })
 vim.keymap.set({ "n", "v" }, "<leader>j", "J", { noremap = true, desc = "Join lines" })
