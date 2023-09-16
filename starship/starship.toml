@@ -13,6 +13,9 @@ palette = "catppuccin_macchiato"
 
 command_timeout = 1000 # default is 500ms
 
+[battery]
+disabled = true
+
 [character]
 success_symbol = "[](blue)"
 error_symbol = "[](red)"
