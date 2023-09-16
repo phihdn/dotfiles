@@ -1,1 +1,1 @@
-$DOTFILES/neofetch/config.conf=$HOME/.config/neofetch/config.conf
+$DOTFILES/neofetch/conf=$HOME/.config/neofetch
