@@ -6,16 +6,7 @@ return {
       require("lazyvim.util").deprecate("lualine.override", "lualine.opts")
     end
 
-    local icons = require("config.icons")
-
-    local navic = {
-      function()
-        return require("nvim-navic").get_location()
-      end,
-      cond = function()
-        return package.loaded["nvim-navic"] and require("nvim-navic").is_available()
-      end,
-    }
+    local icons = require("phihdn.core.icons")
 
     local diagnostics = {
       "diagnostics",
@@ -54,7 +45,7 @@ return {
       sections = {
         lualine_a = {},
         lualine_b = {},
-        lualine_c = { diff, diagnostics, navic },
+        lualine_c = { diff, diagnostics },
         lualine_x = {},
         lualine_y = {},
         lualine_z = {},
