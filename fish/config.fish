@@ -16,8 +16,18 @@
 # -g or --global Sets a globally-scoped variable. Global variables are available to all functions running in the same shell. They can be modified or erased.
 
 #echo "config loading..."
-starship init fish | source # https://starship.rs/
-zoxide init fish | source # 'ajeetdsouza/zoxide'
+# https://starship.rs/
+function starship_transient_prompt_func
+  starship module character
+end
+function starship_transient_rprompt_func
+  starship module time
+end
+starship init fish | source
+enable_transience
+
+# 'ajeetdsouza/zoxide'
+zoxide init fish | source
 
 function safe_source
     # func(safe_source) 'only source if file exists'
