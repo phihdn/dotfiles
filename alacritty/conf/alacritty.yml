@@ -16,8 +16,8 @@ env:
 font:
   normal:
     family: "JetBrainsMono Nerd Font"
-    style: Medium
-  size: 22.0
+    style: ExtraLight
+  size: 20.0
 
 window:
   opacity: 0.8
