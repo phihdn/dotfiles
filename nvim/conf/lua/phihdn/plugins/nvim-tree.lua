@@ -37,13 +37,14 @@ return {
       update_root = false,
     },
     view = {
+      cursorline = false,
       adaptive_size = false,
-      side = "left",
+      side = "right",
       width = 30,
       preserve_window_proportions = true,
     },
     git = {
-      enable = false,
+      enable = true,
       ignore = true,
     },
     filesystem_watchers = {

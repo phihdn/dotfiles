@@ -8,7 +8,7 @@ return {
   end,
   opts = {
     flavour = "macchiato", -- latte, frappe, macchiato, or mocha
-    transparent_background = false,
+    transparent_background = true,
     --color_overrides = {
     --  all = {
     --    surface0 = "#444444",
@@ -18,6 +18,7 @@ return {
     --  },
     --},
     integrations = {
+      nvimtree = true,
       cmp = true,
       fidget = true,
       gitsigns = true,

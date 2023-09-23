@@ -37,18 +37,22 @@ return {
 
     return {
       options = {
-        theme = "auto",
+        theme = "catppuccin",
         globalstatus = true,
         component_separators = { left = "", right = "" },
+        section_separators = { left = "", right = "" },
         disabled_filetypes = { statusline = { "dashboard", "lazy", "alpha" } },
       },
       sections = {
-        lualine_a = {},
+        lualine_a = { "mode" },
         lualine_b = {},
         lualine_c = { diff, diagnostics },
         lualine_x = {},
-        lualine_y = {},
-        lualine_z = {},
+        lualine_y = { "progress" },
+        lualine_z = { "location" },
+      },
+      extensions = {
+        "nvim-tree",
       },
     }
   end,
