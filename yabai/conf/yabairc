@@ -40,8 +40,10 @@ yabai -m mouse_drop_action swap
 # apps to not manage (ignore)
 yabai -m rule --add app="^System Settings$" manage=off
 yabai -m rule --add app="^Calculator$" manage=off
+yabai -m rule --add app="^Contacts$" manage=off
 yabai -m rule --add app="^Archive Utility$" manage=off
 yabai -m rule --add app="^Creative Cloud$" manage=off
 yabai -m rule --add app="^Logi Options$" manage=off
 yabai -m rule --add app="^QuickTime Player$" manage=off
 yabai -m rule --add app="^1Password$" manage=off
+yabai -m rule --add app="^OpenVPN Connect$" manage=off

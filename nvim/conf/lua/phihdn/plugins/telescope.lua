@@ -1,26 +1,14 @@
 return {
   "nvim-telescope/telescope.nvim",
+  branch = '0.1.x', -- or tag = '0.1.3',
   dependencies = {
-    "kkharji/sqlite.lua",
-    { "prochri/telescope-all-recent.nvim", opts = {} },
-    "AckslD/nvim-neoclip.lua",
-    "danielvolchek/tailiscope.nvim",
-    "debugloop/telescope-undo.nvim",
-    "natecraddock/telescope-zf-native.nvim",
-    "joshmedeski/telescope-smart-goto.nvim",
-    "piersolenski/telescope-import.nvim",
+    "nvim-lua/plenary.nvim",
   },
   -- apply the config and additionally load fzf-native
   config = function(_, opts)
     local telescope = require("telescope")
     telescope.setup(opts)
-    telescope.load_extension("import")
-    telescope.load_extension("neoclip")
-    telescope.load_extension("notify")
-    telescope.load_extension("smart_goto")
-    telescope.load_extension("tailiscope")
-    telescope.load_extension("undo")
-    telescope.load_extension("zf-native")
+    --telescope.load_extension("fzf")
   end,
 
   opts = {
@@ -49,6 +37,16 @@ return {
         "--column",
         "--smart-case",
         "--trim", -- add this value
+      },
+      mappings = {
+        i = {
+          ["<C-k>"] = function(...)
+            return require("telescope.actions").move_selection_previous(...)
+          end, -- move to prev result
+          ["<C-j>"] = function(...)
+            return require("telescope.actions").move_selection_next(...)
+          end, -- move to next result
+        },
       },
     },
     pickers = {
@@ -99,9 +97,16 @@ return {
       },
     },
   },
-  keys = function()
-    return {
-      { "<leader>*", "<cmd>Telescope grep_string<cr>", { silent = true, desc = "Grep Word Under Cursor" } },
-    }
-  end,
+  cmd = "Telescope",
+  keys = {
+    { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
+    { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files in cwd" },
+    { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Find recent files" },
+    { "<leader>fs", "<cmd>Telescope live_grep<cr>", desc = "Find string in cwd" },
+    { "<leader>fc", "<cmd>Telescope grep_string<cr>", desc = "Find string under cursor in cwd" },
+    { "<leader>f:", "<cmd>Telescope command_history<cr>", desc = "Find Command History" },
+    -- git
+    { "<leader>fgc", "<cmd>Telescope git_commits<CR>", desc = "Find commits" },
+    { "<leader>fgs", "<cmd>Telescope git_status<CR>", desc = "Find status" },
+  }
 }
