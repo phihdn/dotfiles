@@ -3,5 +3,5 @@
   email = phihdn@gmail.com
 [includeIf "gitdir:~/ws/personal/"]
   path = ~/.gitconfig-personal
-[includeIf "gitdir:~/ws/coligomed/"]
+[includeIf "gitdir:~/ws/work/coligomed/"]
   path = ~/.gitconfig-coligomed

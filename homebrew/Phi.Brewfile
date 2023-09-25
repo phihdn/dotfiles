@@ -61,6 +61,7 @@ brew "openssl"
 cask "amethyst"
 cask "google-chrome"
 cask "1password"
+cask "1password-cli"
 cask "alacritty"
 cask "audacity"
 cask "docker"
@@ -75,8 +76,8 @@ cask "zoom"
 cask "discord"
 cask "figma"
 cask "postman"
-mas "GarageBand", id:682658836
-mas "Keynote", id:409183694
+#mas "GarageBand", id:682658836
+#mas "Keynote", id:409183694
 mas "Slack", id:803453959
 
 # Fonts
