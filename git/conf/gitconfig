@@ -1,0 +1,7 @@
+[user]
+  name = Phi
+  email = phihdn@gmail.com
+[includeIf "gitdir:~/ws/personal/"]
+  path = ~/.gitconfig-personal
+[includeIf "gitdir:~/ws/coligomed/"]
+  path = ~/.gitconfig-coligomed
