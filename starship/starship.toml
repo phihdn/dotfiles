@@ -13,6 +13,12 @@ palette = "catppuccin_macchiato"
 
 command_timeout = 1000 # default is 500ms
 
+format = """
+$directory$cmd_duration
+$character"""
+
+#right_format = '$cmd_duration$status'
+
 [battery]
 disabled = true
 
@@ -37,11 +43,11 @@ disabled = false
 min_time = 100
 format = "[$duration]($style)"
 show_milliseconds = false
-style = "bold italic surface1"
+style = "bold italic overlay0"
 
 [time]
-disabled = true
-style = "bold surface1"
+disabled = false
+style = "overlay0"
 format = "[$time]($style)"
 
 [username]
@@ -64,15 +70,15 @@ symbol = " " # 
 style = "sapphire"
 
 [package]
-disabled = true
+disabled = false
 symbol = "󰏗 "
 
 [aws]
-disabled = true
+disabled = false
 symbol = "  "
 
 [docker_context]
-disabled = true
+disabled = false
 symbol = " "
 format = "via [$symbol$context]($style) "
 style = "blue bold"
@@ -114,7 +120,7 @@ detect_folders = ["node_modules"]
 symbol = "󰍛 "
 
 [git_branch]
-disabled = true
+disabled = false
 symbol = " "
 format = "on [$symbol$branch]($style) "
 #truncation_length = 4
@@ -122,16 +128,16 @@ format = "on [$symbol$branch]($style) "
 style = "bold green"
 
 [git_commit]
-disabled = true
+disabled = false
 
 [git_state]
-disabled = true
+disabled = false
 
 [git_metrics]
-disabled = true
+disabled = false
 
 [git_status]
-disabled = true
+disabled = false
 format = '([\[$all_status$ahead_behind\]]($style) )'
 style = "bold green"
 conflicted = "🏳"
