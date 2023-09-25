@@ -43,10 +43,6 @@ return {
       width = 30,
       preserve_window_proportions = true,
     },
-    git = {
-      enable = true,
-      ignore = true,
-    },
     filesystem_watchers = {
       enable = true,
     },
@@ -69,12 +65,13 @@ return {
           file = true,
           folder = true,
           folder_arrow = true,
-          git = false,
+          git = true,
         },
 
         glyphs = {
           default = "󰈚",
           symlink = "",
+          modified = "●",
           folder = {
             default = "",
             empty = "",
@@ -91,7 +88,7 @@ return {
             unmerged = "",
             renamed = "➜",
             untracked = "★",
-            deleted = "",
+            deleted = "",--
             ignored = "◌",
           },
         },
