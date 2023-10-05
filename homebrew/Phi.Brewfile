@@ -15,6 +15,7 @@ brew "mas"
 # -----------------------------------------------------------------------------
 brew "go"
 brew "node"
+brew "yarn"
 brew "python"
 
 # CLI Tools or other end-use software
@@ -58,7 +59,7 @@ brew "openssl"
 
 ## GUI Apps
 ## -----------------------------------------------------------------------------
-cask "amethyst"
+cask "keycastr"
 cask "google-chrome"
 cask "1password"
 cask "1password-cli"
