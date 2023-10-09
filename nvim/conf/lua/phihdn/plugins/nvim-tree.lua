@@ -25,6 +25,7 @@ return {
   opts = {
     filters = {
       dotfiles = false,
+      git_ignored = false,
       custom = { ".DS_Store" },
     },
     disable_netrw = true,

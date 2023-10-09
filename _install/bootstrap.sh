@@ -27,6 +27,10 @@ fail() {
 	exit
 }
 
+inject_op() {
+  op inject -i $DOTFILES/wakatime/wakatime.cfg.tpl -o $DOTFILES/wakatime/wakatime.cfg
+}
+
 link_file() {
 	local src=$1 dst=$2
 
@@ -138,6 +142,7 @@ create_env_file() {
 	fi
 }
 
+inject_op
 install_dotfiles
 create_env_file
 
