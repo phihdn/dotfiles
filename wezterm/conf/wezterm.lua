@@ -17,8 +17,8 @@ config.font = wezterm.font_with_fallback({
 	{ family = "Symbols Nerd Font Mono", scale = 1.0 },
 })
 
-config.window_background_opacity = 0.8
-config.macos_window_background_blur = 10
+config.window_background_opacity = 0.7
+config.macos_window_background_blur = 0
 config.force_reverse_video_cursor = true
 config.window_decorations = "RESIZE"
 config.use_cap_height_to_scale_fallback_fonts = true
