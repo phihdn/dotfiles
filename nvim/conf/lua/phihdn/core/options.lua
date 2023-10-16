@@ -69,3 +69,4 @@ vim.opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line
 
 -- cursor line
 --vim.opt.cursorline = true -- highlight the current cursor line
+
