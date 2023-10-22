@@ -50,6 +50,7 @@ return {
     actions = {
       open_file = {
         resize_window = true,
+        quit_on_open = true,
       },
     },
     renderer = {
@@ -88,7 +89,7 @@ return {
             staged = "✓",
             unmerged = "",
             renamed = "➜",
-            untracked = "★",
+            untracked = "",
             deleted = "",--
             ignored = "◌",
           },
