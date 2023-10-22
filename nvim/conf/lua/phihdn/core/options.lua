@@ -13,7 +13,7 @@ vim.opt.clipboard = ""
 --vim.opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 
 -- default position
-vim.opt.scrolloff = 5
+vim.opt.scrolloff = 10
 
 -- ex line
 vim.o.ls = 0
@@ -26,8 +26,9 @@ vim.opt.ignorecase = true -- ignore case when searching
 vim.opt.smartcase = true -- if you include mixed case in your search, assumes you want case-sensitive
 
 -- gutter
-vim.opt.number = true -- show relative line numbers
-vim.opt.relativenumber = true -- shows absolute line number on cursor line (when relative number is on)
+vim.opt.number = true -- shows absolute line number on cursor line (when relative number is on)
+vim.opt.relativenumber = true -- show relative line numbers
+vim.opt.numberwidth = 4
 
 -- indent
 vim.opt.tabstop = 2 -- 2 spaces for tabs (prettier default)
@@ -35,9 +36,13 @@ vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2 -- 2 spaces for indent width
 vim.opt.expandtab = true -- expand tab to spaces
 vim.opt.smartindent = true -- copy indent from current line when starting new one
+vim.opt.autoindent = true
+vim.opt.showtabline = 0
+vim.opt.showmatch = true
 
 -- backup
 vim.opt.backup = false
+vim.opt.writebackup = false
 vim.opt.swapfile = false -- turn off swapfile
 vim.opt.undodir = os.getenv("HOME") .. "/.local/state/nvim/undo"
 vim.opt.undofile = true
@@ -51,9 +56,14 @@ vim.opt.spelllang = { "en_us" }
 vim.opt.isfname:append("@-@")
 vim.opt.signcolumn = "yes"
 vim.opt.updatetime = 50
+vim.opt.hidden = true -- allow hidden buffer
+vim.opt.showmode = false -- disable vim showmode such as --INSERT--
+vim.opt.errorbells = false
+vim.opt.fileencoding = "utf-8"
+vim.opt.colorcolumn = "100"
 
 -- wrapping
-vim.opt.wrap = true
+vim.opt.wrap = false
 vim.opt.linebreak = true
 
 -- views can only be fully collapsed with the global statusline
@@ -68,5 +78,16 @@ vim.opt.splitbelow = true -- split horizontal window to the bottom
 vim.opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
 
 -- cursor line
---vim.opt.cursorline = true -- highlight the current cursor line
+vim.opt.cursorline = false -- highlight the current cursor line
+
+-- use mouse
+vim.opt.mouse = "a"
+
+-- title
+vim.opt.title = true
+vim.opt.titlestring = "Neovim - %t"
+
+-- vim.opt.nrformats:append("alpha") -- increment letters
+vim.opt.shortmess:append("IsF")
+-- vim.o.shortmess = "filnxstToOFS"
 
