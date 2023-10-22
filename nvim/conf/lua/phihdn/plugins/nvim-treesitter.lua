@@ -14,11 +14,17 @@ return {
       treesitter.setup({ -- enable syntax highlighting
         highlight = {
           enable = true,
+          additional_vim_regex_highlighting = false,
+          disable = function(lang, buf)
+            local max_filesize = 100 * 1024 -- 100 KB
+            local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+            if ok and stats and stats.size > max_filesize then
+              return true
+            end
+          end,
         },
         -- enable indentation
         indent = { enable = true },
-        -- enable autotagging (w/ nvim-ts-autotag plugin)
-        autotag = { enable = true },
         -- ensure these language parsers are installed
         ensure_installed = {
           "go",
@@ -51,10 +57,14 @@ return {
           "xml",
           "yaml",
         },
-        -- enable nvim-ts-context-commentstring plugin for commenting tsx and jsx
-        context_commentstring = {
+        incremental_selection = {
           enable = true,
-          enable_autocmd = false,
+          keymaps = {
+            init_selection = "<C-v>",
+            node_incremental = "<C-v>",
+            scope_incremental = false,
+            node_decremental = "<bs>",
+          },
         },
         -- auto install above language parsers
         auto_install = true,
