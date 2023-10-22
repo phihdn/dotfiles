@@ -5,6 +5,8 @@ return {
   config = function(_, opts)
     require("catppuccin").setup(opts)
     vim.cmd([[ colorscheme catppuccin ]])
+    vim.cmd([[ hi CursorLine guibg=#403658 ]])
+    vim.cmd([[ hi ColorColumn guibg=#26203f ]])
   end,
   opts = {
     flavour = "macchiato", -- latte, frappe, macchiato, or mocha

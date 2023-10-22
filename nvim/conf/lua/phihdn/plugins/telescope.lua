@@ -8,7 +8,8 @@ return {
   config = function(_, opts)
     local telescope = require("telescope")
     telescope.setup(opts)
-    --telescope.load_extension("fzf")
+    telescope.load_extension("fzf")
+    telescope.load_extension("lazygit")
   end,
 
   opts = {
@@ -51,38 +52,44 @@ return {
     },
     pickers = {
       buffers = {
-        prompt_prefix = "󰸩 ",
+        prompt_prefix = " 󰸩 ",
       },
       commands = {
-        prompt_prefix = " ",
+        prompt_prefix = "   ",
         layout_config = {
           height = 0.63,
           width = 0.78,
         },
       },
       command_history = {
-        prompt_prefix = " ",
+        prompt_prefix = "  ",
         layout_config = {
           height = 0.63,
           width = 0.58,
         },
       },
       git_files = {
-        prompt_prefix = "󰊢 ",
+        prompt_prefix = " 󰊢 ",
         show_untracked = true,
       },
       find_files = {
-        prompt_prefix = " ",
+        prompt_prefix = "   ",
         find_command = { "fd", "-H" },
       },
       live_grep = {
-        prompt_prefix = "󰱽 ",
+        prompt_prefix = " 󰱽 ",
       },
       grep_string = {
-        prompt_prefix = "󰱽 ",
+        prompt_prefix = " 󰱽 ",
       },
     },
     extensions = {
+      fzf = {
+        fuzzy = true, -- false will only do exact matching
+        override_generic_sorter = true, -- override the generic sorter
+        override_file_sorter = true, -- override the file sorter
+        case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+      },
       ["zf-native"] = {
         file = { -- options for sorting file-like items
           enable = true, -- override default telescope file sorter
