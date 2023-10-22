@@ -90,4 +90,3 @@ vim.opt.titlestring = "Neovim - %t"
 -- vim.opt.nrformats:append("alpha") -- increment letters
 vim.opt.shortmess:append("IsF")
 -- vim.o.shortmess = "filnxstToOFS"
-
