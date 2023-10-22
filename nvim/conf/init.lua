@@ -1,2 +1,1 @@
-require("phihdn.core")
-require("phihdn.lazy")
+require("phihdn")
