@@ -1,3 +1,31 @@
+-- return {
+--   "folke/noice.nvim",
+--   dependencies = {
+--     "MunifTanjim/nui.nvim",
+--     "rcarriga/nvim-notify",
+--   },
+--   event = "VeryLazy",
+--   ---@class NoiceConfig
+--   opts = {
+--     ---@type NoicePresets
+--     presets = { inc_rename = true },
+--     ---@type NoiceConfigViews
+--     views = {
+--       cmdline_popup = {
+--         position = {
+--           row = 7,
+--           col = "55%",
+--         },
+--       },
+--       cmdline_popupmenu = {
+--         position = {
+--           row = 7,
+--           col = "55%",
+--         },
+--       },
+--     },
+--   },
+-- }
 return {
   "folke/noice.nvim",
   dependencies = {
@@ -42,19 +70,6 @@ return {
       command_palette = true,
     },
     throttle = 1000 / 120,
-    routes = {
-      {
-        filter = {
-          event = "msg_show",
-          any = {
-            { find = "%d+L, %d+B" },
-            { find = "; after #%d+" },
-            { find = "; before #%d+" },
-          },
-        },
-        view = "mini",
-      },
-    },
     views = {
       cmdline_popup = {
         position = { row = vim.o.lines * 0.32, col = "50%" },
