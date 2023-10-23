@@ -6,7 +6,7 @@ return {
     require("catppuccin").setup(opts)
     vim.cmd([[ colorscheme catppuccin ]])
     vim.cmd([[ hi CursorLine guibg=#403658 ]])
-    vim.cmd([[ hi ColorColumn guibg=#26203f ]])
+    vim.cmd([[ hi ColorColumn guibg=#6e738d ]])
   end,
   opts = {
     flavour = "macchiato", -- latte, frappe, macchiato, or mocha
@@ -39,6 +39,15 @@ return {
       symbols_outline = true,
       illuminate = true,
       which_key = true,
+      indent_blankline = {
+        enabled = true,
+        scope_color = "text", -- catppuccin color (eg. `lavender`) Default: text
+        colored_indent_levels = false,
+      },
+      mini = {
+        enabled = true,
+        indentscope_color = "", -- catppuccin color (eg. `lavender`) Default: text
+      },
       barbecue = {
         dim_dirname = true,
         bold_basename = true,

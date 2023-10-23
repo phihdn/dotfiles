@@ -44,19 +44,19 @@ return {
         disabled_filetypes = { statusline = { "dashboard", "lazy", "alpha" } },
       },
       sections = {
---        lualine_a = { "mode" },
-        lualine_b = {},
-        lualine_c = { "branch", diff, diagnostics },
+        -- lualine_a = { "mode" },
+        lualine_b = { "branch" },
+        lualine_c = { diff, diagnostics },
         lualine_x = {
           {
-             require("noice").api.statusline.mode.get,
-             cond = require("noice").api.statusline.mode.has,
-             color = { fg = "#ff9e64" },
-           },
+            require("noice").api.statusline.mode.get,
+            cond = require("noice").api.statusline.mode.has,
+            color = { fg = "#ff9e64" },
+          },
           "filetype",
         },
---        lualine_y = { "progress" },
---        lualine_z = { "location" },
+        -- lualine_y = { "progress" },
+        -- lualine_z = { "location" },
       },
       extensions = {
         "nvim-tree",
