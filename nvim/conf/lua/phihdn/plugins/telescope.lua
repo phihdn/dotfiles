@@ -1,15 +1,15 @@
 return {
   "nvim-telescope/telescope.nvim",
-  branch = '0.1.x', -- or tag = '0.1.3',
+  branch = "0.1.x", -- or tag = '0.1.3',
   dependencies = {
     "nvim-lua/plenary.nvim",
+    "ThePrimeagen/harpoon",
   },
   -- apply the config and additionally load fzf-native
   config = function(_, opts)
     local telescope = require("telescope")
     telescope.setup(opts)
-    telescope.load_extension("fzf")
-    telescope.load_extension("lazygit")
+    telescope.load_extension("harpoon")
   end,
 
   opts = {
@@ -83,26 +83,7 @@ return {
         prompt_prefix = " 󰱽 ",
       },
     },
-    extensions = {
-      fzf = {
-        fuzzy = true, -- false will only do exact matching
-        override_generic_sorter = true, -- override the generic sorter
-        override_file_sorter = true, -- override the file sorter
-        case_mode = "smart_case", -- or "ignore_case" or "respect_case"
-      },
-      ["zf-native"] = {
-        file = { -- options for sorting file-like items
-          enable = true, -- override default telescope file sorter
-          highlight_results = true, -- highlight matching text in results
-          match_filename = true, -- enable zf filename match priority
-        },
-        generic = { -- options for sorting all other items
-          enable = true, -- override default telescope generic item sorter
-          highlight_results = true, -- highlight matching text in results
-          match_filename = false, -- disable zf filename match priority
-        },
-      },
-    },
+    extensions = {},
   },
   cmd = "Telescope",
   keys = {
@@ -115,5 +96,5 @@ return {
     -- git
     { "<leader>fgc", "<cmd>Telescope git_commits<CR>", desc = "Find commits" },
     { "<leader>fgs", "<cmd>Telescope git_status<CR>", desc = "Find status" },
-  }
+  },
 }
