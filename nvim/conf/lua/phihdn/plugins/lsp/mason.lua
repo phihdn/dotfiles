@@ -45,8 +45,9 @@ return {
 
     mason_tool_installer.setup({
       ensure_installed = {
-        "goimports",
-        "gofumpt",
+        "goimports", -- go auto import
+        "gofumpt", -- stricter gofmt
+        "golangci-lint", -- go linter
         "prettier", -- prettier formatter
         "stylua", -- lua formatter
         "isort", -- python formatter
