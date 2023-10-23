@@ -11,6 +11,7 @@ return {
   opts = {
     flavour = "macchiato", -- latte, frappe, macchiato, or mocha
     transparent_background = true,
+    show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
     --color_overrides = {
     --  all = {
     --    surface0 = "#444444",
