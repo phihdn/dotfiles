@@ -1,5 +1,16 @@
 return {
   "akinsho/bufferline.nvim",
+  events = "VeryLazy",
+  -- keys = {
+  --   { "<leader>bl", "<cmd>BufferLinePick<cr>", desc = "BufferLinePick" },
+  --   { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>", desc = "Toggle pin" },
+  --   { "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", desc = "Delete non-pinned buffers" },
+  --   { "<leader>bo", "<Cmd>BufferLineCloseOthers<CR>", desc = "Delete other buffers" },
+  --   { "<S-h>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev buffer" },
+  --   { "<S-l>", "<cmd>BufferLineCycleNext<cr>", desc = "Next buffer" },
+  --   { "[b", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev buffer" },
+  --   { "]b", "<cmd>BufferLineCycleNext<cr>", desc = "Next buffer" },
+  -- },
   dependencies = { "nvim-tree/nvim-web-devicons" },
   opts = function()
     local Offset = require("bufferline.offset")
@@ -32,10 +43,10 @@ return {
       options = {
         separator_style = { "", "" },
         offsets = { { text_align = "left", separator = false } },
-        indicator = { style = "none" },
+        -- indicator = { style = "none" },
         show_buffer_close_icons = false,
         show_close_icon = false,
-        show_tab_indicators = false,
+        -- show_tab_indicators = false,
         always_show_bufferline = true,
       },
     }
