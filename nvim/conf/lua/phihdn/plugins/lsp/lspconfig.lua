@@ -70,6 +70,12 @@ return {
       vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
     end
 
+    -- configure golang server
+    lspconfig["gopls"].setup({
+      capabilities = capabilities,
+      on_attach = on_attach,
+    })
+
     -- configure html server
     lspconfig["html"].setup({
       capabilities = capabilities,
@@ -78,6 +84,11 @@ return {
 
     -- configure typescript server with plugin
     lspconfig["tsserver"].setup({
+      capabilities = capabilities,
+      on_attach = on_attach,
+    })
+
+    lspconfig["eslint"].setup({
       capabilities = capabilities,
       on_attach = on_attach,
     })
@@ -159,4 +170,3 @@ return {
     })
   end,
 }
-
