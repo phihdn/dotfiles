@@ -14,3 +14,6 @@ alias s "source ~/.config/fish/config.fish"
 
 # GIT ALIASES -----------------------------------------------------------------
 alias gs "git status"
+
+# https://github.com/joshmedeski/sesh
+alias t "sesh connect"
