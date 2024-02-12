@@ -63,7 +63,7 @@ cask "keycastr"
 cask "google-chrome"
 cask "1password"
 cask "1password-cli"
-cask "alacritty"
+#cask "alacritty"
 cask "audacity"
 cask "docker"
 cask "iterm2"
@@ -77,6 +77,7 @@ cask "zoom"
 cask "discord"
 cask "figma"
 cask "postman"
+cask "wezterm"
 #mas "GarageBand", id:682658836
 #mas "Keynote", id:409183694
 mas "Slack", id:803453959

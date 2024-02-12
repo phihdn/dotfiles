@@ -38,7 +38,7 @@ end
 
 safe_source $HOME/.env.sh
 
-set -gx TERM tmux-256color
+set -gx TERM xterm-256color
 
 #set -Ux BAT_THEME Nord # 'sharkdp/bat' cat clone
 set -Ux EDITOR nvim # 'neovim/neovim' text editor
