@@ -2,12 +2,13 @@
 # -----------------------------------------------------------------------------
 cask_args appdir: "/Applications"
 
+#tap "homebrew/core"
+#tap "homebrew/cask"
 tap "homebrew/bundle"
-tap "homebrew/cask"
 tap "homebrew/cask-fonts"
-tap "homebrew/core"
 tap "homebrew/services"
 tap "jesseduffield/lazygit"
+tap "teamookla/speedtest"
 
 brew "mas"
 
@@ -47,6 +48,7 @@ brew "wget"
 brew "zoxide"
 brew "zsh"
 brew "jesseduffield/lazygit/lazygit"
+brew "speedtest"
 
 # Dependencies for programming languages and the like
 # -----------------------------------------------------------------------------
