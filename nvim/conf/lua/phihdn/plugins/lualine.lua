@@ -45,8 +45,8 @@ return {
       },
       sections = {
         -- lualine_a = { "mode" },
-        lualine_b = { "branch" },
-        lualine_c = { diff, diagnostics },
+        lualine_b = { "buffers" },
+        lualine_c = { "branch", diff, diagnostics },
         lualine_x = {
           {
             require("noice").api.statusline.mode.get,
