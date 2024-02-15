@@ -4,12 +4,14 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     "ThePrimeagen/harpoon",
+    { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   },
   -- apply the config and additionally load fzf-native
   config = function(_, opts)
     local telescope = require("telescope")
     telescope.setup(opts)
     telescope.load_extension("harpoon")
+    telescope.load_extension("fzf")
   end,
 
   opts = {
@@ -87,14 +89,39 @@ return {
   },
   cmd = "Telescope",
   keys = {
-    { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
-    { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files in cwd" },
-    { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Find recent files" },
-    { "<leader>fs", "<cmd>Telescope live_grep<cr>", desc = "Find string in cwd" },
-    { "<leader>fc", "<cmd>Telescope grep_string<cr>", desc = "Find string under cursor in cwd" },
-    { "<leader>f:", "<cmd>Telescope command_history<cr>", desc = "Find Command History" },
+    {
+      "<leader>,",
+      "<cmd>Telescope buffers sort_mru=true sort_lastused=true<cr>",
+      desc = "Switch Buffer",
+    },
+    { "<leader>/", "<cmd>Telescope live_grep<cr>", desc = "Grep (cwd)" },
+    { "<leader>:", "<cmd>Telescope command_history<cr>", desc = "Command History" },
+    { "<leader><space>", "<cmd>Telescope find_files<cr>", desc = "Find Files (cwd)" },
+    -- find
+    { "<leader>fb", "<cmd>Telescope buffers sort_mru=true sort_lastused=true<cr>", desc = "[F]ind [B]uffers" },
+    { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "[F]ind [F]iles (cwd)" },
+    { "<leader>fg", "<cmd>Telescope git_files<cr>", desc = "[F]ind files ([G]it-files)" },
+    { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "[F]ind [R]ecent files" },
+    { "<leader>fh", ":Telescope harpoon marks<cr>", desc = "[F]ind [H]arpoon marks" },
     -- git
-    { "<leader>fgc", "<cmd>Telescope git_commits<CR>", desc = "Find commits" },
-    { "<leader>fgs", "<cmd>Telescope git_status<CR>", desc = "Find status" },
+    { "<leader>gc", "<cmd>Telescope git_commits<CR>", desc = "Search git commits" },
+    { "<leader>gs", "<cmd>Telescope git_status<CR>", desc = "Search git status" },
+    -- search
+    { '<leader>s"', "<cmd>Telescope registers<cr>", desc = "Search Registers" },
+    { "<leader>sa", "<cmd>Telescope autocommands<cr>", desc = "[S]earch [A]uto Commands" },
+    { "<leader>sb", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "[S]earch [B]uffer" },
+    { "<leader>sc", "<cmd>Telescope command_history<cr>", desc = "[S]earch [C]ommand History" },
+    { "<leader>sC", "<cmd>Telescope commands<cr>", desc = "[S]earch [C]ommands" },
+    { "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", desc = "[S]earch current buffer [d]iagnostics" },
+    { "<leader>sD", "<cmd>Telescope diagnostics<cr>", desc = "[S]earch Workspace [D]iagnostics" },
+    { "<leader>sg", "<cmd>Telescope live_grep<cr>", desc = "[S]earch [G]rep in cwd" },
+    { "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "[S]earch [h]elp Pages" },
+    { "<leader>sH", "<cmd>Telescope highlights<cr>", desc = "[S]earch [H]ighlight Groups" },
+    { "<leader>sk", "<cmd>Telescope keymaps<cr>", desc = "[S]earch [K]ey Maps" },
+    { "<leader>sM", "<cmd>Telescope man_pages<cr>", desc = "[S]earch [M]an Pages" },
+    { "<leader>sm", "<cmd>Telescope marks<cr>", desc = "[S]earch [M]arks" },
+    { "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "[S]earch vim [O]ptions" },
+    { "<leader>sR", "<cmd>Telescope resume<cr>", desc = "Resume" },
+    { "<leader>sw", "<cmd>Telescope grep_string<cr>", desc = "[S]earch [W]ord in cwd" },
   },
 }
