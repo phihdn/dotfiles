@@ -52,18 +52,16 @@ return {
           "python",
           "sql",
           "typescript",
-          "tsx",
           "toml",
           "xml",
-          "yaml",
         },
         incremental_selection = {
           enable = true,
           keymaps = {
-            init_selection = "<C-v>",
-            node_incremental = "<C-v>",
-            scope_incremental = false,
-            node_decremental = "<bs>",
+            init_selection = "<c-space>",
+            node_incremental = "<c-space>",
+            scope_incremental = "<c-s>",
+            node_decremental = "<c-backspace>",
           },
         },
         -- auto install above language parsers

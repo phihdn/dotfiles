@@ -3,8 +3,8 @@ local keymap = vim.keymap -- for conciseness
 -- use jj to exit insert mode
 keymap.set("i", "jj", "<ESC>", { desc = "Exit insert mode with jj" })
 
--- clear search highlights
-keymap.set("n", "<leader><leader>", ":noh<CR>", { desc = "Clear search highlights" })
+-- Clear search with <esc>
+keymap.set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
 
 -- delete single character without copying into register
 -- keymap.set("n", "x", '"_x')
@@ -46,10 +46,21 @@ keymap.set("v", ">", ">gv")
 keymap.set("n", "<S-l>", ":bnext<CR>")
 keymap.set("n", "<S-h>", ":bprevious<CR>")
 
--- buffer
-keymap.set("n", "<leader>bb", "<cmd>Telescope buffers<cr>", { desc = "Telescope" })
-keymap.set("n", "<leader>bj", "<cmd>bn<cr>", { desc = "Next" })
-keymap.set("n", "<leader>bk", "<cmd>bp<cr>", { desc = "Previous" })
-keymap.set("n", "<leader>bn", "<cmd>bn<cr>", { desc = "Next" })
-keymap.set("n", "<leader>bp", "<cmd>bp<cr>", { desc = "Previous" })
+-- buffers
+keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
+keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
+keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
+keymap.set("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
+keymap.set("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
+keymap.set("n", "<leader>`", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
+
+-- save file
+keymap.set({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
+
+-- lazy
+keymap.set("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
+
+-- new file
+keymap.set("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
+
 keymap.set("n", "<leader>bsd", "<cmd>%bd|e#|bd#<cr>|'<cr>", { desc = "Delete surrounding" })
