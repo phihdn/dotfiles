@@ -5,13 +5,22 @@ return {
     "nvim-lua/plenary.nvim",
     "ThePrimeagen/harpoon",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    "nvim-telescope/telescope-ui-select.nvim",
   },
   -- apply the config and additionally load fzf-native
   config = function(_, opts)
     local telescope = require("telescope")
     telescope.setup(opts)
+    telescope.setup({
+      extensions = {
+        ["ui-select"] = {
+          require("telescope.themes").get_dropdown({}),
+        },
+      },
+    })
     telescope.load_extension("harpoon")
     telescope.load_extension("fzf")
+    telescope.load_extension("ui-select")
   end,
 
   opts = {
