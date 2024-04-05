@@ -23,6 +23,7 @@ brew "python"
 # -----------------------------------------------------------------------------
 brew "bat"
 brew "curl"
+brew "cloc"
 brew "exa"
 brew "fd"
 brew "fish"
