@@ -4,4 +4,4 @@ tmux/conf/plugins
 nvim/conf/*lock.json
 *.bk
 wakatime/wakatime.cfg
-
+.idea
