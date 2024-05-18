@@ -18,14 +18,10 @@ $username\
 $hostname\
 $directory\
 $git_branch\
-$git_state\
-$git_status\
-$git_metrics\
+$cmd_duration \
 $fill\
 $nodejs \
-$cmd_duration \
 $jobs \
-$time \
 $line_break\
 $character"""
 
