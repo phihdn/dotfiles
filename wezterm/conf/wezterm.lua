@@ -16,11 +16,11 @@ local act = wezterm.action
 local config = {
 	-- font
 	font = wezterm.font_with_fallback({
-		"JetBrainsMono Nerd Font",
+		"SFMono Nerd Font",
 		{ family = "Symbols Nerd Font Mono" },
 		-- { family = "Symbols Nerd Font Mono", scale = 1.0 },
 	}),
-	font_size = 16,
+	font_size = 20,
 
 	-- colors
 	color_scheme = "Catppuccin Macchiato",
