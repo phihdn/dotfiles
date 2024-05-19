@@ -9,7 +9,7 @@
 # https://starship.rs
 
 # Sets user-defined palette
-palette = "gruvbox"
+palette = "catppuccin_macchiato"
 
 command_timeout = 1000 # default is 500ms
 
@@ -37,7 +37,7 @@ symbol = " "
 disabled = true
 
 [character]
-success_symbol = "[](overlay1)"
+success_symbol = "[](blue)"
 error_symbol = "[](red)"
 vicmd_symbol = "[](green)"
 
@@ -61,7 +61,8 @@ style = "bold italic overlay0"
 
 [time]
 disabled = false
-format = '[[  $time ](fg:subtext0 bg:surface2)](bg:surface2)'
+style = "overlay0"
+format = "[$time]($style)"
 
 [username]
 disabled = false
@@ -283,31 +284,3 @@ surface0 = "#313244"
 base = "#1e1e2e"
 mantle = "#181825"
 crust = "#11111b"
-
-[palettes.gruvbox]
-rosewater = "#ea6962"
-flamingo = "#ea6962"
-red = "#ea6962"
-maroon = "#ea6962"
-pink = "#d3869b"
-mauve = "#d3869b"
-peach = "#e78a4e"
-yellow = "#d8a657"
-green = "#a9b665"
-teal = "#89b482"
-sky = "#89b482"
-sapphire = "#89b482"
-blue = "#7daea3"
-lavender = "#7daea3"
-text = "#ebdbb2"
-subtext1 = "#d5c4a1"
-subtext0 = "#bdae93"
-overlay2 = "#a89984"
-overlay1 = "#928374"
-overlay0 = "#595959"
-surface2 = "#4d4d4d"
-surface1 = "#404040"
-surface0 = "#292929"
-base = "#1d2021"
-mantle = "#191b1c"
-crust = "#141617"
