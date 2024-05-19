@@ -3,9 +3,9 @@
 #alias la="ls -A"
 #alias ll="ls -l"
 #alias lla="ll -A"
-if type -q exa
-    alias ls "exa --icons --group-directories-first"
-    alias ll "exa --icons --group-directories-first -l"
+if type -q eza
+    alias ls "eza --icons --group-directories-first"
+    alias ll "eza --icons --group-directories-first -l"
 end
 alias lla "ll -a"
 alias grep "grep --color"
