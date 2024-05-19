@@ -1,21 +1,42 @@
 gui:
-  # use the macchiato catppuccin theme
+  # use the gruvbox theme
   theme:
     lightTheme: false 
     activeBorderColor:
-      - "#a6da95" # Green
+      - "#a9b665" # Green
       - bold
     inactiveBorderColor:
-      - "#cad3f5" # Text
+      - "#ebdbb2" # Text
     optionsTextColor:
-      - "#8aadf4" # Blue
+      - "#7daea3" # Blue
     selectedLineBgColor:
-      - "#363a4f" # Surface0
+      - "#292929" # Surface0
     selectedRangeBgColor:
-      - "#363a4f" # Surface0
+      - "#292929" # Surface0
     cherryPickedCommitBgColor:
-      - "#8bd5ca" # Teal
+      - "#89b482" # Teal
     cherryPickedCommitFgColor:
-      - "#8aadf4" # Blue
+      - "#7daea3" # Blue
     unstagedChangesColor:
-      - red       # Red
+      - "#ea6962" # Red
+
+  # use the macchiato catppuccin theme
+  # theme:
+  #   lightTheme: false 
+  #   activeBorderColor:
+  #     - "#a6da95" # Green
+  #     - bold
+  #   inactiveBorderColor:
+  #     - "#cad3f5" # Text
+  #   optionsTextColor:
+  #     - "#8aadf4" # Blue
+  #   selectedLineBgColor:
+  #     - "#363a4f" # Surface0
+  #   selectedRangeBgColor:
+  #     - "#363a4f" # Surface0
+  #   cherryPickedCommitBgColor:
+  #     - "#8bd5ca" # Teal
+  #   cherryPickedCommitFgColor:
+  #     - "#8aadf4" # Blue
+  #   unstagedChangesColor:
+  #     - red       # Red
