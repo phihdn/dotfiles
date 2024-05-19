@@ -15,6 +15,9 @@
 # -l or --local Sets a locally-scoped variable in this block. It is erased when the block ends. Outside of a block, this is the same as --function.
 # -g or --global Sets a globally-scoped variable. Global variables are available to all functions running in the same shell. They can be modified or erased.
 
+# RUN fisher update to install plugins
+# then run `fish_config theme save "Catppuccin Gruvbox"`
+
 #echo "config loading..."
 # https://starship.rs/
 function starship_transient_prompt_func
@@ -81,9 +84,13 @@ end
 safe_source $DOTFILES/fish/alias.fish
 
 # https://github.com/catppuccin/fzf
-set -Ux FZF_DEFAULT_OPTS "\
---color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796 \
---color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6 \
---color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796"
+#set -Ux FZF_DEFAULT_OPTS "\
+#--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796 \
+#--color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6 \
+#--color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796"
 
+set -Ux FZF_DEFAULT_OPTS "\
+--color=bg+:#292929,bg:#292929,spinner:#ea6962,hl:#ea6962 \
+--color=fg:#ebdbb2,header:#ea6962,info:#d3869b,pointer:#ea6962 \
+--color=marker:#ea6962,fg+:#ebdbb2,prompt:#d3869b,hl+:#ea6962"
 #echo "config loaded"
