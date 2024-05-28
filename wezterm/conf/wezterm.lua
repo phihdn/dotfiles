@@ -23,8 +23,8 @@ local config = {
 	font_size = 20,
 
 	-- colors
-	--color_scheme = "Catppuccin Macchiato",
-	color_scheme = "Gruvbox Material (Gogh)",
+	color_scheme = "Catppuccin Mocha",
+	--color_scheme = "Gruvbox Material (Gogh)",
 
 	-- padding
 	--window_padding = {
