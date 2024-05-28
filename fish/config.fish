@@ -16,7 +16,7 @@
 # -g or --global Sets a globally-scoped variable. Global variables are available to all functions running in the same shell. They can be modified or erased.
 
 # RUN fisher update to install plugins
-# then run `fish_config theme save "Catppuccin Gruvbox"`
+# then run `fish_config theme save "Catppuccin Mocha"`
 
 #echo "config loading..."
 # https://starship.rs/
