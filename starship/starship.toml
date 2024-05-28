@@ -9,7 +9,7 @@
 # https://starship.rs
 
 # Sets user-defined palette
-palette = "gruvbox"
+palette = "catppuccin_mocha"
 
 command_timeout = 1000 # default is 500ms
 
@@ -37,7 +37,7 @@ symbol = " "
 disabled = true
 
 [character]
-success_symbol = "[](overlay1)"
+success_symbol = "[](blue)"
 error_symbol = "[](red)"
 vicmd_symbol = "[](green)"
 
