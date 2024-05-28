@@ -1,42 +1,25 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
 gui:
-  # use the gruvbox theme
   theme:
-    lightTheme: false 
     activeBorderColor:
-      - "#a9b665" # Green
+      - '#89b4fa'
       - bold
     inactiveBorderColor:
-      - "#ebdbb2" # Text
+      - '#a6adc8'
     optionsTextColor:
-      - "#7daea3" # Blue
+      - '#89b4fa'
     selectedLineBgColor:
-      - "#292929" # Surface0
-    selectedRangeBgColor:
-      - "#292929" # Surface0
+      - '#313244'
     cherryPickedCommitBgColor:
-      - "#89b482" # Teal
+      - '#45475a'
     cherryPickedCommitFgColor:
-      - "#7daea3" # Blue
+      - '#89b4fa'
     unstagedChangesColor:
-      - "#ea6962" # Red
+      - '#f38ba8'
+    defaultFgColor:
+      - '#cdd6f4'
+    searchingActiveBorderColor:
+      - '#f9e2af'
 
-  # use the macchiato catppuccin theme
-  # theme:
-  #   lightTheme: false 
-  #   activeBorderColor:
-  #     - "#a6da95" # Green
-  #     - bold
-  #   inactiveBorderColor:
-  #     - "#cad3f5" # Text
-  #   optionsTextColor:
-  #     - "#8aadf4" # Blue
-  #   selectedLineBgColor:
-  #     - "#363a4f" # Surface0
-  #   selectedRangeBgColor:
-  #     - "#363a4f" # Surface0
-  #   cherryPickedCommitBgColor:
-  #     - "#8bd5ca" # Teal
-  #   cherryPickedCommitFgColor:
-  #     - "#8aadf4" # Blue
-  #   unstagedChangesColor:
-  #     - red       # Red
+  authorColors:
+    '*': '#b4befe'
