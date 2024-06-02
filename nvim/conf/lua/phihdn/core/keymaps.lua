@@ -131,9 +131,6 @@ map("v", "K", ":m '<-2<CR>gv=gv", opts)
 
 
 -- lazy
-map("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
-
--- new file
-map("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
+map("n", "<leader>l", "<cmd>[L]azy<cr>", { desc = "Lazy" })
 
 map("n", "<leader>bsd", "<cmd>%bd|e#|bd#<cr>|'<cr>", { desc = "Delete surrounding" })
