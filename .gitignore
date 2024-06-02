@@ -5,3 +5,4 @@ nvim/conf/*lock.json
 *.bk
 wakatime/wakatime.cfg
 .idea
+nvim/confbk
