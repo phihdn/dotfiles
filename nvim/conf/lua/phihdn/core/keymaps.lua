@@ -8,10 +8,11 @@ map("i", "jk", "<ESC>", opts)
 -- Keep cursor centered when scrolling
 map("n", "<C-d>", "<C-d>zz", opts)
 map("n", "<C-u>", "<C-u>zz", opts)
-map("n", "n", "nzzv", opts)
-map("n", "N", "Nzzv", opts)
-map("n", "*", "*zzv", opts)
-map("n", "#", "#zzv", opts)
+-- TODO: review these below
+-- map("n", "n", "nzzv", opts)
+-- map("n", "N", "Nzzv", opts)
+-- map("n", "*", "*zzv", opts)
+-- map("n", "#", "#zzv", opts)
 map("n", "g*", "g*zz", opts)
 map("n", "g#", "g#zz", opts)
 
