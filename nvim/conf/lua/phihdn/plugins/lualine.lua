@@ -8,7 +8,7 @@ return {
   lazy = false,
   event = { "BufReadPost", "BufNewFile", "VeryLazy" },
   config = function()
-    -- local icons = require("phihdn.core.icons")
+    local icons = require("phihdn.core.icons")
     require("lualine").setup({
       options = {
         --theme = "auto",
@@ -43,8 +43,8 @@ return {
             "filename",
             path = 1, -- 2 for full path
             symbols = {
-              modified = " 󱇧 ",
-              readonly = "  ",
+              modified = " " .. icons.ui.BoldFileEdit .. " ",
+              readonly = " " .. icons.ui.BoldLock .. " ",
               -- unnamed = "  ",
             },
           },
@@ -52,7 +52,15 @@ return {
         },
         lualine_x = {
           { "fancy_macro" },
-          { "fancy_diagnostics", sources = { "nvim_lsp" }, symbols = { error = " ", warn = " ", info = " " } },
+          { 
+            "fancy_diagnostics",
+            sources = { "nvim_lsp" },
+            symbols = {
+              error = icons.diagnostics.BoldError .. " ",
+              warn = icons.diagnostics.BoldWarning .. " ",
+              info = icons.diagnostics.BoldInformation .. " ",
+            }
+          },
           "progress",
           --{ "fancy_location" },
           "location",
