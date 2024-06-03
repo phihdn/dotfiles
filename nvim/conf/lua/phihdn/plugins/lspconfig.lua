@@ -28,6 +28,7 @@ return {
     { "hrsh7th/cmp-nvim-lsp" },
   },
   config = function()
+    local icons = require("phihdn.core.icons")
     -- Ensure the servers and tools are installed
     --  To check the current status of installed tools and/or manually install
     --  other tools, you can run
@@ -38,9 +39,9 @@ return {
       ui = {
         border = "rounded",
         icons = {
-          package_installed = " ",
-          package_pending = "󰌚 ",
-          package_uninstalled = "󰢤 ",
+          package_installed = icons.ui.BoldCheck .. " ",
+          package_pending = icons.ui.LanPending .. " ",
+          package_uninstalled = icons.ui.BorderNone .. " ",
         },
       },
     })
@@ -196,7 +197,12 @@ return {
     })
 
     -- Change the Diagnostic symbols in the sign column (gutter)
-    local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+    local signs = {
+      Error = icons.diagnostics.BoldError .. " ",
+      Warn = icons.diagnostics.BoldWarning .. " ",
+      Hint = icons.diagnostics.BoldHint .. " ",
+      Info = icons.diagnostics.BoldInformation .. " ",
+    }
     for type, icon in pairs(signs) do
       local hl = "DiagnosticSign" .. type
       vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
