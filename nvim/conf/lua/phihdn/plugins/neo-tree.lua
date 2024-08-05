@@ -46,8 +46,8 @@ return {
             -- Status type
             untracked = "",
             ignored = "",
-            unstaged = "",
-            staged = "",
+            unstaged = "", -- nf-seti-checkbox_unchecked
+            staged = "󰱒", -- nf-md-checkbox_outline
             conflict = "",
           },
         },
