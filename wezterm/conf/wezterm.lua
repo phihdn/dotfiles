@@ -16,23 +16,25 @@ local act = wezterm.action
 local config = {
 	-- font
 	font = wezterm.font_with_fallback({
-		"SFMono Nerd Font",
+		-- "Liga SFMono Nerd Font",
+		"Fira Code",
 		{ family = "Symbols Nerd Font Mono" },
 		-- { family = "Symbols Nerd Font Mono", scale = 1.0 },
 	}),
 	font_size = 20,
+	line_height = 1.4,
 
 	-- colors
 	color_scheme = "Catppuccin Mocha",
 	--color_scheme = "Gruvbox Material (Gogh)",
 
 	-- padding
-	--window_padding = {
-	--	left = 20,
-	--	right = 20,
-	--	top = 20,
-	--	bottom = 10,
-	--},
+	window_padding = {
+		left = 12,
+		right = 12,
+		top = 12,
+		bottom = 0,
+	},
 
 	set_environment_variables = {
 		-- THEME_FLAVOUR = "latte",
