@@ -9,6 +9,7 @@ tap "homebrew/cask-fonts"
 tap "homebrew/services"
 tap "jesseduffield/lazygit"
 tap "teamookla/speedtest"
+tap "shaunsingh/SFMono-Nerd-Font-Ligaturized"
 
 brew "mas"
 
@@ -28,7 +29,6 @@ brew "eza"
 brew "fd"
 brew "fish"
 brew "fzf"
-brew "gh"
 brew "git"
 brew "gh"
 brew "git-lfs"
@@ -50,6 +50,10 @@ brew "zoxide"
 brew "zsh"
 brew "jesseduffield/lazygit/lazygit"
 brew "speedtest"
+brew "docker"
+brew "docker-compose"
+brew "kubectl"
+brew "k3sup"
 
 # Dependencies for programming languages and the like
 # -----------------------------------------------------------------------------
@@ -62,6 +66,7 @@ brew "openssl"
 
 ## GUI Apps
 ## -----------------------------------------------------------------------------
+cask "amethyst"
 cask "keycastr"
 cask "google-chrome"
 cask "1password"
@@ -95,3 +100,4 @@ cask "font-jetbrains-mono-nerd-font"
 cask "font-hack-nerd-font"
 cask "font-fira-code-nerd-font"
 cask "font-sf-mono-nerd-font"
+cask "font-sf-mono-nerd-font-ligaturized"
