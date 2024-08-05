@@ -128,6 +128,7 @@ return {
     { "<leader>sr", "<cmd>Telescope resume<cr>", desc = "[S]earch [R]esume" },
     { "<leader>s.", "<cmd>Telescope oldfiles<cr>", desc = '[S]earch Recent Files ("." for repeat)' },
     { "<leader><leader>", "<cmd>Telescope buffers<cr>", desc = "[ ] Find existing buffers" },
+    { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "[S]earch [T]odo" },
     {
       "<leader>/",
       function()
@@ -153,7 +154,7 @@ return {
 
     -- Shortcut for searching your Neovim configuration files
     {
-      "<leader>sn",
+      "<leader>sN",
       function()
         require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") })
       end,
