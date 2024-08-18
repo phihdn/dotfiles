@@ -5,3 +5,5 @@
   path = ~/.gitconfig-personal
 [includeIf "gitdir:~/ws/work/coligomed/"]
   path = ~/.gitconfig-coligomed
+[init]
+	defaultBranch = main
