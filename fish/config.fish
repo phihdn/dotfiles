@@ -21,10 +21,10 @@
 #echo "config loading..."
 # https://starship.rs/
 function starship_transient_prompt_func
-  echo "$(starship module time) $(starship module character)"
+    echo "$(starship module time) $(starship module character)"
 end
 function starship_transient_rprompt_func
-  starship module status
+    starship module status
 end
 starship init fish | source
 enable_transience
@@ -41,7 +41,7 @@ end
 
 safe_source $HOME/.env.sh
 
-set -gx TERM xterm-256color
+#set -gx TERM tmux-256color
 
 #set -Ux BAT_THEME Nord # 'sharkdp/bat' cat clone
 set -Ux EDITOR nvim # 'neovim/neovim' text editor
