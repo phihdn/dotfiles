@@ -1,4 +1,4 @@
-echo "osx loading..."
+#echo "osx loading..."
 fish_add_path /opt/homebrew/bin # https://brew.sh/
 fish_add_path /opt/homebrew/sbin
 
@@ -11,4 +11,4 @@ fish_add_path $GOROOT/bin
 # 1Password
 set -Ux SSH_AUTH_SOCK ~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 
-echo "osx loaded"
+#echo "osx loaded"

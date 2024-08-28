@@ -89,7 +89,6 @@ cask "figma"
 cask "postman"
 cask "wezterm"
 cask "kitty"
-cask "raycast"
 #mas "GarageBand", id:682658836
 #mas "Keynote", id:409183694
 mas "Slack", id:803453959

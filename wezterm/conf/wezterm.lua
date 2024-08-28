@@ -28,6 +28,14 @@ local config = {
 	color_scheme = "Catppuccin Mocha",
 	--color_scheme = "Gruvbox Material (Gogh)",
 
+	window_background_opacity = 0.85,
+	inactive_pane_hsb = {
+		hue = 0.0,
+		saturation = 0.0,
+		brightness = 0.0,
+	},
+	text_background_opacity = 1.0,
+
 	-- padding
 	window_padding = {
 		left = 12,
@@ -36,9 +44,15 @@ local config = {
 		bottom = 0,
 	},
 
+	-- cursor
+	default_cursor_style = "BlinkingBar",
+	cursor_blink_rate = 800,
+	-- cursor_blink_ease_in = "Constant",
+	-- cursor_blink_ease_out = "Constant",
+
 	set_environment_variables = {
 		-- THEME_FLAVOUR = "latte",
-		--BAT_THEME = h.is_dark() and "Catppuccin-mocha" or "Catppuccin-latte",
+		BAT_THEME = "Catppuccin-mocha",
 	},
 
 	-- general options
