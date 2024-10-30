@@ -45,15 +45,10 @@ local config = {
 		bottom = 0,
 	},
 
-	-- cursor
-	default_cursor_style = "BlinkingBar",
-	cursor_blink_rate = 800,
-	-- cursor_blink_ease_in = "Constant",
-	-- cursor_blink_ease_out = "Constant",
-
 	set_environment_variables = {
 		-- THEME_FLAVOUR = "latte",
 		BAT_THEME = "Catppuccin-mocha",
+		LC_ALL = "en_US.UTF-8",
 	},
 
 	-- general options
@@ -80,7 +75,7 @@ local config = {
 		k.cmd_key("O", k.multiple_actions(":GoToSymbol")),
 		k.cmd_key("P", k.multiple_actions(":GoToCommand")),
 		k.cmd_key("p", k.multiple_actions(":GoToFile")),
-		-- k.cmd_key("q", k.multiple_actions(":qa!")),
+		k.cmd_key("q", k.multiple_actions(":qa!")),
 		k.cmd_to_tmux_prefix("1", "1"),
 		k.cmd_to_tmux_prefix("2", "2"),
 		k.cmd_to_tmux_prefix("3", "3"),
