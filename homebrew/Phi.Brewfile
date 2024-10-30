@@ -22,6 +22,7 @@ brew "python"
 
 # CLI Tools or other end-use software
 # -----------------------------------------------------------------------------
+brew "ansible"
 brew "bat"
 brew "curl"
 brew "cloc"
@@ -34,6 +35,8 @@ brew "gh"
 brew "git-lfs"
 brew "golang-migrate"
 brew "hugo"
+brew "helm"
+brew "gum"
 brew "jq"
 brew "lazydocker"
 brew "lf"
@@ -43,6 +46,7 @@ brew "neovim", args: ["HEAD"]
 brew "nmap"
 #brew "postgresql", restart_service: true
 brew "tmux"
+brew "tz"
 brew "starship"
 brew "ripgrep"
 brew "wget"
@@ -54,6 +58,7 @@ brew "docker"
 brew "docker-compose"
 brew "kubectl"
 brew "k3sup"
+brew "joshmedeski/sesh/sesh"
 
 # Dependencies for programming languages and the like
 # -----------------------------------------------------------------------------
@@ -88,7 +93,9 @@ cask "discord"
 cask "figma"
 cask "postman"
 cask "wezterm"
-cask "kitty"
+#cask "kitty"
+cask "itsycal"
+cask "raycast"
 #mas "GarageBand", id:682658836
 #mas "Keynote", id:409183694
 mas "Slack", id:803453959
@@ -100,3 +107,4 @@ cask "font-hack-nerd-font"
 cask "font-fira-code-nerd-font"
 cask "font-sf-mono-nerd-font"
 cask "font-sf-mono-nerd-font-ligaturized"
+cask "font-jetbrains-mono"

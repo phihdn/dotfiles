@@ -9,7 +9,8 @@
 # https://starship.rs
 
 # Sets user-defined palette
-palette = "catppuccin_mocha"
+# palette = "catppuccin_mocha"
+palette = "gruvbox_dark"
 
 command_timeout = 1000 # default is 500ms
 
@@ -79,7 +80,7 @@ trim_at = "."
 [golang]
 disabled = false
 format = " [$symbol($version )]($style)"
-symbol = " " # 
+symbol = " "                            # 
 style = "sapphire"
 
 [package]
@@ -168,7 +169,7 @@ behind = "⇣${count}"
 stashed = "󰏗 "
 modified = " "
 staged = '[++\($count\)](green)'
-renamed = "襁 " #need to be updated
+renamed = "襁 "                                       #need to be updated
 deleted = " "
 
 # palette tables should be last in the config ⚓️
@@ -311,3 +312,15 @@ surface0 = "#292929"
 base = "#1d2021"
 mantle = "#191b1c"
 crust = "#141617"
+
+[palettes.gruvbox_dark]
+color_fg0 = '#fbf1c7'
+color_bg1 = '#3c3836'
+color_bg3 = '#665c54'
+color_blue = '#458588'
+color_aqua = '#689d6a'
+color_green = '#98971a'
+color_orange = '#d65d0e'
+color_purple = '#b16286'
+color_red = '#cc241d'
+color_yellow = '#d79921'

@@ -26,10 +26,10 @@ local config = {
 	line_height = 1.4,
 
 	-- colors
-	color_scheme = "Catppuccin Mocha",
-	--color_scheme = "Gruvbox Material (Gogh)",
+	--color_scheme = "Catppuccin Mocha",
+	color_scheme = "Gruvbox Dark (Gogh)",
 
-	window_background_opacity = 0.85,
+	window_background_opacity = 1.0,
 	inactive_pane_hsb = {
 		hue = 0.0,
 		saturation = 0.0,
@@ -47,7 +47,8 @@ local config = {
 
 	set_environment_variables = {
 		-- THEME_FLAVOUR = "latte",
-		BAT_THEME = "Catppuccin-mocha",
+		-- BAT_THEME = "Catppuccin-mocha",
+		BAT_THEME = "gruvbox-dark",
 		LC_ALL = "en_US.UTF-8",
 	},
 
