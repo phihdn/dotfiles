@@ -29,7 +29,7 @@ local config = {
 	--color_scheme = "Catppuccin Mocha",
 	color_scheme = "Gruvbox Dark (Gogh)",
 
-	window_background_opacity = 1.0,
+	window_background_opacity = 0.90,
 	inactive_pane_hsb = {
 		hue = 0.0,
 		saturation = 0.0,
@@ -60,6 +60,7 @@ local config = {
 	window_close_confirmation = "NeverPrompt",
 	window_decorations = "RESIZE",
 	audible_bell = "Disabled",
+	term = "wezterm",
 
 	-- keys
 	keys = {
