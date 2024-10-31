@@ -60,7 +60,6 @@ local config = {
 	window_close_confirmation = "NeverPrompt",
 	window_decorations = "RESIZE",
 	audible_bell = "Disabled",
-	term = "wezterm",
 
 	-- keys
 	keys = {
