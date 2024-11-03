@@ -47,6 +47,7 @@ safe_source $HOME/.env.sh
 set -Ux EDITOR nvim # 'neovim/neovim' text editor
 set -Ux VISUAL nvim
 set -Ux fish_greeting # disable fish greeting
+set -U fish_key_bindings fish_vi_key_bindings
 set -Ux LANG en_US.UTF-8
 set -Ux LC_ALL en_US.UTF-8
 set -U FZF_DEFAULT_COMMAND "fd -H -E '.git'"
