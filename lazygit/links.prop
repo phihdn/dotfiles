@@ -1,3 +1,2 @@
 $DOTFILES/lazygit/conf=$HOME/.config/lazygit
 $DOTFILES/lazygit/conf/config.yml=$HOME/Library/Application\ Support/lazygit/config.yml
-
