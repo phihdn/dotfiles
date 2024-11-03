@@ -40,7 +40,7 @@ disabled = true
 [character]
 success_symbol = "[](blue)"
 error_symbol = "[](red)"
-vicmd_symbol = "[](green)"
+vimcmd_symbol = "[](green)"
 
 [directory]
 disabled = false
