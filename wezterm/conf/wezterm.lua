@@ -26,10 +26,10 @@ local config = {
 	line_height = 1.4,
 
 	-- colors
-	--color_scheme = "Catppuccin Mocha",
-	color_scheme = "Gruvbox Dark (Gogh)",
+	color_scheme = "Catppuccin Mocha",
+	-- color_scheme = "Gruvbox Dark (Gogh)",
 
-	window_background_opacity = 0.90,
+	window_background_opacity = 0.80,
 	inactive_pane_hsb = {
 		hue = 0.0,
 		saturation = 0.0,
@@ -47,8 +47,8 @@ local config = {
 
 	set_environment_variables = {
 		-- THEME_FLAVOUR = "latte",
-		-- BAT_THEME = "Catppuccin-mocha",
-		BAT_THEME = "gruvbox-dark",
+		BAT_THEME = "Catppuccin-mocha",
+		-- BAT_THEME = "gruvbox-dark",
 		LC_ALL = "en_US.UTF-8",
 	},
 
@@ -93,7 +93,7 @@ local config = {
 		k.cmd_to_tmux_prefix("G", "G"),
 		k.cmd_to_tmux_prefix("g", "g"),
 		k.cmd_to_tmux_prefix("j", "J"),
-		k.cmd_to_tmux_prefix("K", "T"),
+		k.cmd_to_tmux_prefix("K", "R"),
 		k.cmd_to_tmux_prefix("k", "K"),
 		k.cmd_to_tmux_prefix("l", "L"),
 		k.cmd_to_tmux_prefix("n", "%"),
@@ -105,6 +105,7 @@ local config = {
 		k.cmd_to_tmux_prefix("w", "x"),
 		k.cmd_to_tmux_prefix("z", "z"),
 		k.cmd_to_tmux_prefix("Z", "Z"),
+		k.cmd_to_tmux_prefix("9", "9"),
 		k.cmd_ctrl_to_tmux_prefix("t", "J"),
 
 		k.cmd_key(
