@@ -9,7 +9,7 @@ tap "homebrew/services"
 tap "jesseduffield/lazygit"
 tap "joshmedeski/sesh"
 tap "teamookla/speedtest"
-tap "shaunsingh/SFMono-Nerd-Font-Ligaturized"
+tap "arl/arl" # for gitmux https://github.com/arl/gitmux
 
 brew "mas"
 
@@ -46,6 +46,7 @@ brew "neovim", args: ["HEAD"]
 brew "nmap"
 #brew "postgresql", restart_service: true
 brew "tmux"
+brew "gitmux"
 brew "tz"
 brew "starship"
 brew "ripgrep"
@@ -54,8 +55,6 @@ brew "zoxide"
 brew "zsh"
 brew "jesseduffield/lazygit/lazygit"
 brew "speedtest"
-brew "docker"
-brew "docker-compose"
 brew "kubectl"
 brew "k3sup"
 brew "joshmedeski/sesh/sesh"
@@ -72,6 +71,7 @@ brew "openssl"
 ## GUI Apps
 ## -----------------------------------------------------------------------------
 cask "amethyst"
+cask "nikitabobko/tap/aerospace"
 cask "keycastr"
 cask "google-chrome"
 cask "1password"
