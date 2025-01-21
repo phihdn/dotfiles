@@ -93,19 +93,21 @@ safe_source $DOTFILES/fish/alias.fish
 #--multi"
 
 # catppuccin transparent
-set -Ux FZF_DEFAULT_OPTS "\
---color=bg+:#313244,spinner:#f5e0dc,hl:#f38ba8 \
---color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
---color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
---color=selected-bg:#45475a \
---multi"
+#set -Ux FZF_DEFAULT_OPTS "\
+#--color=bg+:#313244,spinner:#f5e0dc,hl:#f38ba8 \
+#--color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+#--color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
+#--color=selected-bg:#45475a \
+#--multi"
 
 # gruvbox
-#set -Ux FZF_DEFAULT_OPTS "\
-#--color=bg+:#292929,bg:#292929,spinner:#ea6962,hl:#ea6962 \
-#--color=fg:#ebdbb2,header:#ea6962,info:#d3869b,pointer:#ea6962 \
-#--color=marker:#ea6962,fg+:#ebdbb2,prompt:#d3869b,hl+:#ea6962"
+set -Ux FZF_DEFAULT_OPTS "\
+--color=bg+:#292929,bg:#292929,spinner:#ea6962,hl:#ea6962 \
+--color=fg:#ebdbb2,header:#ea6962,info:#d3869b,pointer:#ea6962 \
+--color=marker:#ea6962,fg+:#ebdbb2,prompt:#d3869b,hl+:#ea6962"
 
+# load theme
+theme_gruvbox dark hard
 
 #echo "config loaded"
 
@@ -113,3 +115,6 @@ set -Ux FZF_DEFAULT_OPTS "\
 if [ -f '/Users/phihdn/Downloads/google-cloud-sdk/path.fish.inc' ]
     . '/Users/phihdn/Downloads/google-cloud-sdk/path.fish.inc'
 end
+
+# Added by LM Studio CLI (lms)
+set -gx PATH $PATH /Users/phihdn/.cache/lm-studio/bin

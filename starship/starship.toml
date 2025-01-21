@@ -9,8 +9,8 @@
 # https://starship.rs
 
 # Sets user-defined palette
-palette = "catppuccin_mocha"
-# palette = "gruvbox_dark"
+# palette = "catppuccin_mocha"
+palette = "gruvbox_dark"
 
 command_timeout = 1000 # default is 500ms
 
