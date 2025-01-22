@@ -40,6 +40,7 @@ brew "gum"
 brew "jq"
 brew "lazydocker"
 brew "lf"
+brew "lsd"
 brew "mosh"
 brew "neofetch"
 brew "neovim", args: ["HEAD"]
@@ -71,7 +72,6 @@ brew "openssl"
 ## GUI Apps
 ## -----------------------------------------------------------------------------
 cask "amethyst"
-cask "nikitabobko/tap/aerospace"
 cask "keycastr"
 cask "google-chrome"
 cask "1password"

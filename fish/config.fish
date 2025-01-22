@@ -82,7 +82,7 @@ switch (uname)
         safe_source $DOTFILES/fish/config-windows.fish
 end
 
-safe_source $DOTFILES/fish/alias.fish
+#safe_source $DOTFILES/fish/alias.fish
 
 # https://github.com/catppuccin/fzf
 #set -Ux FZF_DEFAULT_OPTS "\
