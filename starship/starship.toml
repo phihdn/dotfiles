@@ -8,6 +8,8 @@
 # The minimal, blazing-fast, and infinitely customizable prompt
 # https://starship.rs
 
+"$schema" = 'https://starship.rs/config-schema.json'
+
 # Sets user-defined palette
 # palette = "catppuccin_mocha"
 palette = "gruvbox_dark"
@@ -38,15 +40,18 @@ symbol = " "
 disabled = true
 
 [character]
-success_symbol = "[](blue)"
-error_symbol = "[](red)"
-vimcmd_symbol = "[](green)"
+disabled = false
+success_symbol = "[](bold fg:color_green)"
+error_symbol = "[](bold fg:color_red)"
+vimcmd_symbol = "[](bold fg:color_green)"
+vimcmd_replace_one_symbol = '[](bold fg:color_purple)'
+vimcmd_replace_symbol = '[](bold fg:color_purple)'
+vimcmd_visual_symbol = '[](bold fg:color_yellow)'
 
 [directory]
 disabled = false
 format = "[$path]($style)[$read_only]($read_only_style) "
-# Catppuccin 'lavender'
-style = "bold lavender"
+style = "bold color_fg0"
 read_only = " 󰌾"
 read_only_style = "197"
 truncation_length = 10
@@ -58,16 +63,16 @@ disabled = false
 min_time = 100
 format = "[$duration]($style)"
 show_milliseconds = false
-style = "bold italic overlay0"
+style = "bold italic color_aqua"
 
 [time]
-disabled = false
+disabled = true
 format = '[[  $time ](fg:subtext0 bg:surface2)](bg:surface2)'
 
 [username]
 disabled = false
-style_user = "green bold"
-style_root = "red bold"
+style_user = "bold color_fg0"
+style_root = "bold red"
 format = "[$user]($style) "
 show_always = false
 
