@@ -19,6 +19,8 @@ brew "go"
 brew "node"
 brew "yarn"
 brew "python"
+brew "pyenv"
+brew "pyenv-virtualenv"
 
 # CLI Tools or other end-use software
 # -----------------------------------------------------------------------------
