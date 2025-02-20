@@ -20,14 +20,14 @@
 
 #echo "config loading..."
 # https://starship.rs/
-function starship_transient_prompt_func
-    echo "$(starship module time) $(starship module character)"
-end
-function starship_transient_rprompt_func
-    starship module status
-end
+#function starship_transient_prompt_func
+#    echo "$(starship module time) $(starship module character)"
+#end
+#function starship_transient_rprompt_func
+#    starship module status
+#end
 starship init fish | source
-enable_transience
+#enable_transience
 
 # 'ajeetdsouza/zoxide'
 zoxide init fish | source
