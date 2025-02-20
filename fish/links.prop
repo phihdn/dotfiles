@@ -1,3 +1,4 @@
 $DOTFILES/fish/config.fish=$HOME/.config/fish/config.fish
 $DOTFILES/fish/fish_plugins=$HOME/.config/fish/fish_plugins
-$DOTFILES/fish/conf.d=$HOME/.config/fish/conf.d
+$DOTFILES/fish/conf.d/abbr.fish=$HOME/.config/fish/conf.d/abbr.fish
+$DOTFILES/fish/conf.d/alias.fish=$HOME/.config/fish/conf.d/alias.fish
