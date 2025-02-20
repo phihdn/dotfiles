@@ -118,3 +118,9 @@ end
 
 # Added by LM Studio CLI (lms)
 set -gx PATH $PATH /Users/phihdn/.cache/lm-studio/bin
+
+# https://github.com/pyenv/pyenv?tab=readme-ov-file#b-set-up-your-shell-environment-for-pyenv
+pyenv init - fish | source
+
+# https://github.com/pyenv/pyenv-virtualenv?tab=readme-ov-file#installation
+status --is-interactive; and pyenv virtualenv-init - | source
