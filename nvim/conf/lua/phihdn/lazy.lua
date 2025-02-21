@@ -11,7 +11,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({ { import = "phihdn.plugins" },  }, {
+require("lazy").setup({ { import = "phihdn.plugins" }, { import = "phihdn.plugins.lsp" } }, {
   checker = {
     enabled = true,
     notify = false,
