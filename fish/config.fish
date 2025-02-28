@@ -85,12 +85,12 @@ end
 #safe_source $DOTFILES/fish/alias.fish
 
 # https://github.com/catppuccin/fzf
-#set -Ux FZF_DEFAULT_OPTS "\
-#--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
-#--color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
-#--color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
-#--color=selected-bg:#45475a \
-#--multi"
+set -Ux FZF_DEFAULT_OPTS "\
+--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
+--color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+--color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
+--color=selected-bg:#45475a \
+--multi"
 
 # catppuccin transparent
 #set -Ux FZF_DEFAULT_OPTS "\
@@ -101,13 +101,10 @@ end
 #--multi"
 
 # gruvbox
-set -Ux FZF_DEFAULT_OPTS "\
---color=bg+:#292929,bg:#292929,spinner:#ea6962,hl:#ea6962 \
---color=fg:#ebdbb2,header:#ea6962,info:#d3869b,pointer:#ea6962 \
---color=marker:#ea6962,fg+:#ebdbb2,prompt:#d3869b,hl+:#ea6962"
-
-# load theme
-theme_gruvbox dark hard
+#set -Ux FZF_DEFAULT_OPTS "\
+#--color=bg+:#292929,bg:#292929,spinner:#ea6962,hl:#ea6962 \
+#--color=fg:#ebdbb2,header:#ea6962,info:#d3869b,pointer:#ea6962 \
+#--color=marker:#ea6962,fg+:#ebdbb2,prompt:#d3869b,hl+:#ea6962"
 
 #echo "config loaded"
 
