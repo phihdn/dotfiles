@@ -87,6 +87,9 @@ safe_source $DOTFILES/fish/color.fish
 
 #safe_source $DOTFILES/fish/alias.fish
 
+# remove theme
+set -e FZF_DEFAULT_OPTS
+
 # https://github.com/catppuccin/fzf
 # set -Ux FZF_DEFAULT_OPTS "\
 # --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
