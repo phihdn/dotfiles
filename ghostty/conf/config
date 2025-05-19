@@ -2,7 +2,8 @@ clipboard-read = "allow"
 
 font-family = CommitMono Nerd Font
 font-size = 20
-theme = catppuccin-mocha
+#theme = catppuccin-mocha
+theme = Kanagawa Dragon
 shell-integration-features = no-cursor,sudo,no-title
 cursor-style = block
 adjust-cell-height = 35%
