@@ -7,3 +7,5 @@
   path = ~/.gitconfig-coligomed
 [init]
 	defaultBranch = main
+[pull]
+	rebase = true
