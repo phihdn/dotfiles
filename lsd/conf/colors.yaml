@@ -1,0 +1,39 @@
+user: "#d3869b"         # Gruvbox purple
+group: "#83a598"        # Gruvbox blue
+permission:
+  read: "#b8bb26"        # Gruvbox green
+  write: "#fabd2f"       # Gruvbox yellow
+  exec: "#fb4934"        # Gruvbox red
+  exec-sticky: "#d3869b" # Gruvbox purple
+  no-access: "#928374"   # Gruvbox gray
+  octal: "#8ec07c"       # Gruvbox aqua
+  acl: "#8ec07c"         # Gruvbox aqua
+  context: "#83a598"     # Gruvbox blue
+date:
+  hour-old: "#8ec07c"    # Gruvbox aqua
+  day-old: "#83a598"     # Gruvbox blue
+  older: "#458588"       # Slightly deeper Gruvbox blue
+size:
+  none: "#928374"        # Gruvbox gray
+  small: "#b8bb26"       # Gruvbox green
+  medium: "#fabd2f"      # Gruvbox yellow
+  large: "#fe8019"       # Gruvbox orange
+inode:
+  valid: "#d3869b"       # Gruvbox purple
+  invalid: "#928374"     # Gruvbox gray
+links:
+  valid: "#d3869b"       # Gruvbox purple
+  invalid: "#928374"     # Gruvbox gray
+tree-edge: "#a89984"     # Gruvbox faded fg
+git-status:
+  default: "#ebdbb2"           # Gruvbox light fg
+  unmodified: "#928374"        # Gruvbox gray
+  ignored: "#928374"           # Gruvbox gray
+  new-in-index: "#b8bb26"      # Gruvbox green
+  new-in-workdir: "#b8bb26"    # Gruvbox green
+  typechange: "#fabd2f"        # Gruvbox yellow
+  deleted: "#fb4934"           # Gruvbox red
+  renamed: "#b8bb26"           # Gruvbox green
+  modified: "#fabd2f"          # Gruvbox yellow
+  conflicted: "#fb4934"        # Gruvbox red
+
