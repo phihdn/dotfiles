@@ -1,27 +1,53 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
 
+# Catppuccin Mocha
+#
+# gui:
+#   theme:
+#     activeBorderColor:
+#       - '#89b4fa'
+#       - bold
+#     inactiveBorderColor:
+#       - '#a6adc8'
+#     optionsTextColor:
+#       - '#89b4fa'
+#     selectedLineBgColor:
+#       - '#313244'
+#     cherryPickedCommitBgColor:
+#       - '#45475a'
+#     cherryPickedCommitFgColor:
+#       - '#89b4fa'
+#     unstagedChangesColor:
+#       - '#f38ba8'
+#     defaultFgColor:
+#       - '#cdd6f4'
+#     searchingActiveBorderColor:
+#       - '#f9e2af'
+#
+#   authorColors:
+#     '*': '#b4befe'
+
 gui:
   theme:
     activeBorderColor:
-      - '#fabd2f'  # Gruvbox Yellow
+      - '#7E9CD8'  # crystalBlue - for active borders
       - bold
     inactiveBorderColor:
-      - '#7c6f64'  # Gruvbox Gray
+      - '#727169'  # fujiGray - for inactive borders
     optionsTextColor:
-      - '#d79921'  # Gruvbox Orange
+      - '#7E9CD8'  # crystalBlue - for option text highlights
     selectedLineBgColor:
-      - '#32302f'  # Gruvbox Darker Background
+      - '#363646'  # sumiInk3 - for selected line backgrounds
     cherryPickedCommitBgColor:
-      - '#504945'  # Gruvbox Selection Color
+      - '#2A2A37'  # sumiInk2 - for cherry-picked commit backgrounds
     cherryPickedCommitFgColor:
-      - '#fabd2f'  # Gruvbox Yellow
+      - '#7E9CD8'  # crystalBlue - for cherry-picked commit text
     unstagedChangesColor:
-      - '#fb4934'  # Gruvbox Red
+      - '#C34043'  # autumnRed - for unstaged changes
     defaultFgColor:
-      - '#ebdbb2'  # Gruvbox Foreground
+      - '#DCD7BA'  # fujiWhite - for default text
     searchingActiveBorderColor:
-      - '#d79921'  # Gruvbox Orange
-
+      - '#E6C384'  # carpYellow - for search highlights
   authorColors:
-    '*': '#b8bb26'  # Gruvbox Green
+    '*': '#957FB8'  # oniViolet - for author names
 
