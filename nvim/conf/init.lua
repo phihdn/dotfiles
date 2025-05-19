@@ -1,1 +1,1 @@
-require("phihdn")
+require("config.lazy")
