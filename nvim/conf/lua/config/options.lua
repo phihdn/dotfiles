@@ -16,8 +16,10 @@ vim.opt.clipboard = "" -- don't use system clipboard
 vim.opt.scrolloff = 10
 
 -- ex line
-vim.o.ls = 0
-vim.o.ch = 0
+-- vim.o.ls = 0 -- laststatus 0: Never show, 1: Only show if there are at least two windows, 2: Always show, 3: (Neovim-only) Always show one global status line for the whole tabpage
+-- vim.o.ch = 0 -- cmdheight: 0: hide command line, 1: alwasy shows 1 line, 2+: Useful if you want more space for command feedback/errors
+-- views can only be fully collapsed with the global statusline
+--vim.opt.laststatus = 3
 
 -- search
 vim.opt.hlsearch = true
@@ -62,12 +64,16 @@ vim.opt.errorbells = false
 vim.opt.fileencoding = "utf-8"
 vim.opt.colorcolumn = "100"
 
+-- Sets how neovim will display certain whitespace characters in the editor.
+--  See `:help 'list'`
+--  and `:help 'listchars'`
+vim.opt.list = true
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+
 -- wrapping
 vim.opt.wrap = false
 vim.opt.linebreak = true
 
--- views can only be fully collapsed with the global statusline
-vim.opt.laststatus = 3
 -- Default splitting will cause your main splits to jump when opening an edgebar.
 -- To prevent this, set `splitkeep` to either `screen` or `topline`.
 vim.opt.splitkeep = "screen"
@@ -78,7 +84,7 @@ vim.opt.splitbelow = true -- split horizontal window to the bottom
 vim.opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
 
 -- cursor line
-vim.opt.cursorline = false -- highlight the current cursor line
+vim.opt.cursorline = true -- highlight the current cursor line
 
 -- use mouse
 vim.opt.mouse = "a"
