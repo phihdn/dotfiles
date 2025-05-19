@@ -32,6 +32,8 @@ switch $argv[1]
         echo 
     case go goreleaser
         echo 
+    case kubectl k9s
+        echo 
     case java mvn
         echo 
     case less more
