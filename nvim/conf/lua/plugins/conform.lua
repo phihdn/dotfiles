@@ -73,13 +73,13 @@ return {
       go = { "gofumpt", "golines", "goimports-reviser" },
       c = { "clang_format" },
       cpp = { "clang_format" },
-      yaml = { "yamlfmt" },
+      yaml = { "prettierd" },
       -- templ = { "prettier" },
-      html = { "prettier" },
-      json = { "prettier" },
-      markdown = { "prettier" },
+      html = { "prettierd" },
+      json = { "prettierd" },
+      markdown = { "prettierd" },
       -- sql = { "sqlfmt" },
-      css = { "prettier", stop_after_first = true },
+      css = { "prettierd", stop_after_first = true },
     },
   },
   keys = {
@@ -96,4 +96,3 @@ return {
     },
   },
 }
-
