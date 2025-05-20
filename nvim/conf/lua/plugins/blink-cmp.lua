@@ -1,5 +1,28 @@
 return {
   {
+    "zbirenbaum/copilot.lua",
+    event = "InsertEnter",
+    cmd = "Copilot",
+    build = ":Copilot auth",
+    opts = {
+      suggestion = {
+        enabled = false,
+        auto_trigger = true,
+        hide_during_completion = true,
+        keymap = {
+          accept = false,
+          next = "<M-]>",
+          prev = "<M-[>",
+        },
+      },
+      panel = { enabled = false },
+      filetypes = {
+        markdown = true,
+        help = true,
+      },
+    },
+  },
+  {
     "saghen/blink.compat",
     -- use the latest release, via version = '*', if you also use the latest release for blink.cmp
     version = "*",
@@ -15,6 +38,7 @@ return {
       "rafamadriz/friendly-snippets",
       "moyiz/blink-emoji.nvim",
       "ray-x/cmp-sql",
+      "giuxtaposition/blink-cmp-copilot",
     },
 
     -- use a release tag to download pre-built binaries
@@ -56,7 +80,7 @@ return {
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { "lsp", "path", "snippets", "buffer", "emoji", "sql" },
+        default = { "lsp", "path", "snippets", "buffer", "emoji", "sql", "copilot" },
         providers = {
           emoji = {
             module = "blink-emoji",
@@ -93,6 +117,12 @@ return {
                 vim.o.filetype
               )
             end,
+          },
+          copilot = {
+            name = "copilot",
+            module = "blink-cmp-copilot",
+            score_offset = 100,
+            async = true,
           },
         },
       },
