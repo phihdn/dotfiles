@@ -81,10 +81,10 @@ vim.opt.splitright = true -- split vertical window to the right
 vim.opt.splitbelow = true -- split horizontal window to the bottom
 
 -- backspace
-vim.opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
+vim.opt.backspace = { "start", "eol", "indent" } -- allow backspace on indent, end of line or insert mode start position
 
 -- cursor line
-vim.opt.cursorline = true -- highlight the current cursor line
+vim.opt.cursorline = false -- highlight the current cursor line
 
 -- use mouse
 vim.opt.mouse = "a"
