@@ -54,7 +54,6 @@ set -U FZF_DEFAULT_COMMAND "fd -H -E '.git'"
 #set -Ux NODE_PATH "~/.nvm/versions/node/v16.19.0/bin/node" # 'nvm-sh/nvm'
 #set -gx RIPGREP_CONFIG_PATH "$HOME/.config/rg/ripgreprc"
 
-
 # ordered by priority - bottom up
 fish_add_path $HOME/.local/bin
 fish_add_path $HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin
