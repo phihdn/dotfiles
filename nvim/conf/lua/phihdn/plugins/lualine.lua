@@ -94,6 +94,8 @@ return {
       b = { fg = colors.fg, bg = colors.bg },
       c = { fg = colors.fg, bg = colors.bg },
     }
+
+    local icons = require("phihdn.core.icons")
     require("lualine").setup({
       options = {
         -- theme = "auto",
@@ -129,8 +131,8 @@ return {
             "filename",
             path = 1, -- 2 for full path
             symbols = {
-              modified = " 󱇧 ",
-              readonly = "  ",
+              modified = " " .. icons.ui.BoldFileEdit .. " ",
+              readonly = " " .. icons.ui.BoldLock .. " ",
               -- unnamed = "  ",
             },
           },
@@ -142,9 +144,9 @@ return {
             "fancy_diagnostics",
             sources = { "nvim_lsp" },
             symbols = {
-              error = " ",
-              warn = " ",
-              info = " ",
+              error = icons.diagnostics.BoldError .. " ",
+              warn = icons.diagnostics.BoldWarning .. " ",
+              info = icons.diagnostics.BoldInformation .. " ",
             },
           },
           { "fancy_lsp_servers" },
