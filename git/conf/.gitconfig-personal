@@ -1,3 +1,16 @@
 [user]
   name = Phi
   email = phihdn@gmail.com
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3DwCfKM834Tipn3qaQXi9zU4+lwd7LvoJyS7Gv8la1
+
+[gpg]
+  format = ssh
+
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+[commit]
+  gpgsign = true
+
+[tag]
+  gpgSign = true
