@@ -1,25 +1,32 @@
 return {
   "ibhagwan/fzf-lua",
+  enabled = false,
   -- optional for icon support
   -- dependencies = { "nvim-tree/nvim-web-devicons" },
   -- or if using mini.icons/mini.nvim
   dependencies = { "echasnovski/mini.icons" },
   opts = {},
-  keys={
-    { 
+  keys = {
+    {
       "<leader>ff",
-      function() require('fzf-lua').files() end,
-      desc="[F]ind [F]iles in project directory"
+      function()
+        require("fzf-lua").files()
+      end,
+      desc = "[F]ind [F]iles in project directory",
     },
-    { 
+    {
       "<leader>fg",
-      function() require('fzf-lua').live_grep() end,
-      desc="[F]ind by [G]repping in project directory"
+      function()
+        require("fzf-lua").live_grep()
+      end,
+      desc = "[F]ind by [G]repping in project directory",
     },
-    { 
+    {
       "<leader>fn",
-      function() require('fzf-lua').files({cwd=vim.fn.stdpath("config")}) end,
-      desc="[F]ind in [N]eovim configuration"
+      function()
+        require("fzf-lua").files({ cwd = vim.fn.stdpath("config") })
+      end,
+      desc = "[F]ind in [N]eovim configuration",
     },
     {
       "<leader>fh",
@@ -91,5 +98,5 @@ return {
       end,
       desc = "[/] Live grep the current buffer",
     },
-  }
+  },
 }
