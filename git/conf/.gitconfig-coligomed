@@ -1,3 +1,17 @@
 [user]
   name = Phi Hoang
   email = phiduong@coligomed.com
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILnGgp0aCiz6c0MQIBusPciHpgKZ5e/sb3rVL+1BkJNm
+
+[url "git@gitlab.coligomed.com:DHP/dhp-backend-service/"]
+  insteadOf = "coligomed-be:"
+
+[commit]
+  gpgSign = true
+
+[gpg]
+  format = ssh
+
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+

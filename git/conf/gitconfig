@@ -1,11 +1,22 @@
 [user]
   name = Phi
   email = phihdn@gmail.com
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3DwCfKM834Tipn3qaQXi9zU4+lwd7LvoJyS7Gv8la1
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 [includeIf "gitdir:~/ws/personal/"]
   path = ~/.gitconfig-personal
 [includeIf "gitdir:~/ws/work/coligomed/"]
   path = ~/.gitconfig-coligomed
+[url "git@github.com:"]
+  insteadOf = "gh:"
 [init]
-	defaultBranch = main
+  defaultBranch = main
 [pull]
-	rebase = true
+  rebase = true
+[status]
+  branch = true
+  showStash = true
+  showUntrackedFiles = all
