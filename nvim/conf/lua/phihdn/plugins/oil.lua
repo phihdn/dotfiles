@@ -24,6 +24,7 @@ return {
           ["<C-c>"] = false, -- prevent from closing Oil as <C-c> is esc key
           ["<M-h>"] = "actions.select_split",
           ["q"] = "actions.close",
+          ["<Esc>"] = "actions.close",
         },
         win_options = {
           winbar = "%{v:lua.CustomOilBar()}",
