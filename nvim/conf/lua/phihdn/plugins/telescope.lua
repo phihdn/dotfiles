@@ -46,12 +46,16 @@ return {
             ["<C-k>"] = actions.move_selection_previous,
             ["<C-j>"] = actions.move_selection_next,
             ["<C-t>"] = trouble.open,
+            ["<C-x>"] = actions.select_horizontal, -- Open in horizontal split
+            ["<C-v>"] = actions.select_vertical, -- Open in vertical split
           },
 
           n = {
             ["<C-k>"] = actions.move_selection_previous,
             ["<C-j>"] = actions.move_selection_next,
             ["<C-t>"] = trouble.open,
+            ["<C-x>"] = actions.select_horizontal, -- Open in horizontal split
+            ["<C-v>"] = actions.select_vertical, -- Open in vertical split
           },
         },
         -- path_display = formattedName,
@@ -64,7 +68,7 @@ return {
         file_ignore_patterns = { "%.git/.", "node_modules", "package-lock.json" },
         initial_mode = "insert",
         select_strategy = "reset",
-        sorting_strategy = "ascending",
+        -- sorting_strategy = "ascending", -- ascending if prompt_position is "top" and descending if prompt_position is "bottom"
         color_devicons = true,
         set_env = { ["COLORTERM"] = "truecolor" }, -- default = nil,
         layout_config = {
@@ -73,7 +77,7 @@ return {
           preview_cutoff = 0,
           horizontal = { preview_width = 0.60 },
           vertical = { width = 0.55, height = 0.9, preview_cutoff = 0 },
-          prompt_position = "top",
+          -- prompt_position = "top",
         },
         vimgrep_arguments = {
           "rg",
@@ -90,17 +94,17 @@ return {
       pickers = {
         commands = {
           prompt_prefix = "   ",
-          layout_config = {
-            height = 0.63,
-            width = 0.78,
-          },
+          -- layout_config = {
+          --   height = 0.63,
+          --   width = 0.78,
+          -- },
         },
         command_history = {
           prompt_prefix = "  ",
-          layout_config = {
-            height = 0.63,
-            width = 0.58,
-          },
+          -- layout_config = {
+          --   height = 0.63,
+          --   width = 0.58,
+          -- },
         },
         git_files = {
           prompt_prefix = " 󰊢 ",
@@ -131,24 +135,24 @@ return {
             },
           },
           previewer = false,
-          -- initial_mode = "normal",
-          theme = "dropdown",
+          -- layout_strategy = "vertical",
+          -- -- initial_mode = "normal",
           layout_config = {
             height = 0.4,
             width = 0.6,
-            prompt_position = "top",
-            preview_cutoff = 120,
+            -- prompt_position = "top",
+            -- preview_cutoff = 120,
           },
         },
         current_buffer_fuzzy_find = {
           previewer = false,
-          theme = "dropdown",
-          layout_config = {
-            height = 0.4,
-            width = 0.6,
-            prompt_position = "top",
-            preview_cutoff = 120,
-          },
+          -- theme = "dropdown",
+          -- layout_config = {
+          --   height = 0.4,
+          --   width = 0.6,
+          --   prompt_position = "top",
+          --   preview_cutoff = 120,
+          -- },
         },
         lsp_references = {
           show_line = false,
@@ -170,16 +174,15 @@ return {
           case_mode = "smart_case", -- or "ignore_case" or "respect_case"
         },
         ["ui-select"] = {
-          require("telescope.themes").get_cursor({ -- or write a minimal custom config
-            layout_strategy = "center",
+          require("telescope.themes").get_dropdown({
+            -- layout_strategy = "center",
             layout_config = {
               height = 0.4,
               width = 0.6,
             },
-            sorting_strategy = "ascending",
-            initial_mode = "insert",
+            -- initial_mode = "insert",
             prompt_prefix = " ",
-            results_title = false,
+            -- results_title = false,
             previewer = false,
           }),
         },
