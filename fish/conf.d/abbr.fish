@@ -28,7 +28,6 @@ abbr gpr "gh pr create"
 abbr gpum "git pull upstream master"
 abbr gr "git remote"
 abbr gra "git remote add"
-abbr grc "git rebase --continue"
 abbr grao "git remote add origin"
 abbr grau "git remote add upstream"
 abbr grv "git remote -v"
@@ -40,3 +39,6 @@ abbr ld lazydocker
 abbr lg lazygit
 abbr ll "lsd  --group-dirs first -Al"
 abbr lt "lsd  --group-dirs last -A --tree"
+
+abbr s sesh_start
+abbr s. "sesh connect ."
