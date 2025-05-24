@@ -4,8 +4,8 @@ cask_args appdir: "/Applications"
 
 #tap "homebrew/core"
 #tap "homebrew/cask"
-tap "homebrew/bundle"
-tap "homebrew/services"
+# tap "homebrew/bundle"
+# tap "homebrew/services"
 tap "jesseduffield/lazygit"
 tap "joshmedeski/sesh"
 tap "teamookla/speedtest"
@@ -16,9 +16,9 @@ brew "mas"
 # Programming languages
 # -----------------------------------------------------------------------------
 brew "go"
-brew "node"
+# brew "node" # use nvm instead
 brew "yarn"
-brew "python"
+# brew "python" # use pyenv instead
 brew "pyenv"
 brew "pyenv-virtualenv"
 
