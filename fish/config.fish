@@ -18,32 +18,11 @@
 # RUN fisher update to install plugins
 # then run `fish_config theme save "Catppuccin Mocha"`
 
-#echo "config loading..."
-# https://starship.rs/
-#function starship_transient_prompt_func
-#    echo "$(starship module time) $(starship module character)"
-#end
-#function starship_transient_rprompt_func
-#    starship module status
-#end
-starship init fish | source
-#enable_transience
-
-# 'ajeetdsouza/zoxide'
-zoxide init fish | source
-
-function safe_source
-    # func(safe_source) 'only source if file exists'
-    if test -r $argv[1]
-        source $argv[1]
-    end
+if not set -q DOTFILES
+    set -gx DOTFILES (bash -c 'source ~/.env.sh >/dev/null 2>&1; printf "$DOTFILES"')
 end
 
-safe_source $HOME/.env.sh
-
 #set -gx TERM tmux-256color
-
-#set -Ux BAT_THEME Nord # 'sharkdp/bat' cat clone
 set -Ux EDITOR nvim # 'neovim/neovim' text editor
 set -Ux VISUAL nvim
 set -Ux fish_greeting # disable fish greeting
@@ -53,38 +32,6 @@ set -Ux LC_ALL en_US.UTF-8
 set -U FZF_DEFAULT_COMMAND "fd -H -E '.git'"
 #set -Ux NODE_PATH "~/.nvm/versions/node/v16.19.0/bin/node" # 'nvm-sh/nvm'
 #set -gx RIPGREP_CONFIG_PATH "$HOME/.config/rg/ripgreprc"
-
-# ordered by priority - bottom up
-fish_add_path $HOME/.local/bin
-fish_add_path $HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin
-fish_add_path $HOME/.config/bin # my custom scripts
-
-# NodeJS
-#set -gx PATH node_modules/.bin $PATH
-
-# NVM
-#function __check_rvm --on-variable PWD --description 'Do nvm stuff'
-#  status --is-command-substitution; and return
-#
-#  if test -f .nvmrc; and test -r .nvmrc;
-#    nvm use
-#  else
-#  end
-#end
-
-switch (uname)
-    case Darwin
-        safe_source $DOTFILES/fish/config-osx.fish
-    case Linux
-        safe_source $DOTFILES/fish/config-linux.fish
-    case '*'
-        safe_source $DOTFILES/fish/config-windows.fish
-end
-
-# Theme
-safe_source $DOTFILES/fish/color.fish
-
-#safe_source $DOTFILES/fish/alias.fish
 
 # remove theme
 set -e FZF_DEFAULT_OPTS
@@ -111,12 +58,71 @@ set -e FZF_DEFAULT_OPTS
 #--color=fg:#ebdbb2,header:#ea6962,info:#d3869b,pointer:#ea6962 \
 #--color=marker:#ea6962,fg+:#ebdbb2,prompt:#d3869b,hl+:#ea6962"
 
+
+function safe_source
+    # func(safe_source) 'only source if file exists'
+    if test -r $argv[1]
+        source $argv[1]
+    end
+end
+
+# Only run interactive config for interactive shells
+if status is-interactive
+    #echo "config loading..."
+    # https://starship.rs/
+    function starship_transient_prompt_func
+       echo "$(starship module time) $(starship module character)"
+    end
+    function starship_transient_rprompt_func
+       starship module status
+    end
+    starship init fish | source
+    enable_transience
+
+    # 'ajeetdsouza/zoxide'
+    zoxide init fish | source
+
+    # Source platform-specific config
+    switch (uname)
+        case Darwin
+            safe_source $DOTFILES/fish/config-osx.fish
+        case Linux
+            safe_source $DOTFILES/fish/config-linux.fish
+        case '*'
+            safe_source $DOTFILES/fish/config-windows.fish
+    end
+    # Theme
+    safe_source $DOTFILES/fish/color.fish
+
+    safe_source $DOTFILES/fish/alias.fish
+end
+
+safe_source $HOME/.env.sh
+
+
+# ordered by priority - bottom up
+fish_add_path $HOME/.local/bin
+fish_add_path $HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin
+fish_add_path $HOME/.config/bin # my custom scripts
+
+# NodeJS
+#set -gx PATH node_modules/.bin $PATH
+
+# NVM
+#function __check_rvm --on-variable PWD --description 'Do nvm stuff'
+#  status --is-command-substitution; and return
+#
+#  if test -f .nvmrc; and test -r .nvmrc;
+#    nvm use
+#  else
+#  end
+#end
+
+
+
+
 #echo "config loaded"
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/phihdn/Downloads/google-cloud-sdk/path.fish.inc' ]
-    . '/Users/phihdn/Downloads/google-cloud-sdk/path.fish.inc'
-end
 
 # Added by LM Studio CLI (lms)
 set -gx PATH $PATH /Users/phihdn/.cache/lm-studio/bin
@@ -126,3 +132,14 @@ pyenv init - fish | source
 
 # https://github.com/pyenv/pyenv-virtualenv?tab=readme-ov-file#installation
 status --is-interactive; and pyenv virtualenv-init - | source
+
+# k9s
+set -Ux K9S_CONFIG_DIR $HOME/.config/k9s
+
+# Added by Windsurf
+fish_add_path /Users/phihdn/.codeium/windsurf/bin
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/phihdn/Downloads/google-cloud-sdk/path.fish.inc' ]
+    . '/Users/phihdn/Downloads/google-cloud-sdk/path.fish.inc'
+end
