@@ -16,6 +16,7 @@ brew "mas"
 # Programming languages
 # -----------------------------------------------------------------------------
 brew "go"
+brew "rust"
 # brew "node" # use nvm instead
 brew "yarn"
 # brew "python" # use pyenv instead
