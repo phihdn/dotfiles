@@ -66,8 +66,8 @@ vim.keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" })
 -- close current split window
 vim.keymap.set("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close current split" })
 
--- Executes shell command from in here making file executable
-vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true, desc = "makes file executable" })
+-- Executes shell command from in here making file executable (conflict with trouble keys)
+-- vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true, desc = "makes file executable" })
 
 -- Copy filepath to the clipboard
 vim.keymap.set("n", "<leader>fp", function()

@@ -78,7 +78,7 @@ return {
       html = { "prettierd" },
       json = { "prettierd" },
       markdown = { "prettierd" },
-      -- sql = { "sqlfmt" },
+      sql = { "sleek" },
       css = { "prettierd", stop_after_first = true },
     },
   },
