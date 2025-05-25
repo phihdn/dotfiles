@@ -225,6 +225,25 @@ return {
         --   },
         -- },
       },
+      yamlls = {
+        settings = {
+          yaml = {
+            keyOrdering = false,
+            format = {
+              enable = true,
+            },
+            validate = true,
+            hover = true,
+            completion = true,
+            schemas = {
+              -- You can map schemas here if needed
+              -- ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+            },
+          },
+        },
+      },
+
+      postgres_lsp = {},
     }
 
     -- Ensure the servers and tools above are installed
@@ -248,6 +267,7 @@ return {
       "gofumpt",
       "golines",
       "goimports-reviser",
+      "sleek",
     })
     require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
