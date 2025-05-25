@@ -21,4 +21,7 @@ fish_add_path $GOROOT/bin
 # 1Password
 set -Ux SSH_AUTH_SOCK ~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 
+# Postgres
+fish_add_path $HOMEBREW_PREFIX/opt/postgresql@15/bin
+
 #echo "osx loaded"
