@@ -39,7 +39,7 @@ Brewfile.lock.json
 personal/
 private/
 
-dotfiles/nvim/conf/*lock.json
+dotfiles/nvim/.config/nvim/*lock.json
 
 # k9s
 dotfiles/k9s/.config/k9s/benchmarks/*
