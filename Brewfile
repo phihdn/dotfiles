@@ -7,6 +7,7 @@
 tap "jesseduffield/lazygit"
 tap "arl/arl"  # for gitmux
 tap "jorgerojas26/lazysql" # Lazysql
+tap "nikitabobko/tap" # AeroSpace
 
 # Essential CLI Tools
 # -----------------------------------------------------------------------------

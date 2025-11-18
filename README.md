@@ -122,6 +122,24 @@ stow -D nvim  # Remove nvim config
 stow -n -v nvim  # See what would be linked
 ```
 
+### Homebrew Package Management
+```bash
+# Sync packages with Brewfile (install + cleanup)
+brew-sync
+
+# Preview what packages would be removed
+brew-sync preview
+
+# Only install packages from Brewfile
+brew-sync install
+
+# Only cleanup packages not in Brewfile
+brew-sync cleanup
+
+# Force sync without prompting
+brew-sync force
+```
+
 ## 🐍🟢 Language Version Management
 
 This setup includes modern tools for managing Node.js and Python versions:
