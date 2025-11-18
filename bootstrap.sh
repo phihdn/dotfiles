@@ -131,22 +131,23 @@ fi
 
 log_section "Setting Up Shell Environment"
 
-# Install Zap ZSH plugin manager
-log_step "Checking for Zap ZSH plugin manager"
-if [[ ! -d "${XDG_DATA_HOME:-$HOME/.local/share}/zap" ]]; then
-  log_info "Installing Zap ZSH plugin manager..."
-  if zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh) --branch release-v1; then
-    log_success "Zap ZSH plugin manager installed successfully"
+# Install Zinit ZSH plugin manager
+log_step "Checking for Zinit ZSH plugin manager"
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+if [[ ! -d "$ZINIT_HOME" ]]; then
+  log_info "Installing Zinit plugin manager..."
+  if bash -c "$(curl --fail --show-error --silent --location https://github.com/zdharma-continuum/zinit/raw/refs/heads/main/scripts/install.sh)"; then
+    log_success "Zinit installed successfully"
     
     log_step "Removing default .zshrc to allow stow management"
     rm -f ~/.zshrc
     log_info "Default .zshrc removed (will be managed by stow)"
   else
-    log_error "Failed to install Zap ZSH plugin manager"
+    log_error "Failed to install Zinit plugin manager"
     exit 1
   fi
 else
-  log_success "Zap ZSH plugin manager already installed"
+  log_success "Zinit already installed"
 fi
 
 # Install nvm (Node Version Manager)

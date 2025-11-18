@@ -1,7 +1,7 @@
 ###########
 ## shell ##
 ###########
-command = "/opt/homebrew/bin/zsh --login"
+# command = "/opt/homebrew/bin/zsh --login"
 # initial-command = "/opt/homebrew/bin/zsh --login -c 'sesh_start'"
 shell-integration = zsh
 shell-integration-features = "no-cursor,sudo,title"
