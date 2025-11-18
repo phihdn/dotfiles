@@ -59,7 +59,7 @@ brew "go"
 brew "rust"
 brew "pyenv"
 brew "pyenv-virtualenv"
-# Note: Use nvm for Node.js, pyenv for Python
+# Note: nvm for Node.js is installed via bootstrap.sh, pyenv for Python
 
 # Cloud & DevOps
 # -----------------------------------------------------------------------------

@@ -1,9 +1,4 @@
-# Source .sh files in .zsh.d
-
-for config_file in ~/.zsh.d/*.sh; do
-  [ -r "$config_file" ] && source "$config_file"
-done
-
+# NVM (Node Version Manager) configuration
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

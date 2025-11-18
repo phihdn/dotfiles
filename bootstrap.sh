@@ -58,6 +58,26 @@ if [[ ! -d "${XDG_DATA_HOME:-$HOME/.local/share}/zap" ]]; then
   rm -f ~/.zshrc
 fi
 
+# Install nvm (Node Version Manager)
+if [[ ! -d "$HOME/.config/nvm" ]]; then
+  echo "Installing nvm (Node Version Manager)..."
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+  # Move nvm to XDG config directory
+  if [[ -d "$HOME/.nvm" ]]; then
+    mkdir -p "$HOME/.config"
+    mv "$HOME/.nvm" "$HOME/.config/nvm"
+  fi
+  
+  # Install latest LTS Node.js and set as default (run once during installation)
+  echo "Installing latest LTS Node.js and setting as default..."
+  export NVM_DIR="$HOME/.config/nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  
+  nvm install --lts
+  nvm use --lts
+  nvm alias default node
+fi
+
 # Re-source Homebrew env just in case
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
