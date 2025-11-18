@@ -104,5 +104,13 @@ if [[ -d "./dotfiles/scripts/.local/bin" ]]; then
   chmod +x ./dotfiles/scripts/.local/bin/*
 fi
 
+# Install latest Python version as default with uv
+if command -v uv &>/dev/null; then
+  echo "Installing latest Python version as default with uv..."
+  uv python install --default
+else
+  echo "Warning: uv not found, skipping Python installation"
+fi
+
 # Optionally restart the shell
 exec zsh -l

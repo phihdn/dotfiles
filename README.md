@@ -55,7 +55,7 @@ This will:
 - **neovim** — Modern Vim-based editor with Lua config
 - **lazygit**, **lazydocker** — TUI for Git and Docker
 - **kubectl**, **k9s**, **helm** — Kubernetes tools
-- **pyenv**, **go**, **rust** — Language version managers
+- **uv**, **go**, **rust** — Language version managers and package installers
 - **wakatime** — Development time tracking
 
 ### 💻 GUI Applications
@@ -121,6 +121,175 @@ stow -D nvim  # Remove nvim config
 ```bash
 stow -n -v nvim  # See what would be linked
 ```
+
+## 🐍🟢 Language Version Management
+
+This setup includes modern tools for managing Node.js and Python versions:
+
+### 📦 Node.js with nvm
+
+**nvm** (Node Version Manager) is automatically installed and configured for Node.js version management.
+
+#### Basic Usage
+```bash
+# List available Node.js versions
+nvm list-remote
+
+# Install latest LTS version
+nvm install --lts
+
+# Install specific version
+nvm install 18.19.0
+
+# Use specific version
+nvm use 18.19.0
+
+# Set default version
+nvm alias default 18.19.0
+
+# List installed versions
+nvm list
+
+# Install packages globally for current version
+npm install -g pnpm yarn typescript
+```
+
+#### Project-specific Node versions
+```bash
+# Create .nvmrc file in project root
+echo "18.19.0" > .nvmrc
+
+# Use version from .nvmrc
+nvm use
+
+# Auto-switch when entering directory (add to shell config)
+cd my-project  # Automatically switches to .nvmrc version
+```
+
+### 🐍 Python with uv
+
+**uv** is a fast Python package installer and resolver that replaces pip, pip-tools, and virtualenv.
+
+#### Basic Usage
+```bash
+# Install Python versions
+uv python install 3.12
+uv python install 3.11
+
+# List installed Python versions
+uv python list
+
+# Create new project with virtual environment
+uv init my-python-project
+cd my-python-project
+
+# Add dependencies
+uv add requests pandas numpy
+uv add pytest --dev  # Development dependency
+
+# Install dependencies from pyproject.toml
+uv sync
+
+# Run Python with project environment
+uv run python script.py
+uv run pytest
+
+# Activate virtual environment manually
+source .venv/bin/activate  # or use uv shell
+```
+
+#### Advanced uv Usage
+```bash
+# Create project with specific Python version
+uv init --python 3.11 my-project
+
+# Add dependency with version constraint
+uv add "django>=4.0,<5.0"
+
+# Update dependencies
+uv lock --upgrade
+
+# Export requirements.txt (for compatibility)
+uv export --format requirements-txt --output-file requirements.txt
+
+# Run commands in virtual environment
+uv run --python 3.12 python script.py
+
+# Install package globally
+uv tool install black
+uv tool install ruff
+
+# List global tools
+uv tool list
+```
+
+#### Project Structure with uv
+```
+my-python-project/
+├── pyproject.toml     # Project metadata and dependencies
+├── uv.lock           # Lockfile with exact versions
+├── .venv/            # Virtual environment (auto-created)
+├── src/
+│   └── my_package/
+└── tests/
+```
+
+#### Migration from pip/pipenv/poetry
+```bash
+# From requirements.txt
+uv add -r requirements.txt
+
+# From Pipfile
+uv add $(cat Pipfile | grep -E '^[a-zA-Z]' | cut -d' ' -f1)
+
+# From poetry (copy dependencies from pyproject.toml)
+uv add package1 package2 package3
+```
+
+### 🔄 Switching Between Versions
+
+#### Node.js Version Switching
+```bash
+# Quick version switching
+nvm use 16    # Switch to Node 16
+nvm use 18    # Switch to Node 18
+nvm use node  # Switch to latest
+
+# Project-based switching (with .nvmrc)
+echo "18.19.0" > .nvmrc
+nvm use  # Uses version from .nvmrc
+```
+
+#### Python Version Switching
+```bash
+# Project-specific Python (via pyproject.toml)
+[tool.uv]
+python = "3.11"
+
+# Or specify when creating project
+uv init --python 3.11 my-project
+
+# Run with specific Python version
+uv run --python 3.12 python script.py
+```
+
+### 💡 Pro Tips
+
+#### Node.js Tips
+- Use `.nvmrc` files for consistent Node versions across team
+- Install global packages after switching Node versions
+- Use `nvm alias` to create shortcuts for frequently used versions
+
+#### Python Tips  
+- Use `uv sync` to ensure dependencies match lockfile exactly
+- Leverage `uv run` to avoid manual virtual environment activation
+- Use `uv tool install` for global Python tools (black, ruff, etc.)
+- Pin Python versions in `pyproject.toml` for team consistency
+
+#### Performance
+- **uv is 10-100x faster** than pip for package installation
+- **nvm** provides instant Node.js version switching
+- Both tools cache downloads for faster subsequent installs
 
 ## 📋 Available Packages
 

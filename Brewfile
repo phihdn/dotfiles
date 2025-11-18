@@ -57,9 +57,8 @@ brew "lsd"  # ls deluxe
 # -----------------------------------------------------------------------------
 brew "go"
 brew "rust"
-brew "pyenv"
-brew "pyenv-virtualenv"
-# Note: nvm for Node.js is installed via bootstrap.sh, pyenv for Python
+brew "uv"  # Fast Python package installer and resolver
+# Note: nvm for Node.js is installed via bootstrap.sh, uv for Python
 
 # Cloud & DevOps
 # -----------------------------------------------------------------------------
@@ -104,8 +103,7 @@ cask "figma"       # Design tool
 # Terminals
 cask "wezterm"     # GPU-accelerated terminal
 cask "ghostty"     # Fast terminal (if available)
-# cask "alacritty"   # Alternative terminal
-# cask "kitty"       # Alternative terminal
+cask "kitty"       # Alternative terminal
 
 # Browsers
 cask "google-chrome"
@@ -140,7 +138,7 @@ brew "openssl"
 # brew "postgresql", restart_service: true
 # brew "redis", restart_service: true
 # brew "node"  # Use nvm instead
-# brew "python"  # Use pyenv instead
+# brew "python"  # Use uv instead
 # brew "yarn"
 # brew "hugo"
 # brew "golang-migrate"
