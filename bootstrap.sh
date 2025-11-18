@@ -17,11 +17,11 @@ PACKAGES=(
   "neofetch"
   "nvim"
   "scripts"
-#   "sesh"
-#   "starship"
-#   "tmux"
-#   "wakatime"
-#   "wezterm"
+  "sesh"
+  "starship"
+  "tmux"
+  "wakatime"
+  "wezterm"
   "zsh"
 )
 
@@ -77,6 +77,12 @@ for package in "${PACKAGES[@]}"; do
     echo "Warning: Package $package not found, skipping..."
   fi
 done
+
+# Make scripts executable
+if [[ -d "./dotfiles/scripts/.local/bin" ]]; then
+  echo "Making scripts executable..."
+  chmod +x ./dotfiles/scripts/.local/bin/*
+fi
 
 # Optionally restart the shell
 exec zsh -l
