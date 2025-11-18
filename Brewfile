@@ -8,6 +8,8 @@ tap "jesseduffield/lazygit"
 tap "arl/arl"  # for gitmux
 tap "jorgerojas26/lazysql" # Lazysql
 tap "nikitabobko/tap" # AeroSpace
+tap "FelixKratz/formulae" # Sketchybar and JankyBorders
+
 
 # Essential CLI Tools
 # -----------------------------------------------------------------------------
@@ -88,7 +90,9 @@ brew "joshmedeski/sesh/sesh"
 # -----------------------------------------------------------------------------
 
 # Window Management
-cask "nikitabobko/tap/aerospace"  # Tiling window manager
+cask "aerospace"  # Tiling window manager
+brew "felixkratz/formulae/borders" # JankyBorders
+brew "felixkratz/formulae/sketchybar" # SketchyBar
 
 # Productivity
 cask "raycast"     # Spotlight replacement
