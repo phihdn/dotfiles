@@ -1,3 +1,0 @@
-$DOTFILES/git/conf/gitconfig=$HOME/.gitconfig
-$DOTFILES/git/conf/.gitconfig-personal=$HOME/.gitconfig-personal
-$DOTFILES/git/conf/.gitconfig-work=$HOME/.gitconfig-work

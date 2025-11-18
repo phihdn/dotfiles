@@ -1,8 +1,47 @@
+# macOS
 .DS_Store
-tmux/conf/plugins
-*/*.Brewfile.lock.json
-nvim/conf/*lock.json
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.backup
+*.bak
+*~
 *.bk
-wakatime/wakatime.cfg
-.idea
-nvim/confbk
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE files
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Environment files (may contain secrets)
+.env
+.env.local
+
+# Generated config files from templates (may contain secrets)
+dotfiles/wakatime/.wakatime.cfg
+
+# Homebrew
+Brewfile.lock.json
+*/*.Brewfile.lock.json
+
+# Personal files that shouldn't be shared
+personal/
+private/
+
+dotfiles/nvim/conf/*lock.json
+
+# k9s
+dotfiles/k9s/.config/k9s/benchmarks/*
+dotfiles/k9s/.config/k9s/clusters/*
+dotfiles/k9s/.config/k9s/screen-dumps/*

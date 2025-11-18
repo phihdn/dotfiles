@@ -1,0 +1,40 @@
+# Global stow ignore patterns
+# These patterns apply to all stow packages
+
+# Template files
+\.tpl$
+\.template$
+\.example$
+
+# Backup files
+\.backup$
+\.bak$
+*~
+
+# Temporary files
+\.tmp$
+\.temp$
+\.swp$
+\.swo$
+
+# macOS files
+\.DS_Store$
+\.DS_Store\?$
+\._.*$
+
+# Version control
+\.git$
+\.gitignore$
+\.gitkeep$
+
+# Documentation that shouldn't be linked
+README.*$
+CHANGELOG.*$
+LICENSE.*$
+
+# Log files
+\.log$
+
+# Editor files
+\.vscode$
+\.idea$
