@@ -3,7 +3,15 @@
 
 # You can use it to add commands that run after AeroSpace startup.
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
-after-startup-command = []
+after-startup-command = [
+    "exec-and-forget sketchybar",
+    "exec-and-forget borders"
+]
+
+# Notify Sketchybar about workspace change
+exec-on-workspace-change = ['/bin/bash', '-c',
+    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+]
 
 # Start AeroSpace at login
 start-at-login = true
@@ -55,7 +63,7 @@ automatically-unhide-macos-hidden-apps = false
     inner.vertical =   10
     outer.left =       10
     outer.bottom =     10
-    outer.top =        10
+    outer.top =        50
     outer.right =      10
 
 # 'main' binding mode declaration
@@ -219,26 +227,26 @@ run = "move-node-to-workspace 4"
 if.app-id = 'com.apple.Notes'
 run = "move-node-to-workspace 4"
 
-# 5 for work browser and slack
+# 6 for work browser and slack
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome'
-run = "move-node-to-workspace 5"
+run = "move-node-to-workspace 6"
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
-run = "move-node-to-workspace 5"
+run = "move-node-to-workspace 6"
 
-# 6 for work tools like tableplus and postman
+# 7 for work tools like tableplus and postman
 [[on-window-detected]]
 if.app-id = 'com.tinyapp.TablePlus'
-run = "move-node-to-workspace 6"
+run = "move-node-to-workspace 7"
 [[on-window-detected]]
 if.app-id = 'com.postmanlabs.mac'
-run = "move-node-to-workspace 6"
+run = "move-node-to-workspace 7"
 
-# 7 for work code editor like cursor and vscode
+# 8 for work code editor like cursor and vscode
 [[on-window-detected]]
 if.app-id = 'com.microsoft.VSCode'
-run = "move-node-to-workspace 7"
+run = "move-node-to-workspace 8"
 [[on-window-detected]]
 if.app-id = 'com.cursor.app'
-run = "move-node-to-workspace 7"
+run = "move-node-to-workspace 8"

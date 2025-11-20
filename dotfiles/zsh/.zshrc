@@ -106,7 +106,7 @@ alias s.="sesh connect ."
 
 # Lazy load nvm (only when needed)
 _lazy_load_nvm() {
-  unset -f nvm node npm npx
+  unset -f _lazy_load_nvm nvm node npm npx
   export NVM_DIR="$HOME/.config/nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
@@ -121,7 +121,7 @@ npx() { _lazy_load_nvm && npx "$@" }
 # Lazy load uv (only when needed)
 _lazy_load_uv() {
   if command -v uv &> /dev/null; then
-    unset -f _lazy_load_uv
+    unset -f _lazy_load_uv uv
     eval "$(uv generate-shell-completion zsh)"
     export PATH="$HOME/.local/bin:$PATH"
   fi
@@ -141,4 +141,12 @@ if command -v zoxide &> /dev/null; then
   eval "$(zoxide init zsh)"
 fi
 
-eval "$(starship init zsh)"
+# Cursor Agent compatibility - disable complex prompts when running in agent mode
+if [[ -n "$CURSOR_AGENT" ]]; then
+  # Simple prompt for Cursor Agent
+  export PS1='$ '
+  # Skip starship initialization
+else
+  # Initialize starship for interactive sessions
+  eval "$(starship init zsh)"
+fi

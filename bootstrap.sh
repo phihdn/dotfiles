@@ -61,6 +61,8 @@ PACKAGES=(
   "scripts"
   "sesh"
   "starship"
+  "sketchybar"
+  "yankyborders"
   "tmux"
   "wakatime"
   "wezterm"
@@ -207,6 +209,12 @@ else
 fi
 
 log_section "Installing Dotfiles Configuration"
+
+# Clean up macOS metadata files that can cause stow conflicts
+log_step "Cleaning up macOS metadata files"
+if find ./dotfiles -name ".DS_Store" -type f -delete 2>/dev/null; then
+  log_info "Removed .DS_Store files to prevent stow conflicts"
+fi
 
 # Use GNU Stow to symlink dotfiles
 log_info "Setting up dotfiles with GNU Stow..."

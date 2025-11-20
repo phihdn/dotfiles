@@ -18,9 +18,11 @@
 \.swo$
 
 # macOS files
-\.DS_Store$
-\.DS_Store\?$
-\._.*$
+\.DS_Store
+\.DS_Store\?
+\._.*
+.DS_Store
+.DS_Store?
 
 # Version control
 \.git$
