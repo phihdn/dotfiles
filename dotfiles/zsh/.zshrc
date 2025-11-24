@@ -29,8 +29,16 @@ fi
 # ============================================================================
 
 # Fast syntax highlighting (turbo mode)
+# Load kubectl completion after compinit is initialized
+_load_kubectl_completion() {
+  if [[ $commands[kubectl] ]] && (( $+functions[compdef] )); then
+    source <(kubectl completion zsh) 2>/dev/null
+  fi
+}
+
 zinit wait lucid for \
   atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
+  atload"_load_kubectl_completion" \
     zdharma-continuum/fast-syntax-highlighting \
   atload"!_zsh_autosuggest_start" \
     zsh-users/zsh-autosuggestions \
@@ -140,9 +148,6 @@ fi
 if command -v zoxide &> /dev/null; then
   eval "$(zoxide init zsh)"
 fi
-
-# kubectl completion
-[[ $commands[kubectl] ]] && source <(kubectl completion zsh)
 
 # Cursor Agent compatibility - disable complex prompts when running in agent mode
 if [[ -n "$CURSOR_AGENT" ]]; then
