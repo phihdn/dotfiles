@@ -141,6 +141,9 @@ if command -v zoxide &> /dev/null; then
   eval "$(zoxide init zsh)"
 fi
 
+# kubectl completion
+[[ $commands[kubectl] ]] && source <(kubectl completion zsh)
+
 # Cursor Agent compatibility - disable complex prompts when running in agent mode
 if [[ -n "$CURSOR_AGENT" ]]; then
   # Simple prompt for Cursor Agent

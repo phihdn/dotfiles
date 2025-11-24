@@ -62,7 +62,7 @@ PACKAGES=(
   "sesh"
   "starship"
   "sketchybar"
-  "yankyborders"
+  "jankyborders"
   "tmux"
   "wakatime"
   "wezterm"
