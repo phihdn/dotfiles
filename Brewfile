@@ -47,7 +47,7 @@ brew "lazysql"
 # Shell & Terminal
 # -----------------------------------------------------------------------------
 brew "zsh"
-brew "fish"
+# brew "fish"
 brew "starship"  # Cross-shell prompt
 brew "zoxide"    # Smart cd
 
@@ -70,7 +70,8 @@ brew "k9s"
 brew "k3sup"
 brew "helm"
 brew "ansible"
-brew "docker"
+# brew "docker"
+cask "gcloud-cli"
 brew "awscli"
 brew "tailscale"
 
@@ -101,7 +102,8 @@ cask "1password-cli"
 
 # Development
 cask "visual-studio-code"
-cask "docker-desktop"
+# cask "docker-desktop"
+cask "rancher"
 cask "postman"     # API testing
 cask "figma"       # Design tool
 
@@ -142,8 +144,8 @@ brew "openssl"
 # -----------------------------------------------------------------------------
 # brew "postgresql", restart_service: true
 # brew "redis", restart_service: true
-# brew "node"  # Use nvm instead
-# brew "python"  # Use uv instead
+brew "node"  # Use nvm instead
+brew "python"  # Use uv instead
 # brew "yarn"
 # brew "hugo"
 # brew "golang-migrate"

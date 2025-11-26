@@ -108,6 +108,9 @@ alias lt="lsd --group-dirs last -A --tree"
 alias s="sesh_start"
 alias s.="sesh connect ."
 
+# Kubernetes aliases
+alias k="kubectl"
+
 # ============================================================================
 # LAZY LOADING FUNCTIONS
 # ============================================================================
