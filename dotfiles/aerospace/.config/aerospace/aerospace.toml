@@ -242,11 +242,14 @@ run = "move-node-to-workspace 7"
 [[on-window-detected]]
 if.app-id = 'com.postmanlabs.mac'
 run = "move-node-to-workspace 7"
+[[on-window-detected]]
+if.app-id = 'com.sublimemerge'
+run = "move-node-to-workspace 7"
 
 # 8 for work code editor like cursor and vscode
 [[on-window-detected]]
 if.app-id = 'com.microsoft.VSCode'
 run = "move-node-to-workspace 8"
 [[on-window-detected]]
-if.app-id = 'com.cursor.app'
+if.app-id = 'com.todesktop.230313mzl4w4u92'
 run = "move-node-to-workspace 8"
