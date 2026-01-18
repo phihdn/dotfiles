@@ -52,10 +52,19 @@ zinit wait lucid for \
 export GIT_EDITOR=vim
 export EDITOR=vim
 
+# Local binaries (user scripts)
+export PATH="$HOME/.local/bin:$PATH"
+
 # GNU coreutils (ls, cat, etc.)
 export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 # GNU findutils (find, xargs, etc.)
 export PATH="/opt/homebrew/opt/findutils/libexec/gnubin:$PATH"
+
+# Bun JavaScript runtime
+export PATH="$HOME/.bun/bin:$PATH"
+
+# Python (Homebrew)
+export PATH="/opt/homebrew/opt/python/libexec/bin:$PATH"
 
 export XDG_CONFIG_HOME="$HOME/.config"
 export K9S_CONFIG_DIR="$XDG_CONFIG_HOME/k9s"
@@ -110,6 +119,12 @@ alias s.="sesh connect ."
 
 # Kubernetes aliases
 alias k="kubectl"
+alias kc="kubectl config current-context"
+alias kctx="kubectl config use-context"
+alias kns="kubectl config set-context --current --namespace"
+alias kp="kubectl port-forward"
+alias kpf="kubectl port-forward service"
+alias kpf="kubectl port-forward service"
 
 # ============================================================================
 # LAZY LOADING FUNCTIONS
@@ -161,3 +176,8 @@ else
   # Initialize starship for interactive sessions
   eval "$(starship init zsh)"
 fi
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/phihdn/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+export KUBECONFIG=~/.kube/config:~/.kube/config-k3s-homelab

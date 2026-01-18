@@ -9,7 +9,7 @@ tap "arl/arl"  # for gitmux
 tap "jorgerojas26/lazysql" # Lazysql
 tap "nikitabobko/tap" # AeroSpace
 tap "FelixKratz/formulae" # Sketchybar and JankyBorders
-
+tap "oven-sh/bun"  # Bun JavaScript runtime
 
 # Essential CLI Tools
 # -----------------------------------------------------------------------------
@@ -60,6 +60,7 @@ brew "lsd"  # ls deluxe
 # -----------------------------------------------------------------------------
 brew "go"
 brew "rust"
+brew "oven-sh/bun/bun"  # Fast JavaScript runtime, bundler, and package manager
 brew "uv"  # Fast Python package installer and resolver
 # Note: nvm for Node.js is installed via bootstrap.sh, uv for Python
 
@@ -97,15 +98,17 @@ brew "felixkratz/formulae/sketchybar" # SketchyBar
 
 # Productivity
 cask "raycast"     # Spotlight replacement
+cask "claude"      # Claude Desktop
 cask "1password"   # Password manager
 cask "1password-cli"
 
 # Development
 cask "visual-studio-code"
+cask "claude-code" # Claude Code assistant
 # cask "docker-desktop"
 cask "rancher"
 cask "postman"     # API testing
-cask "figma"       # Design tool
+cask "bruno"
 
 # Terminals
 cask "wezterm"     # GPU-accelerated terminal

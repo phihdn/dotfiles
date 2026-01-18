@@ -190,6 +190,15 @@ run = "layout floating"
 [[on-window-detected]]
 if.app-id = 'com.macpaw.CleanMyMac4'
 run = "layout floating"
+[[on-window-detected]]
+if.app-id = 'com.elgato.WaveLink'
+run = "layout floating"
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = "layout floating"
+[[on-window-detected]]
+if.app-id = 'com.anthropic.claudefordesktop'
+run = "layout floating"
 
 # 1 for terminal
 [[on-window-detected]]
@@ -244,6 +253,9 @@ if.app-id = 'com.postmanlabs.mac'
 run = "move-node-to-workspace 7"
 [[on-window-detected]]
 if.app-id = 'com.sublimemerge'
+run = "move-node-to-workspace 7"
+[[on-window-detected]]
+if.app-id = 'com.usebruno.app'
 run = "move-node-to-workspace 7"
 
 # 8 for work code editor like cursor and vscode

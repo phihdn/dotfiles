@@ -53,6 +53,12 @@ cleanup_packages() {
     brew bundle cleanup --file="$BREWFILE" --force
 }
 
+# Function to cleanup Homebrew cache (downloads, old versions)
+cleanup_cache() {
+    echo -e "${BLUE}🗑️  Cleaning Homebrew cache (downloads older than 1 day)...${NC}"
+    brew cleanup --prune=1 -s
+}
+
 # Main execution
 case "${1:-sync}" in
     "preview"|"--preview"|"-p")
@@ -97,7 +103,22 @@ case "${1:-sync}" in
         install_packages
         echo ""
         cleanup_packages
+        echo ""
+        cleanup_cache
         echo -e "${GREEN}✅ Force synchronization completed${NC}"
+        ;;
+    "cache"|"--cache")
+        echo -e "${BLUE}🔍 Preview cache cleanup:${NC}"
+        brew cleanup --prune=1 -s -n
+        echo ""
+        read -p "Do you want to proceed with cache cleanup? (y/N): " -n 1 -r
+        echo ""
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            cleanup_cache
+            echo -e "${GREEN}✅ Cache cleanup completed${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Cache cleanup cancelled${NC}"
+        fi
         ;;
     "help"|"--help"|"-h")
         echo "Usage: brew-sync [COMMAND]"
@@ -107,12 +128,14 @@ case "${1:-sync}" in
         echo "  preview, -p  Show what packages would be removed"
         echo "  install, -i  Only install packages from Brewfile"
         echo "  cleanup, -c  Only cleanup packages not in Brewfile"
-        echo "  force, -f    Install and cleanup without prompting"
+        echo "  cache        Clean Homebrew cache (old downloads, scrub cache)"
+        echo "  force, -f    Install, cleanup packages, and clean cache"
         echo "  help, -h     Show this help message"
         echo ""
         echo "Examples:"
         echo "  brew-sync           # Install and prompt for cleanup"
         echo "  brew-sync preview   # See what would be removed"
+        echo "  brew-sync cache     # Clean download cache (frees disk space)"
         echo "  brew-sync force     # Install and cleanup automatically"
         ;;
     *)

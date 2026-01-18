@@ -81,3 +81,4 @@ keybind = super+l=text:\x01\x4c
 keybind = super+s=text:\x1b\x3a\x77\x0a
 # <Esc><Space>ff (open file by telescope)
 keybind = super+p=text:\x1b\x20\x66\x66
+keybind = shift+enter=text:\x1b\r
