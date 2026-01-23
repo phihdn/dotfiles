@@ -47,7 +47,7 @@ brew "lazysql"
 # Shell & Terminal
 # -----------------------------------------------------------------------------
 brew "zsh"
-# brew "fish"
+brew "fish"
 brew "starship"  # Cross-shell prompt
 brew "zoxide"    # Smart cd
 
