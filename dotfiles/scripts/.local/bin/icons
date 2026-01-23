@@ -72,6 +72,8 @@ switch $argv[1]
         echo 
     case tmux
         echo 
+    case claude
+        echo 󰚩
     case youtube-dl
         echo 
 end
