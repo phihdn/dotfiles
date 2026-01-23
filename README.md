@@ -6,13 +6,13 @@ A lean, modern development environment for macOS that brings the best terminal-f
 
 ## ✨ Core Features
 
-* 🚀 **Zsh** with modern configuration and plugins
-* 🧠 **Raycast** — fast launcher & automation  
+* 🐟 **Fish shell** — user-friendly shell with great defaults (default)
+* 🧠 **Raycast** — fast launcher & automation
 * 🪟 **AeroSpace** — tiling window management (like i3, for Mac)
 * 🧑‍💻 **Neovim** — full-featured, modern editor configuration
 * 🖋️ **GNU Stow** — simple, modular dotfile management
 * 🧰 **Essential CLI tools** — ripgrep, fzf, bat, eza, and more
-* 🐟 **Fish shell** — user-friendly shell with great defaults
+* 🚀 **Zsh** — alternative shell with Zinit plugins
 * 🌟 **Starship** — beautiful, fast cross-shell prompt
 
 ## 🎯 Philosophy
@@ -35,9 +35,11 @@ This will:
 1. Install Xcode CLI tools (if needed)
 2. Install Homebrew (if needed)
 3. Install packages from Brewfile
-4. Install Zap ZSH plugin manager
+4. Install Zinit (Zsh plugin manager)
 5. Inject 1Password secrets (if available)
 6. Symlink all dotfiles with GNU Stow
+
+**Note:** After bootstrap, run `chsh -s $(which fish)` to set Fish as default shell.
 
 ## 📦 What Gets Installed
 

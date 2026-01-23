@@ -31,10 +31,11 @@ brew-sync force    # Full sync, no prompts
 - `PACKAGES` array in `bootstrap.sh` defines install order
 
 ### Key Integrations
-- **Shell**: Zsh + Zinit plugin manager + Starship prompt
+- **Shell**: Fish (default) + Fisher plugin manager + Starship prompt
+- **Alt Shell**: Zsh + Zinit available as fallback
 - **Window Management**: AeroSpace + JankyBorders + SketchyBar
 - **Git**: 1Password SSH signing, conditional includes for `~/ws/work/` vs `~/ws/personal/`
-- **Node.js**: nvm at `~/.config/nvm` (non-standard XDG location)
+- **Node.js**: nvm.fish plugin (`~/.local/share/nvm/`)
 - **Python**: uv for package/version management
 
 ### Secrets
