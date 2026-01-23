@@ -287,10 +287,31 @@ else
   log_info "Install uv manually if you need Python version management"
 fi
 
+log_section "Setting Default Shell"
+
+# Set fish as default shell
+log_step "Setting fish as default shell"
+FISH_PATH=$(which fish)
+if [[ -n "$FISH_PATH" ]]; then
+  if ! grep -q "$FISH_PATH" /etc/shells; then
+    log_info "Adding fish to /etc/shells..."
+    echo "$FISH_PATH" | sudo tee -a /etc/shells
+  fi
+  if [[ "$SHELL" != "$FISH_PATH" ]]; then
+    log_info "Changing default shell to fish..."
+    chsh -s "$FISH_PATH"
+    log_success "Default shell changed to fish"
+  else
+    log_success "Fish is already the default shell"
+  fi
+else
+  log_warn "Fish not found, keeping current shell"
+fi
+
 log_section "Bootstrap Complete"
 
 log_success "Dotfiles bootstrap completed successfully!"
-log_info "Restarting shell to apply all configurations..."
+log_info "Starting fish shell..."
 
-# Restart the shell to apply all configurations
-exec zsh -l
+# Start fish shell
+exec fish -l
