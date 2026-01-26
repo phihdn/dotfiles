@@ -308,6 +308,22 @@ else
   log_warn "Fish not found, keeping current shell"
 fi
 
+log_section "Setting Up Shell Completions"
+
+# Generate kubectl completions for fish
+log_step "Generating kubectl completions for fish"
+if command -v kubectl &>/dev/null && command -v fish &>/dev/null; then
+  FISH_COMPLETIONS_DIR="$HOME/.config/fish/completions"
+  mkdir -p "$FISH_COMPLETIONS_DIR"
+  if kubectl completion fish > "$FISH_COMPLETIONS_DIR/kubectl.fish"; then
+    log_success "kubectl completions generated for fish"
+  else
+    log_warn "Failed to generate kubectl completions"
+  fi
+else
+  log_info "kubectl or fish not found, skipping completions"
+fi
+
 log_section "Bootstrap Complete"
 
 log_success "Dotfiles bootstrap completed successfully!"

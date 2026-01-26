@@ -35,6 +35,6 @@ if test -d $HOME/.cache/lm-studio/bin
 end
 
 # Kubernetes config
-if test -f ~/.kube/config-k3s-homelab
-    set -gx KUBECONFIG ~/.kube/config:~/.kube/config-k3s-homelab
+if test -f $HOME/.kube/config-k3s-homelab
+    set -gx KUBECONFIG $HOME/.kube/config:$HOME/.kube/config-k3s-homelab
 end

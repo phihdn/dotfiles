@@ -5,6 +5,7 @@
 set -U fish_greeting
 
 # Environment
+set -gx SHELL /opt/homebrew/bin/fish
 set -gx EDITOR nvim
 set -gx VISUAL nvim
 set -gx LANG en_US.UTF-8
