@@ -5,9 +5,16 @@ set -euo pipefail
 # ============================================================================
 # DOTFILES BOOTSTRAP SCRIPT
 # ============================================================================
-# This script sets up a complete development environment by installing
-# necessary tools and symlinking dotfiles using GNU Stow.
+# Sets up a complete development environment by installing the necessary
+# tools and applying dotfiles with chezmoi.
+#
+# This repository IS the chezmoi source. A `.chezmoiroot` file points chezmoi
+# at the `home/` subdirectory, which mirrors $HOME using chezmoi's naming
+# conventions (dot_, executable_, private_, *.tmpl).
 # ============================================================================
+
+# Absolute path to this repository (chezmoi source directory)
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Color codes for output formatting
 readonly RED='\033[0;31m'
@@ -43,31 +50,6 @@ log_section() {
 log_step() {
     echo -e "${BLUE}  →${NC} $1"
 }
-
-# Centralized list of dotfiles packages
-PACKAGES=(
-  "1password"
-  "aerospace"
-  "bat"
-  "git"
-  "ghostty"
-  "k9s"
-  "kitty"
-  "lazygit"
-  "lf"
-  "lsd"
-  "neofetch"
-  "nvim"
-  "scripts"
-  "sesh"
-  "starship"
-  "sketchybar"
-  "jankyborders"
-  "tmux"
-  "wakatime"
-  "wezterm"
-  "zsh"
-)
 
 log_section "Installing Development Prerequisites"
 
@@ -108,15 +90,15 @@ fi
 
 log_section "Installing Applications and Dependencies"
 
-# Install applications via Brewfile and cleanup unlisted packages
+# Install applications via Brewfile (includes chezmoi) and cleanup unlisted packages
 log_step "Checking for Brewfile"
-if [[ -f ./Brewfile ]]; then
+if [[ -f "${REPO_DIR}/Brewfile" ]]; then
   log_info "Installing applications from Brewfile..."
-  if brew bundle --file=./Brewfile; then
+  if brew bundle --file="${REPO_DIR}/Brewfile"; then
     log_success "Applications installed successfully from Brewfile"
-    
+
     log_step "Cleaning up packages not listed in Brewfile"
-    if brew bundle cleanup --file=./Brewfile --force; then
+    if brew bundle cleanup --file="${REPO_DIR}/Brewfile" --force; then
       log_success "Package cleanup completed"
     else
       log_warn "Package cleanup encountered issues (non-critical)"
@@ -126,24 +108,50 @@ if [[ -f ./Brewfile ]]; then
     exit 1
   fi
 else
-  log_error "Brewfile not found in current directory"
-  log_info "Please ensure you're running this script from the dotfiles root directory"
+  log_error "Brewfile not found in repository directory"
   exit 1
+fi
+
+# Re-source Homebrew env so freshly installed tools (chezmoi, op) are on PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+log_section "Applying Dotfiles with chezmoi"
+
+log_step "Verifying chezmoi is installed"
+if ! command -v chezmoi &>/dev/null; then
+  log_error "chezmoi not found on PATH after Brewfile install"
+  exit 1
+fi
+
+# Point chezmoi at this repository as its source directory. The repo's
+# .chezmoiroot file makes chezmoi use the home/ subdirectory automatically.
+log_step "Configuring chezmoi source directory: ${REPO_DIR}"
+mkdir -p "${HOME}/.config/chezmoi"
+cat > "${HOME}/.config/chezmoi/chezmoi.toml" <<EOF
+sourceDir = "${REPO_DIR}"
+EOF
+
+# The wakatime config template resolves a secret via the 1Password CLI. If op
+# is not signed in yet, that single file will fail; the rest still applies and
+# you can re-run "chezmoi apply" after signing in.
+log_step "Applying dotfiles (chezmoi apply)"
+if chezmoi apply --source "${REPO_DIR}"; then
+  log_success "Dotfiles applied successfully"
+else
+  log_warn "chezmoi apply reported errors (often a not-signed-in 1Password CLI)."
+  log_warn "Sign in with 'eval \$(op signin)' and re-run 'chezmoi apply'."
 fi
 
 log_section "Setting Up Shell Environment"
 
-# Install Zinit ZSH plugin manager
+# Install Zinit ZSH plugin manager (zsh is the alternative shell)
 log_step "Checking for Zinit ZSH plugin manager"
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 if [[ ! -d "$ZINIT_HOME" ]]; then
   log_info "Installing Zinit plugin manager..."
-  if bash -c "$(curl --fail --show-error --silent --location https://github.com/zdharma-continuum/zinit/raw/refs/heads/main/scripts/install.sh)"; then
+  mkdir -p "$(dirname "$ZINIT_HOME")"
+  if git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"; then
     log_success "Zinit installed successfully"
-    
-    log_step "Removing default .zshrc to allow stow management"
-    rm -f ~/.zshrc
-    log_info "Default .zshrc removed (will be managed by stow)"
   else
     log_error "Failed to install Zinit plugin manager"
     exit 1
@@ -158,7 +166,7 @@ if [[ ! -d "$HOME/.config/nvm" ]]; then
   log_info "Installing nvm (Node Version Manager)..."
   if curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash; then
     log_success "nvm installed successfully"
-    
+
     # Move nvm to XDG config directory
     if [[ -d "$HOME/.nvm" ]]; then
       log_step "Moving nvm to XDG config directory"
@@ -166,12 +174,12 @@ if [[ ! -d "$HOME/.config/nvm" ]]; then
       mv "$HOME/.nvm" "$HOME/.config/nvm"
       log_info "nvm moved to $HOME/.config/nvm"
     fi
-    
+
     # Install latest LTS Node.js and set as default (run once during installation)
     log_step "Installing latest LTS Node.js and setting as default"
     export NVM_DIR="$HOME/.config/nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    
+
     if nvm install --lts && nvm use --lts && nvm alias default node; then
       log_success "Latest LTS Node.js installed and set as default"
     else
@@ -183,92 +191,6 @@ if [[ ! -d "$HOME/.config/nvm" ]]; then
   fi
 else
   log_success "nvm already installed"
-fi
-
-log_section "Configuring Secrets and Environment"
-
-# Re-source Homebrew env just in case
-log_step "Re-sourcing Homebrew environment"
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# Inject 1Password secrets if available
-log_step "Checking for 1Password CLI and secret templates"
-if command -v op &>/dev/null && [[ -f ./dotfiles/wakatime/wakatime.cfg.tpl ]]; then
-  log_info "Injecting 1Password secrets into configuration files..."
-  if op inject -i ./dotfiles/wakatime/wakatime.cfg.tpl -o ./dotfiles/wakatime/.wakatime.cfg; then
-    log_success "1Password secrets injected successfully"
-  else
-    log_warn "Failed to inject 1Password secrets (may need manual configuration)"
-  fi
-else
-  if ! command -v op &>/dev/null; then
-    log_info "1Password CLI not available, skipping secret injection"
-  else
-    log_info "No secret templates found, skipping secret injection"
-  fi
-fi
-
-log_section "Installing Dotfiles Configuration"
-
-# Clean up macOS metadata files that can cause stow conflicts
-log_step "Cleaning up macOS metadata files"
-if find ./dotfiles -name ".DS_Store" -type f -delete 2>/dev/null; then
-  log_info "Removed .DS_Store files to prevent stow conflicts"
-fi
-
-# Use GNU Stow to symlink dotfiles
-log_info "Setting up dotfiles with GNU Stow..."
-package_count=0
-installed_count=0
-
-for package in "${PACKAGES[@]}"; do
-  ((package_count++))
-  log_step "Processing package: $package ($package_count/${#PACKAGES[@]})"
-  
-  if [[ -d "./dotfiles/$package" ]]; then
-    if stow --target="$HOME" --dir=./dotfiles "$package"; then
-      log_success "Package '$package' installed successfully"
-      ((installed_count++))
-    else
-      log_error "Failed to install package '$package'"
-      exit 1
-    fi
-  else
-    log_warn "Package '$package' directory not found, skipping..."
-  fi
-done
-
-log_success "Dotfiles installation completed: $installed_count/$package_count packages installed"
-
-log_section "Configuring Scripts and Permissions"
-
-# Make scripts executable
-log_step "Checking for custom scripts directory"
-if [[ -d "./dotfiles/scripts/.local/bin" ]]; then
-  log_info "Making scripts executable..."
-  script_count=0
-  
-  for script in ./dotfiles/scripts/.local/bin/*; do
-    if [[ -f "$script" ]]; then
-      ((script_count++))
-      script_name=$(basename "$script")
-      log_step "Making '$script_name' executable"
-      
-      if chmod +x "$script"; then
-        log_info "✓ $script_name"
-      else
-        log_warn "Failed to make '$script_name' executable"
-      fi
-    fi
-  done
-  
-  if [[ $script_count -gt 0 ]]; then
-    log_success "$script_count scripts made executable"
-  else
-    log_info "No scripts found in directory"
-  fi
-else
-  log_info "Scripts directory not found, skipping..."
 fi
 
 log_section "Setting Up Python Environment"
@@ -284,7 +206,6 @@ if command -v uv &>/dev/null; then
   fi
 else
   log_info "uv not found, skipping Python installation"
-  log_info "Install uv manually if you need Python version management"
 fi
 
 log_section "Setting Default Shell"
@@ -327,6 +248,7 @@ fi
 log_section "Bootstrap Complete"
 
 log_success "Dotfiles bootstrap completed successfully!"
+log_info "Manage your dotfiles with: chezmoi diff | chezmoi apply | chezmoi edit <file>"
 log_info "Starting fish shell..."
 
 # Start fish shell

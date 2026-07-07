@@ -28,9 +28,6 @@ Thumbs.db
 .env
 .env.local
 
-# Generated config files from templates (may contain secrets)
-dotfiles/wakatime/.wakatime.cfg
-
 # Homebrew
 Brewfile.lock.json
 */*.Brewfile.lock.json
@@ -39,9 +36,9 @@ Brewfile.lock.json
 personal/
 private/
 
-dotfiles/nvim/.config/nvim/*lock.json
+home/dot_config/nvim/*lock.json
 
-# k9s
-dotfiles/k9s/.config/k9s/benchmarks/*
-dotfiles/k9s/.config/k9s/clusters/*
-dotfiles/k9s/.config/k9s/screen-dumps/*
+# k9s runtime state
+home/dot_config/k9s/benchmarks/*
+home/dot_config/k9s/clusters/*
+home/dot_config/k9s/screen-dumps/*

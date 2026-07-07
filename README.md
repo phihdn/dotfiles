@@ -10,7 +10,7 @@ A lean, modern development environment for macOS that brings the best terminal-f
 * 🧠 **Raycast** — fast launcher & automation
 * 🪟 **AeroSpace** — tiling window management (like i3, for Mac)
 * 🧑‍💻 **Neovim** — full-featured, modern editor configuration
-* 🖋️ **GNU Stow** — simple, modular dotfile management
+* 🖋️ **chezmoi** — declarative, template-aware dotfile management
 * 🧰 **Essential CLI tools** — ripgrep, fzf, bat, eza, and more
 * 🚀 **Zsh** — alternative shell with Zinit plugins
 * 🌟 **Starship** — beautiful, fast cross-shell prompt
@@ -34,12 +34,13 @@ cd ~/dotfiles
 This will:
 1. Install Xcode CLI tools (if needed)
 2. Install Homebrew (if needed)
-3. Install packages from Brewfile
-4. Install Zinit (Zsh plugin manager)
-5. Inject 1Password secrets (if available)
-6. Symlink all dotfiles with GNU Stow
+3. Install packages from Brewfile (including chezmoi)
+4. Point chezmoi's `sourceDir` at this repo and run `chezmoi apply`
+5. Install Zinit (Zsh plugin manager) and nvm
+6. Set Fish as the default shell
 
-**Note:** After bootstrap, run `chsh -s $(which fish)` to set Fish as default shell.
+Secrets (e.g. the WakaTime API key) are resolved from 1Password at apply time.
+If the `op` CLI isn't signed in yet, sign in and re-run `chezmoi apply`.
 
 ## 📦 What Gets Installed
 
@@ -49,7 +50,7 @@ This will:
 - **eza**, **fd**, **lsd** — Better ls and find alternatives
 - **htop**, **neofetch** — System monitoring and info
 - **tmux**, **sesh**, **starship** — Terminal multiplexer and prompt
-- **stow** — Dotfile management
+- **chezmoi** — Dotfile management
 - **jq** — JSON processor
 - **lf** — Terminal file manager
 
@@ -76,29 +77,31 @@ This will:
 
 ## 📁 Dotfiles Structure
 
-Dotfiles are managed using **GNU Stow** for clean, modular organization:
+Dotfiles are managed using **chezmoi**. This repository is the chezmoi *source directory*. A `.chezmoiroot` file at the repo root contains `home`, so chezmoi treats the `home/` subdirectory as the source and applies it to `$HOME`.
 
 ```
-dotfiles/
-├── zsh/          # Zsh configuration
-├── fish/         # Fish shell configuration  
-├── nvim/         # Neovim configuration
-├── git/          # Git configuration
-├── tmux/         # Tmux configuration
-├── aerospace/    # AeroSpace window manager
-├── starship/     # Starship prompt
-├── wezterm/      # WezTerm terminal
-├── scripts/      # Custom utility scripts
-└── ...
+.
+├── .chezmoiroot        # contains "home" → chezmoi source is home/
+├── Brewfile            # Homebrew packages
+├── bootstrap.sh        # installer
+├── README.md
+└── home/               # chezmoi source (mirrors $HOME)
+    ├── dot_zshrc                 → ~/.zshrc
+    ├── dot_gitconfig             → ~/.gitconfig
+    ├── private_dot_wakatime.cfg.tmpl → ~/.wakatime.cfg (0600, templated secret)
+    ├── dot_local/bin/executable_*    → ~/.local/bin/*  (executable)
+    └── dot_config/               → ~/.config/
+        ├── nvim/ fish/ tmux/ aerospace/ starship.toml ...
 ```
 
-Each folder mirrors the target filesystem structure from `$HOME`:
+chezmoi's naming conventions encode file attributes:
 
-```bash
-# Example: Installing nvim config
-stow --target=$HOME nvim
-# Creates: ~/.config/nvim -> ~/dotfiles/nvim/.config/nvim
-```
+| Source name | Target | Meaning |
+|-------------|--------|---------|
+| `dot_config/` | `~/.config/` | leading dot |
+| `executable_foo` | `~/foo` (`+x`) | executable bit |
+| `private_foo` | `~/foo` (`0600`) | restricted perms |
+| `foo.tmpl` | `~/foo` | Go template (secrets, host vars) |
 
 ## 🚀 Usage
 
@@ -107,21 +110,22 @@ stow --target=$HOME nvim
 ./bootstrap.sh
 ```
 
-### Install specific packages
+### Preview / apply changes
 ```bash
-cd dotfiles
-stow nvim fish tmux  # Only these packages
+chezmoi diff              # See what would change in $HOME
+chezmoi apply             # Apply changes
+chezmoi apply --dry-run -v
 ```
 
-### Uninstall specific packages
+### Edit a managed file
 ```bash
-cd dotfiles
-stow -D nvim  # Remove nvim config
+chezmoi edit ~/.zshrc     # edits the source under home/, then run chezmoi apply
 ```
 
-### Preview changes (dry run)
+### Start managing a new file
 ```bash
-stow -n -v nvim  # See what would be linked
+chezmoi add ~/.config/newapp/config
+chezmoi add --template ~/.config/app/secret.conf   # add as a template
 ```
 
 ### Homebrew Package Management
@@ -311,9 +315,9 @@ uv run --python 3.12 python script.py
 - **nvm** provides instant Node.js version switching
 - Both tools cache downloads for faster subsequent installs
 
-## 📋 Available Packages
+## 📋 Managed Configurations
 
-**Total: 20 packages** organized by category:
+**20 application configs** managed by chezmoi, organized by category:
 
 ### 🖥️ Terminal Emulators
 - **ghostty**, **kitty**, **wezterm** - Modern GPU-accelerated terminals
@@ -348,8 +352,8 @@ uv run --python 3.12 python script.py
 
 ---
 
-| Package | Description |
-|---------|-------------|
+| Config | Description |
+|--------|-------------|
 | **1password** | 1Password CLI and SSH agent configuration |
 | **aerospace** | AeroSpace tiling window manager configuration |
 | **bat** | bat (cat clone) with syntax highlighting themes |
@@ -388,48 +392,55 @@ To update your dotfiles:
 ```bash
 cd ~/dotfiles
 git pull
-./bootstrap.sh  # Reinstall with updates
+chezmoi apply    # apply updated dotfiles to $HOME
+# or, to also refresh tools/packages:
+./bootstrap.sh
 ```
 
 ## 🛠️ Customization
 
-### Adding new packages
-1. Create a new directory in `dotfiles/`
-2. Structure it to mirror your home directory
-3. Add the package name to `PACKAGES` array in `bootstrap.sh`
-4. Run `./bootstrap.sh` or `stow package-name`
+### Adding new config
+```bash
+chezmoi add ~/.config/newapp/config   # copies into home/ with correct naming
+```
+Then commit the new files under `home/` and push.
 
 ### Modifying existing configs
-1. Edit files in the `dotfiles/` directory
-2. Changes are immediately reflected (symlinks!)
-3. Commit and push your changes
+```bash
+chezmoi edit ~/.zshrc   # edit the source under home/
+chezmoi apply           # write changes to $HOME
+```
+Note: unlike stow, chezmoi does **not** use symlinks — it writes real files to
+`$HOME`. Always edit the source (via `chezmoi edit` or directly in `home/`) and
+run `chezmoi apply`, not the target files.
 
-### Ignoring files from stow
-Use `.stow-local-ignore` in individual packages or `.stow-global-ignore` at the root:
-- Template files (`.tpl`, `.template`, `.example`)
-- Backup files (`.backup`, `.bak`)
-- Documentation files (`README.*`, `LICENSE.*`)
-- Temporary files (`.tmp`, `.swp`)
+### Ignoring files
+Add target-path patterns to `home/.chezmoiignore` (gitignore syntax) for
+per-machine state that should never be applied.
 
 ## 🆘 Troubleshooting
 
-### Conflicts during installation
+### Adopt existing $HOME files into the repo
 ```bash
-# Option 1: Remove conflicting files
-rm ~/.config/nvim/init.lua
-
-# Option 2: Adopt existing files into stow
-stow --adopt nvim
+chezmoi add ~/.config/nvim   # import current files as the new source of truth
 ```
 
-### Broken symlinks after moving dotfiles
+### See exactly what will change
 ```bash
-./bootstrap.sh  # Reinstall everything
+chezmoi diff
+chezmoi apply --dry-run -v
 ```
 
-### Check what stow would do
+### Secret/template errors (e.g. WakaTime)
 ```bash
-stow -n -v package-name  # Dry run with verbose output
+eval "$(op signin)"   # sign in to 1Password CLI
+chezmoi apply         # re-render templates
+```
+
+### Verify chezmoi's state
+```bash
+chezmoi doctor        # diagnose configuration/tooling issues
+chezmoi managed       # list managed files
 ```
 
 ## 🤝 Contributing

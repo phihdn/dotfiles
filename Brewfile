@@ -4,19 +4,23 @@
 
 # Taps
 # -----------------------------------------------------------------------------
-tap "jesseduffield/lazygit"
-tap "arl/arl"  # for gitmux
-tap "jorgerojas26/lazysql" # Lazysql
-tap "nikitabobko/tap" # AeroSpace
-tap "FelixKratz/formulae" # Sketchybar and JankyBorders
-tap "oven-sh/bun"  # Bun JavaScript runtime
+# Non-official taps must be trusted (Homebrew >= 6.0.0) before their formulae/
+# casks will load. `trusted: true` declares this in-Brewfile so `brew bundle`
+# works non-interactively and survives `brew bundle cleanup --force`.
+tap "jesseduffield/lazygit", trusted: true
+tap "arl/arl", trusted: true  # for gitmux
+tap "jorgerojas26/lazysql", trusted: true # Lazysql
+tap "nikitabobko/tap", trusted: true # AeroSpace
+tap "FelixKratz/formulae", trusted: true # Sketchybar and JankyBorders
+tap "oven-sh/bun", trusted: true  # Bun JavaScript runtime
+tap "charmbracelet/tap", trusted: true
 
 # Essential CLI Tools
 # -----------------------------------------------------------------------------
 brew "git"
 brew "curl"
 brew "wget"
-brew "stow"  # For dotfiles management
+brew "chezmoi"  # For dotfiles management
 brew "fzf"   # Fuzzy finder
 brew "ripgrep"  # Fast grep alternative
 brew "bat"   # Better cat
@@ -43,6 +47,7 @@ brew "git-lfs"
 brew "lazygit"
 brew "lazydocker"
 brew "lazysql"
+brew "charmbracelet/tap/crush"
 
 # Shell & Terminal
 # -----------------------------------------------------------------------------
@@ -83,10 +88,10 @@ brew "nmap"  # Network mapper
 brew "cloc"  # Count lines of code
 brew "gum"   # Glamorous shell scripts
 brew "tz"    # Time zone helper
-brew "teamookla/speedtest/speedtest"  # Speedtest CLI
+brew "teamookla/speedtest/speedtest", trusted: true  # Speedtest CLI
 
 # Specialized tools
-brew "joshmedeski/sesh/sesh"
+brew "joshmedeski/sesh/sesh", trusted: true
 
 # GUI Applications
 # -----------------------------------------------------------------------------

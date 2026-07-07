@@ -1,0 +1,11 @@
+[settings]
+debug = false
+hidefilenames = false
+exclude =
+  {{ .chezmoi.homeDir }}/ws/work/
+ignore =
+    COMMIT_EDITMSG$
+    PULLREQ_EDITMSG$
+    MERGE_MSG$
+    TAG_EDITMSG$
+api_key = {{ onepasswordRead "op://Personal/WakaTime/api_key" }}

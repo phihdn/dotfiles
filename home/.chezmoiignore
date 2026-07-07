@@ -1,0 +1,9 @@
+# Patterns of target paths chezmoi should never manage.
+# Syntax mirrors .gitignore (patterns are relative to $HOME).
+
+.DS_Store
+
+# k9s runtime state (per-machine, not tracked)
+.config/k9s/benchmarks
+.config/k9s/clusters
+.config/k9s/screen-dumps
