@@ -153,6 +153,30 @@ log_section "Setting Up Shell Environment"
 # plugins are cloned into $ZDOTDIR/plugins on first interactive zsh launch,
 # so no plugin-manager bootstrap step is required here.
 
+# Install tpm (tmux plugin manager). The tmux config sources it at the end and
+# lists plugins with `set -g @plugin`; without this clone, tpm's prefix+I /
+# prefix+U bindings silently never get created.
+log_step "Checking for tpm (tmux plugin manager)"
+TPM_DIR="$HOME/.config/tmux/plugins/tpm"
+if [[ ! -d "$TPM_DIR" ]]; then
+  log_info "Installing tpm (tmux plugin manager)..."
+  if git clone --depth 1 https://github.com/tmux-plugins/tpm "$TPM_DIR"; then
+    log_success "tpm installed successfully"
+    # Install the plugins declared in tmux.conf without needing prefix+I
+    log_step "Installing tmux plugins"
+    if "$TPM_DIR/bin/install_plugins"; then
+      log_success "tmux plugins installed"
+    else
+      log_warn "tmux plugin install encountered issues (run prefix+I inside tmux to retry)"
+    fi
+  else
+    log_error "Failed to install tpm"
+    exit 1
+  fi
+else
+  log_success "tpm already installed"
+fi
+
 # Install nvm (Node Version Manager)
 log_step "Checking for nvm (Node Version Manager)"
 if [[ ! -d "$HOME/.config/nvm" ]]; then

@@ -10,3 +10,6 @@
 
 # zsh plugins are cloned at runtime by the plugin manager
 .config/zsh/plugins
+
+# tmux plugins are cloned at runtime by tpm
+.config/tmux/plugins
