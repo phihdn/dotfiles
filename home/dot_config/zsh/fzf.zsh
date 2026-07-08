@@ -13,7 +13,6 @@ export FZF_DEFAULT_OPTS='
   --layout=reverse
   --border=rounded
   --prompt="  "
-  --pointer="  "
   --preview-window=right:65%:wrap:border-left
 '
 

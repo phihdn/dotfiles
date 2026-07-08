@@ -38,9 +38,14 @@ compinit -d "$_zcompdir/zcompdump"
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'  # case-insensitive
 
-# kubectl completion (loaded after compinit so compdef is available)
+# kubectl completion (loaded after compinit so compdef is available).
+# Generate it with an empty KUBECONFIG (/dev/null) so version-switching kubectl
+# wrappers (e.g. Rancher Desktop's ~/.rd/bin/kubectl) don't probe the current
+# cluster to pick a matching binary. That probe runs the kubeconfig exec plugin
+# (e.g. `aws eks get-token`) on every shell start and errors out on an expired
+# SSO token. The completion script doesn't depend on any cluster.
 if command -v kubectl >/dev/null 2>&1; then
-  source <(kubectl completion zsh) 2>/dev/null
+  source <(KUBECONFIG=/dev/null kubectl completion zsh) 2>/dev/null
 fi
 
 # =========================================================
