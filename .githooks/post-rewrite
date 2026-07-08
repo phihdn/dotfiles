@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+# Auto-apply dotfiles after a rebase-style `git pull` (this repo sets
+# pull.rebase = true, so pulls rebase and fire post-rewrite, not post-merge).
+# Runs only for rebases, not `git commit --amend`.
+
+[ "$1" = "rebase" ] || exit 0
+command -v chezmoi >/dev/null 2>&1 || exit 0
+
+echo "[chezmoi] git rebase detected — applying dotfiles..."
+chezmoi apply

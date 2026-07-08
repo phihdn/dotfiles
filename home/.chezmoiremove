@@ -1,0 +1,3 @@
+# Targets chezmoi should delete from $HOME if present.
+# The monolithic ~/.zshrc was replaced by $ZDOTDIR (~/.config/zsh) config.
+.zshrc

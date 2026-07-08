@@ -131,6 +131,11 @@ cat > "${HOME}/.config/chezmoi/chezmoi.toml" <<EOF
 sourceDir = "${REPO_DIR}"
 EOF
 
+# Enable tracked git hooks so `git pull` auto-runs `chezmoi apply`
+# (post-merge for merges, post-rewrite for rebases since pull.rebase = true).
+log_step "Enabling git hooks (auto chezmoi apply on pull)"
+git -C "${REPO_DIR}" config core.hooksPath .githooks
+
 # The wakatime config template resolves a secret via the 1Password CLI. If op
 # is not signed in yet, that single file will fail; the rest still applies and
 # you can re-run "chezmoi apply" after signing in.
@@ -144,21 +149,9 @@ fi
 
 log_section "Setting Up Shell Environment"
 
-# Install Zinit ZSH plugin manager (zsh is the alternative shell)
-log_step "Checking for Zinit ZSH plugin manager"
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-if [[ ! -d "$ZINIT_HOME" ]]; then
-  log_info "Installing Zinit plugin manager..."
-  mkdir -p "$(dirname "$ZINIT_HOME")"
-  if git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"; then
-    log_success "Zinit installed successfully"
-  else
-    log_error "Failed to install Zinit plugin manager"
-    exit 1
-  fi
-else
-  log_success "Zinit already installed"
-fi
+# The zsh config (alternative shell) uses a self-contained plugin manager:
+# plugins are cloned into $ZDOTDIR/plugins on first interactive zsh launch,
+# so no plugin-manager bootstrap step is required here.
 
 # Install nvm (Node Version Manager)
 log_step "Checking for nvm (Node Version Manager)"
@@ -210,23 +203,24 @@ fi
 
 log_section "Setting Default Shell"
 
-# Set fish as default shell
-log_step "Setting fish as default shell"
-FISH_PATH=$(which fish)
-if [[ -n "$FISH_PATH" ]]; then
-  if ! grep -q "$FISH_PATH" /etc/shells; then
-    log_info "Adding fish to /etc/shells..."
-    echo "$FISH_PATH" | sudo tee -a /etc/shells
+# Set zsh (Homebrew) as the default shell. Fish remains fully configured and
+# can be launched with `fish` or set as default instead if preferred.
+log_step "Setting zsh as default shell"
+ZSH_PATH=$(brew --prefix)/bin/zsh
+if [[ -x "$ZSH_PATH" ]]; then
+  if ! grep -q "^${ZSH_PATH}$" /etc/shells; then
+    log_info "Adding zsh to /etc/shells..."
+    echo "$ZSH_PATH" | sudo tee -a /etc/shells
   fi
-  if [[ "$SHELL" != "$FISH_PATH" ]]; then
-    log_info "Changing default shell to fish..."
-    chsh -s "$FISH_PATH"
-    log_success "Default shell changed to fish"
+  if [[ "$SHELL" != "$ZSH_PATH" ]]; then
+    log_info "Changing default shell to zsh..."
+    chsh -s "$ZSH_PATH"
+    log_success "Default shell changed to zsh"
   else
-    log_success "Fish is already the default shell"
+    log_success "zsh is already the default shell"
   fi
 else
-  log_warn "Fish not found, keeping current shell"
+  log_warn "Homebrew zsh not found, keeping current shell"
 fi
 
 log_section "Setting Up Shell Completions"

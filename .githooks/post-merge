@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Auto-apply dotfiles after a merge-style `git pull`.
+# Enabled via: git config core.hooksPath .githooks (done by bootstrap.sh).
+
+command -v chezmoi >/dev/null 2>&1 || exit 0
+
+echo "[chezmoi] git merge detected — applying dotfiles..."
+chezmoi apply

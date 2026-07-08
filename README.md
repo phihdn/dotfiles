@@ -6,13 +6,13 @@ A lean, modern development environment for macOS that brings the best terminal-f
 
 ## ✨ Core Features
 
-* 🐟 **Fish shell** — user-friendly shell with great defaults (default)
+* 🐟 **Fish shell** — user-friendly shell with great defaults (alternative)
 * 🧠 **Raycast** — fast launcher & automation
 * 🪟 **AeroSpace** — tiling window management (like i3, for Mac)
 * 🧑‍💻 **Neovim** — full-featured, modern editor configuration
 * 🖋️ **chezmoi** — declarative, template-aware dotfile management
 * 🧰 **Essential CLI tools** — ripgrep, fzf, bat, eza, and more
-* 🚀 **Zsh** — alternative shell with Zinit plugins
+* 🚀 **Zsh** — default shell with a modular XDG config (`~/.config/zsh`) and a self-contained plugin manager
 * 🌟 **Starship** — beautiful, fast cross-shell prompt
 
 ## 🎯 Philosophy
@@ -36,8 +36,8 @@ This will:
 2. Install Homebrew (if needed)
 3. Install packages from Brewfile (including chezmoi)
 4. Point chezmoi's `sourceDir` at this repo and run `chezmoi apply`
-5. Install Zinit (Zsh plugin manager) and nvm
-6. Set Fish as the default shell
+5. Install nvm (zsh plugins self-install on first launch)
+6. Set zsh as the default shell (fish stays available via `fish`)
 
 Secrets (e.g. the WakaTime API key) are resolved from 1Password at apply time.
 If the `op` CLI isn't signed in yet, sign in and re-run `chezmoi apply`.
@@ -86,11 +86,12 @@ Dotfiles are managed using **chezmoi**. This repository is the chezmoi *source d
 ├── bootstrap.sh        # installer
 ├── README.md
 └── home/               # chezmoi source (mirrors $HOME)
-    ├── dot_zshrc                 → ~/.zshrc
+    ├── dot_zshenv                → ~/.zshenv (bootstraps ZDOTDIR)
     ├── dot_gitconfig             → ~/.gitconfig
     ├── private_dot_wakatime.cfg.tmpl → ~/.wakatime.cfg (0600, templated secret)
     ├── dot_local/bin/executable_*    → ~/.local/bin/*  (executable)
     └── dot_config/               → ~/.config/
+        ├── zsh/                  → ~/.config/zsh/ (modular: .zshrc, aliases.zsh, plugins.zsh, ...)
         ├── nvim/ fish/ tmux/ aerospace/ starship.toml ...
 ```
 
@@ -102,6 +103,141 @@ chezmoi's naming conventions encode file attributes:
 | `executable_foo` | `~/foo` (`+x`) | executable bit |
 | `private_foo` | `~/foo` (`0600`) | restricted perms |
 | `foo.tmpl` | `~/foo` | Go template (secrets, host vars) |
+
+### Configuration reference
+
+Annotated view of what each managed config is for:
+
+```
+home/
+├── dot_zshenv                    → ~/.zshenv               zsh bootstrap (points ZDOTDIR at ~/.config/zsh)
+├── dot_gitconfig                 → ~/.gitconfig            git identity + 1Password SSH signing
+├── dot_gitconfig-personal        → ~/.gitconfig-personal   included for repos under ~/ws/personal/
+├── dot_gitconfig-work       → ~/.gitconfig-work  included for repos under ~/ws/work/work/
+├── private_dot_wakatime.cfg.tmpl → ~/.wakatime.cfg         WakaTime (API key pulled from 1Password, 0600)
+├── dot_local/bin/executable_*    → ~/.local/bin/*          user scripts (brew-sync, sesh_start, git-bare-clone, ...)
+└── dot_config/                   → ~/.config/
+    ├── zsh/           zsh shell config — modular (see "zsh configuration" below)
+    ├── fish/          fish shell config (config.fish, conf.d/, functions/)
+    ├── nvim/          Neovim — Lua config under lua/phihdn/{core,plugins}
+    ├── tmux/          tmux config + gitmux + catppuccin theme
+    ├── starship.toml  Starship prompt (shared by zsh and fish)
+    ├── aerospace/     AeroSpace tiling window manager
+    ├── sketchybar/    menu bar (executable plugins/)
+    ├── borders/       JankyBorders (executable bordersrc)
+    ├── ghostty/       terminal emulator
+    ├── kitty/         terminal emulator
+    ├── wezterm/       terminal emulator (Lua)
+    ├── bat/           bat config + Catppuccin/Kanagawa themes
+    ├── lazygit/       lazygit TUI config
+    ├── lf/            lf file manager (lfrc + executable previewer.sh)
+    ├── lsd/           lsd (ls replacement) config + colors
+    ├── k9s/           k9s config + skins (per-cluster state ignored)
+    ├── sesh/          sesh tmux session manager
+    ├── neofetch/      neofetch system info
+    └── 1Password/ssh/agent.toml   1Password SSH agent config
+```
+
+### zsh configuration (`~/.config/zsh`, `ZDOTDIR`)
+
+The zsh config is split into small, single-purpose modules. `~/.zshenv` is the
+only zsh file kept in `$HOME`; it sets `ZDOTDIR` to `~/.config/zsh` so every
+other file lives there and `$HOME` stays clean.
+
+| File | Purpose |
+|------|---------|
+| `~/.zshenv` (`dot_zshenv`) | Minimal bootstrap. Sets `XDG_CONFIG_HOME` and `ZDOTDIR=~/.config/zsh`, then sources `$ZDOTDIR/.zshenv`. Read by **every** zsh invocation. |
+| `.zshenv` | Environment for all shells: XDG dirs, `EDITOR`/`VISUAL=nvim`, `MANPAGER=bat`, `GPG_TTY`, `KUBECONFIG`, `K9S_CONFIG_DIR`, and a deduplicated `PATH` (including nvm's default node — see below). |
+| `.zprofile` | Login shells only. Re-prepends nvm's node to `PATH` after macOS `path_helper` reorders it (see [node / nvm on PATH](#node--nvm-on-path)). |
+| `.zshrc` | Interactive setup: history, shell options, completion (`compinit`), `zoxide`, fzf key-bindings, `kubectl` completion, lazy `nvm` + `uv` completion, then sources the modules below. |
+| `fzf.zsh` | fzf defaults (`fd` source, `bat` preview, UI options) and the `Ctrl-F` file-picker widget. |
+| `aliases.zsh` | Aliases (git, kubernetes, `lsd`/`eza`, `bat`, `rg`, sesh) and helper functions (`lf` dir-follow). |
+| `bindings.zsh` | Key-bindings and vi-mode cursor settings. Defines the `zvm_after_init` hook **before** plugins load so custom bindings survive zsh-vi-mode's reset. |
+| `plugins.zsh` | Self-contained plugin manager: clones plugins into `~/.config/zsh/plugins` on first launch and sources them. Run `zplugin-update` to update. |
+| `prompt.zsh` | Initializes the Starship prompt (or a minimal `$` prompt inside Cursor Agent). |
+
+Plugins loaded by `plugins.zsh` (in order):
+
+1. [`zsh-autosuggestions`](https://github.com/zsh-users/zsh-autosuggestions) — fish-style inline suggestions
+2. [`zsh-history-substring-search`](https://github.com/zsh-users/zsh-history-substring-search) — ↑/↓ substring history search
+3. [`zsh-vi-mode`](https://github.com/jeffreytse/zsh-vi-mode) — modal vi keybindings
+4. [`fast-syntax-highlighting`](https://github.com/zdharma-continuum/fast-syntax-highlighting) — command-line syntax highlighting
+
+#### Startup load order
+
+zsh reads its startup files in a fixed order. With `ZDOTDIR` set, ours load like this:
+
+```
+1. /etc/zshenv                    (system, if present)
+2. ~/.zshenv                      → sets ZDOTDIR, then sources:
+     └─ ~/.config/zsh/.zshenv     (environment: XDG, PATH incl. nvm node, ...)
+   (login)  /etc/zprofile         → macOS path_helper reorders PATH
+            ~/.config/zsh/.zprofile  → re-prepends nvm node after path_helper
+3. ~/.config/zsh/.zshrc           (interactive shells) sources, in order:
+     ├─ fzf.zsh
+     ├─ aliases.zsh
+     ├─ bindings.zsh   ← defines zvm_after_init BEFORE plugins load
+     ├─ plugins.zsh    ← zsh-vi-mode resets keymaps, then runs zvm_after_init
+     └─ prompt.zsh     ← starship (last, so it owns the prompt)
+   (login)  /etc/zlogin, ~/.config/zsh/.zlogin        — not used here
+```
+
+Why the order matters:
+- **`.zshenv` runs for every shell** (including non-interactive scripts), so it holds only environment/`PATH` — nothing interactive.
+- **`.zshrc` runs only for interactive shells** — aliases, keybindings, prompt.
+- **`bindings.zsh` is sourced before `plugins.zsh`** because `zsh-vi-mode` clears keymaps on init and only re-applies custom bindings registered via the `zvm_after_init` hook.
+- **`prompt.zsh` is sourced last** so Starship initializes after any plugin that could touch the prompt.
+
+#### node / nvm on PATH
+
+Node is managed by [nvm](https://github.com/nvm-sh/nvm), but nvm's own
+`node`/`npm`/`npx` only land on `PATH` after `nvm.sh` is sourced — and `nvm.sh`
+is slow (100 ms+) and is only sourced from `.zshrc`, i.e. **interactive shells
+only**. That meant non-interactive tools (scripts, editors, AI coding agents
+like Claude Code) fell back to a *different* node (e.g. `/usr/local/bin/node`)
+with none of your nvm-installed global packages.
+
+To fix this without paying nvm's startup cost, `.zshenv` resolves nvm's
+**default** node version and prepends its `bin` directory to `PATH` directly:
+
+```bash
+export NVM_DIR="$HOME/.config/nvm"
+# ...resolve the default version, then add
+# "$NVM_DIR/versions/node/<ver>/bin" to PATH
+```
+
+Because `.zshenv` is read by **every** zsh invocation, all shells — interactive,
+non-interactive, login, and non-login — now use the same node. The `nvm`
+*command* itself stays lazy-loaded in `.zshrc` (a one-line function that sources
+`nvm.sh` on first use), since you only need it occasionally for `nvm use` /
+`nvm install`. `uv` is a fast standalone binary already on `PATH`, so `.zshrc`
+just loads its completion eagerly — no wrapper needed.
+
+**macOS login-shell caveat.** On macOS, `/etc/zprofile` runs `path_helper`,
+which rebuilds `PATH` *after* `.zshenv` and pushes system dirs like
+`/usr/local/bin` back to the front. `~/.config/zsh/.zprofile` runs after that
+and re-prepends nvm's node, so login shells stay consistent too.
+
+**How do I know which shell type a tool (e.g. Claude Code) uses?** The pragmatic
+test is to just run this inside the tool's shell:
+
+```bash
+command -v node   # nvm path = good; /usr/local/bin/node = wrong node
+```
+
+To inspect the shell mode explicitly (works in zsh or bash):
+
+```bash
+# zsh
+[[ -o login ]] && echo login || echo non-login
+[[ -o interactive ]] && echo interactive || echo non-interactive
+# bash
+shopt -q login_shell && echo login || echo non-login
+case $- in *i*) echo interactive;; *) echo non-interactive;; esac
+```
+
+With the setup above, `node` resolves to nvm's version in **all** of those
+modes, so it shouldn't matter — but this is how you'd confirm.
 
 ## 🚀 Usage
 
@@ -119,7 +255,7 @@ chezmoi apply --dry-run -v
 
 ### Edit a managed file
 ```bash
-chezmoi edit ~/.zshrc     # edits the source under home/, then run chezmoi apply
+chezmoi edit ~/.config/zsh/.zshrc   # edits the source under home/, then run chezmoi apply
 ```
 
 ### Start managing a new file
@@ -373,7 +509,7 @@ uv run --python 3.12 python script.py
 | **tmux** | tmux terminal multiplexer configuration and plugins |
 | **wakatime** | WakaTime time tracking configuration |
 | **wezterm** | WezTerm terminal emulator configuration |
-| **zsh** | Zsh shell configuration with modular .zsh.d structure |
+| **zsh** | Modular Zsh config under `~/.config/zsh` (ZDOTDIR) with a self-contained plugin manager |
 
 ## ✅ Result
 
@@ -391,11 +527,32 @@ To update your dotfiles:
 
 ```bash
 cd ~/dotfiles
-git pull
-chezmoi apply    # apply updated dotfiles to $HOME
+git pull         # auto-applies via git hook (see below)
 # or, to also refresh tools/packages:
 ./bootstrap.sh
 ```
+
+### Auto-apply git hooks
+
+A `git pull` in this repo automatically runs `chezmoi apply`, so updates
+propagate to `$HOME` without a manual step. Tracked hooks live in `.githooks/`:
+
+- `post-merge` — fires after a merge-style pull.
+- `post-rewrite` — fires after a rebase-style pull (this repo sets
+  `pull.rebase = true`, so pulls rebase and would otherwise skip `post-merge`).
+  It only runs for rebases, not `git commit --amend`.
+
+Both are no-ops if `chezmoi` isn't installed. They're enabled by pointing git at
+the tracked hooks directory:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+`bootstrap.sh` runs this automatically, so a fresh clone is wired up after the
+first bootstrap. Because `core.hooksPath` lives in the local (uncommitted)
+`.git/config`, each new clone needs bootstrap (or the command above) once. If you
+ever want to apply manually instead, just run `chezmoi apply`.
 
 ## 🛠️ Customization
 
@@ -407,8 +564,8 @@ Then commit the new files under `home/` and push.
 
 ### Modifying existing configs
 ```bash
-chezmoi edit ~/.zshrc   # edit the source under home/
-chezmoi apply           # write changes to $HOME
+chezmoi edit ~/.config/zsh/.zshrc   # edit the source under home/
+chezmoi apply                       # write changes to $HOME
 ```
 Note: unlike stow, chezmoi does **not** use symlinks — it writes real files to
 `$HOME`. Always edit the source (via `chezmoi edit` or directly in `home/`) and

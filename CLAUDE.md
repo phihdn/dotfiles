@@ -39,11 +39,11 @@ brew-sync force              # Full sync, no prompts
 - `home/.chezmoiignore` → target paths chezmoi must never manage (per-machine state).
 
 ### Key Integrations
-- **Shell**: Fish (default) + Fisher plugin manager + Starship prompt
-- **Alt Shell**: Zsh + Zinit available as fallback
+- **Shell**: Zsh (default) — modular XDG config under `~/.config/zsh` (`ZDOTDIR`), bootstrapped by a minimal `~/.zshenv`, with a self-contained git-clone plugin manager (no zinit) + Starship prompt
+- **Alt Shell**: Fish + Fisher plugin manager (still fully configured; launch with `fish`)
 - **Window Management**: AeroSpace + JankyBorders + SketchyBar
 - **Git**: 1Password SSH signing, conditional includes for `~/ws/work/` vs `~/ws/personal/`
-- **Node.js**: nvm (`~/.config/nvm`)
+- **Node.js**: nvm (`~/.config/nvm`). `.zshenv` prepends nvm's default node `bin` to `PATH` so `node`/`npm`/`npx` work in **all** shells (interactive, non-interactive, login, non-login) — important for tools/agents that shell out non-interactively. `~/.config/zsh/.zprofile` re-prepends it after macOS `path_helper` in login shells. The `nvm` command itself is lazy-loaded in `.zshrc`.
 - **Python**: uv for package/version management
 
 ### Secrets
@@ -58,3 +58,10 @@ Then commit the resulting files under `home/`.
 
 ### chezmoi Source Directory
 After `bootstrap.sh`, `~/.config/chezmoi/chezmoi.toml` sets `sourceDir` to this repo, so bare `chezmoi` commands operate on this checkout directly (edit here, then `chezmoi apply`).
+
+### Auto-apply Git Hooks
+Tracked hooks in `.githooks/` run `chezmoi apply` automatically after a `git pull`:
+- `post-merge` → fires on merge-style pulls.
+- `post-rewrite` → fires on rebase-style pulls (this repo sets `pull.rebase = true`, so pulls rebase and skip `post-merge`); guarded to run only for `rebase`, not `git commit --amend`.
+
+Both no-op if `chezmoi` is absent. They're activated via `git config core.hooksPath .githooks`, which `bootstrap.sh` sets. Since `core.hooksPath` lives in the local `.git/config` (not committed), each fresh clone needs bootstrap (or that command) once.

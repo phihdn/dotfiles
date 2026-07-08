@@ -7,3 +7,6 @@
 .config/k9s/benchmarks
 .config/k9s/clusters
 .config/k9s/screen-dumps
+
+# zsh plugins are cloned at runtime by the plugin manager
+.config/zsh/plugins

@@ -1,0 +1,6 @@
+# ~/.zshenv — minimal bootstrap.
+# Relocates the zsh configuration to $XDG_CONFIG_HOME/zsh (ZDOTDIR) so that
+# ~/ stays clean. All real environment setup lives in $ZDOTDIR/.zshenv.
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+[[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"

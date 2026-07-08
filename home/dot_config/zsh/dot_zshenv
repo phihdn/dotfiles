@@ -1,0 +1,59 @@
+# ~/.config/zsh/.zshenv — environment for all zsh invocations.
+
+# ---------- XDG base directories ----------
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+# ---------- Editor ----------
+export EDITOR="nvim"
+export VISUAL="nvim"
+
+# ---------- Pager ----------
+if command -v bat >/dev/null 2>&1; then
+  export MANPAGER="bat -l man -p"
+fi
+
+# ---------- GPG ----------
+export GPG_TTY=$(tty)
+
+# ---------- Tool config locations ----------
+export K9S_CONFIG_DIR="$XDG_CONFIG_HOME/k9s"
+export KUBECONFIG="$HOME/.kube/config:$HOME/.kube/config-k3s-homelab"
+
+# ---------- nvm node on PATH (all shells) ----------
+# Put nvm's default node/npm/npx on PATH for EVERY shell — interactive and
+# non-interactive (scripts, editors, Claude Code, etc.) — so they all use the
+# same node as the interactive shell. `nvm` itself stays lazy-loaded in .zshrc.
+# _zsh_nvm_node_bin is left set (not exported) so .zprofile can re-prepend it
+# after macOS path_helper reorders PATH in login shells.
+export NVM_DIR="$HOME/.config/nvm"
+_zsh_nvm_node_bin=""
+if [[ -d "$NVM_DIR/versions/node" ]]; then
+  _nvm_alias="$(< "$NVM_DIR/alias/default" 2>/dev/null)"
+  case "$_nvm_alias" in
+    v*) _nvm_ver="$_nvm_alias" ;;                       # pinned version
+    *)  # "node"/"lts/*"/empty -> newest installed version
+        _nvm_ver="${${(f)$(print -l "$NVM_DIR"/versions/node/*(/N:t) | sort -V)}[-1]}" ;;
+  esac
+  [[ -x "$NVM_DIR/versions/node/$_nvm_ver/bin/node" ]] \
+    && _zsh_nvm_node_bin="$NVM_DIR/versions/node/$_nvm_ver/bin"
+  unset _nvm_alias _nvm_ver
+fi
+
+# ---------- PATH ----------
+# Deduplicate automatically (keeps the first occurrence).
+typeset -U path PATH
+
+path=(
+  "$HOME/.local/bin"                                   # user scripts
+  "$HOME/.rd/bin"                                      # Rancher Desktop
+  ${_zsh_nvm_node_bin:+"$_zsh_nvm_node_bin"}           # nvm default node
+  "/opt/homebrew/opt/coreutils/libexec/gnubin"         # GNU coreutils
+  "/opt/homebrew/opt/findutils/libexec/gnubin"         # GNU findutils
+  "/opt/homebrew/opt/python/libexec/bin"               # Homebrew python
+  "$HOME/.bun/bin"                                      # Bun
+  $path
+)
+export PATH
