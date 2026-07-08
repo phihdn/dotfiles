@@ -47,6 +47,16 @@ alias s="sesh_start"
 alias s.="sesh connect ."
 
 # =========================================================
+# Claude Code — multiple accounts
+# =========================================================
+# Each account uses its own CLAUDE_CONFIG_DIR so logins, history, projects, and
+# sessions stay isolated. Shared config (skills, agents, commands, settings,
+# hooks, ...) is symlinked from ~/.claude into each dir. Run `/login` once per
+# alias to sign in with the matching account.
+alias claude-work="CLAUDE_CONFIG_DIR=\"\$HOME/.claude-work\" claude"
+alias claude-personal="CLAUDE_CONFIG_DIR=\"\$HOME/.claude-personal\" claude"
+
+# =========================================================
 # Git
 # =========================================================
 
@@ -106,3 +116,9 @@ lf() {
     [ -d "$dir" ] && [ "$dir" != "$(pwd)" ] && cd "$dir"
   fi
 }
+
+# =========================================================
+# AWS CLI
+# =========================================================
+
+alias aws-config="aws configure sso --profile $1" # Configure AWS SSO for a profile

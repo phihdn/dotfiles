@@ -239,6 +239,77 @@ case $- in *i*) echo interactive;; *) echo non-interactive;; esac
 With the setup above, `node` resolves to nvm's version in **all** of those
 modes, so it shouldn't matter — but this is how you'd confirm.
 
+## 🤖 Claude Code — multiple accounts
+
+Run two Claude Code accounts (e.g. work + personal) on one machine without them
+colliding. Claude Code ties all of an account's state to a single config
+directory, selectable via the `CLAUDE_CONFIG_DIR` environment variable
+([technique reference](https://frontendhire.com/learn/ai/courses/using-multiple-claude-accounts/overview)).
+
+Two aliases (in both `zsh` and `fish`) point Claude at per-account dirs:
+
+```bash
+claude-work       # CLAUDE_CONFIG_DIR=~/.claude-work claude
+claude-personal   # CLAUDE_CONFIG_DIR=~/.claude-personal claude
+```
+
+**What's isolated vs shared.** Each dir keeps its own login (on macOS the login
+lives in the Keychain, keyed per config dir), `history.jsonl`, `projects/`, and
+`sessions/`. Shared, read-mostly config is **symlinked** from `~/.claude` into
+each account dir so there's a single source of truth:
+
+```
+~/.claude-work/skills   -> ~/.claude/skills
+~/.claude-work/agents   -> ~/.claude/agents
+~/.claude-work/commands -> ~/.claude/commands
+# ...also: settings.json, statusline.cjs, hooks, output-styles, rules,
+#          schemas, scripts, plugins, CLAUDE.md
+```
+
+`bootstrap.sh` creates the dirs and symlinks automatically (guarded on
+`~/.claude` existing). To set it up manually or on another machine:
+
+```bash
+for dir in ~/.claude-work ~/.claude-personal; do
+  mkdir -p "$dir"
+  for item in CLAUDE.md settings.json statusline.cjs agents commands hooks \
+              output-styles rules schemas scripts skills plugins workflows; do
+    [ -e ~/.claude/"$item" ] && ln -sfn ~/.claude/"$item" "$dir/$item"
+  done
+done
+```
+
+### Installing skills with claudekit-cli (`ck`)
+
+[`claudekit-cli`](https://github.com/mrgoonie/claudekit-cli) (`ck`) installs
+global skills/commands/agents to `$CLAUDE_CONFIG_DIR` if set, otherwise to
+`~/.claude` (verified against its `PathResolver.getGlobalKitDir()`). Since the
+`claude-work`/`claude-personal` aliases only export `CLAUDE_CONFIG_DIR` for the
+`claude` process, a plain terminal leaves it unset — so **`ck` installs to
+`~/.claude`, and the symlinks above propagate everything to both accounts
+automatically**. Install once, no per-account runs:
+
+```bash
+ck init -g   # writes to ~/.claude → both accounts see it via the symlinks
+ck skills
+```
+
+Cautions:
+- **Don't run `ck` from inside a `claude-work`/`claude-personal` session** — there `CLAUDE_CONFIG_DIR` is exported, so `ck` would target the account dir instead of `~/.claude`. Use a plain terminal.
+- **Don't run `ck init --fresh` / `ck uninstall` with `CLAUDE_CONFIG_DIR` pointed at an account dir** — those delete config subdirs and could recurse through the symlinks into your real `~/.claude`. Run them against `~/.claude`.
+- If `ck` ever adds a **new** top-level dir (e.g. `workflows/`), re-run the seeding snippet above to symlink it into the account dirs.
+
+**First-time login** — run each alias once and sign in with the matching
+account:
+
+```bash
+claude-work       # then: /login  (work account)
+claude-personal   # then: /login  (personal account)
+```
+
+After that, each alias remembers its own login. Use the alias that matches the
+repo you're in.
+
 ## 🚀 Usage
 
 ### Install everything

@@ -45,6 +45,7 @@ brew-sync force              # Full sync, no prompts
 - **Git**: 1Password SSH signing, conditional includes for `~/ws/work/` vs `~/ws/personal/`
 - **Node.js**: nvm (`~/.config/nvm`). `.zshenv` prepends nvm's default node `bin` to `PATH` so `node`/`npm`/`npx` work in **all** shells (interactive, non-interactive, login, non-login) — important for tools/agents that shell out non-interactively. `~/.config/zsh/.zprofile` re-prepends it after macOS `path_helper` in login shells. The `nvm` command itself is lazy-loaded in `.zshrc`.
 - **Python**: uv for package/version management
+- **Claude Code (multi-account)**: `claude-work` / `claude-personal` aliases (zsh + fish) set `CLAUDE_CONFIG_DIR` to `~/.claude-work` / `~/.claude-personal` so logins/history/projects/sessions are isolated. Shared config (skills, agents, commands, settings, hooks, ...) is symlinked from `~/.claude`; `bootstrap.sh` creates the dirs + symlinks (guarded on `~/.claude` existing). `claudekit-cli` (`ck`) installs globally to `$CLAUDE_CONFIG_DIR` or, unset, `~/.claude` — so run `ck` from a plain terminal (not inside a `claude-*` session) and the symlinks propagate skills to both accounts; avoid `ck --fresh`/`uninstall` against an account dir.
 
 ### Secrets
 Secrets are resolved at `chezmoi apply` time via the 1Password CLI template function. Example: `home/private_dot_wakatime.cfg.tmpl` renders `~/.wakatime.cfg` using `{{ onepasswordRead "op://Personal/WakaTime/api_key" }}`. Requires `op` to be signed in.

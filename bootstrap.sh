@@ -239,11 +239,31 @@ else
   log_info "kubectl or fish not found, skipping completions"
 fi
 
+log_section "Setting Up Claude Code Accounts"
+
+# Two Claude Code accounts (work + personal) via separate CLAUDE_CONFIG_DIRs.
+# The `claude-work` / `claude-personal` aliases (in zsh & fish) point Claude at
+# these dirs so logins, history, projects, and sessions stay isolated. Shared
+# config (skills, agents, commands, settings, hooks, ...) is symlinked from
+# ~/.claude so there is a single source of truth. Run `/login` once per alias.
+log_step "Seeding Claude account config directories"
+if [[ -d "$HOME/.claude" ]]; then
+  claude_shared=(CLAUDE.md settings.json statusline.cjs agents commands hooks \
+    output-styles rules schemas scripts skills plugins workflows)
+  for claude_dir in "$HOME/.claude-work" "$HOME/.claude-personal"; do
+    mkdir -p "$claude_dir"
+    for item in "${claude_shared[@]}"; do
+      [[ -e "$HOME/.claude/$item" ]] && ln -sfn "$HOME/.claude/$item" "$claude_dir/$item"
+    done
+  done
+  log_success "Claude account dirs ready (~/.claude-work, ~/.claude-personal)"
+  log_info "Sign in once per account: 'claude-work' then /login; 'claude-personal' then /login"
+else
+  log_info "~/.claude not found, skipping Claude multi-account setup"
+fi
+
 log_section "Bootstrap Complete"
 
 log_success "Dotfiles bootstrap completed successfully!"
 log_info "Manage your dotfiles with: chezmoi diff | chezmoi apply | chezmoi edit <file>"
-log_info "Starting fish shell..."
-
-# Start fish shell
-exec fish -l
+log_info "Restart your terminal or run 'exec zsh -l' to load your new shell config."
