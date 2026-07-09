@@ -1,14 +1,19 @@
 # PATH configuration - loaded early
 
-# Homebrew (macOS)
-if test -d /opt/homebrew
-    fish_add_path -gP /opt/homebrew/bin /opt/homebrew/sbin
-    set -gx HOMEBREW_PREFIX /opt/homebrew
+# Homebrew (macOS arm64: /opt/homebrew, macOS Intel: /usr/local, Linuxbrew)
+for brew_prefix in /opt/homebrew /usr/local /home/linuxbrew/.linuxbrew
+    if test -x $brew_prefix/bin/brew
+        fish_add_path -gP $brew_prefix/bin $brew_prefix/sbin
+        set -gx HOMEBREW_PREFIX $brew_prefix
+        break
+    end
 end
 
-# GNU coreutils and findutils (prefer over BSD)
-fish_add_path -gP /opt/homebrew/opt/coreutils/libexec/gnubin
-fish_add_path -gP /opt/homebrew/opt/findutils/libexec/gnubin
+# GNU coreutils and findutils (prefer over BSD; Homebrew-only, macOS)
+if set -q HOMEBREW_PREFIX
+    fish_add_path -gP $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin
+    fish_add_path -gP $HOMEBREW_PREFIX/opt/findutils/libexec/gnubin
+end
 
 # User binaries
 fish_add_path $HOME/.local/bin

@@ -16,6 +16,23 @@ set -euo pipefail
 # Absolute path to this repository (chezmoi source directory)
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# OS detection — this script supports macOS (Darwin) and Linux
+OS="$(uname -s)"
+
+# Put Homebrew on PATH, wherever it lives (macOS arm64/Intel, Linuxbrew).
+# Returns non-zero if no brew installation is found.
+brew_shellenv() {
+  local brew_bin
+  for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew \
+                  /home/linuxbrew/.linuxbrew/bin/brew; do
+    if [[ -x "$brew_bin" ]]; then
+      eval "$("$brew_bin" shellenv)"
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Color codes for output formatting
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'
@@ -53,38 +70,61 @@ log_step() {
 
 log_section "Installing Development Prerequisites"
 
-# Install Xcode Command Line Tools if not already installed
-log_step "Checking for Xcode Command Line Tools"
-if ! xcode-select -p &>/dev/null; then
-  log_info "Xcode Command Line Tools not found, installing..."
-  if xcode-select --install; then
-    log_step "Waiting for Xcode Command Line Tools installation to complete"
-    until xcode-select -p &>/dev/null; do
-      sleep 5
-    done
-    log_success "Xcode Command Line Tools installed successfully"
+if [[ "$OS" == "Darwin" ]]; then
+  # Install Xcode Command Line Tools if not already installed
+  log_step "Checking for Xcode Command Line Tools"
+  if ! xcode-select -p &>/dev/null; then
+    log_info "Xcode Command Line Tools not found, installing..."
+    if xcode-select --install; then
+      log_step "Waiting for Xcode Command Line Tools installation to complete"
+      until xcode-select -p &>/dev/null; do
+        sleep 5
+      done
+      log_success "Xcode Command Line Tools installed successfully"
+    else
+      log_error "Failed to install Xcode Command Line Tools"
+      exit 1
+    fi
   else
-    log_error "Failed to install Xcode Command Line Tools"
-    exit 1
+    log_success "Xcode Command Line Tools already installed"
   fi
 else
-  log_success "Xcode Command Line Tools already installed"
+  # Linux: Homebrew needs curl, git, and a compiler; install via distro first
+  log_step "Checking for build prerequisites (curl, git, gcc)"
+  missing=()
+  for cmd in curl git gcc; do
+    command -v "$cmd" &>/dev/null || missing+=("$cmd")
+  done
+  if (( ${#missing[@]} > 0 )); then
+    log_error "Missing prerequisites: ${missing[*]}"
+    log_error "Install them with your package manager first, e.g.:"
+    log_error "  sudo apt-get install -y build-essential curl git   # Debian/Ubuntu"
+    log_error "  sudo dnf install -y @development-tools curl git    # Fedora"
+    exit 1
+  fi
+  log_success "Build prerequisites already installed"
 fi
 
-# Install Homebrew if not already installed
+# Install Homebrew if not already installed (the official installer supports
+# macOS and Linux; on Linux it installs to /home/linuxbrew/.linuxbrew)
 log_step "Checking for Homebrew package manager"
-if ! command -v brew &>/dev/null; then
+if ! command -v brew &>/dev/null && ! brew_shellenv; then
   log_info "Homebrew not found, installing..."
   if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
     log_step "Configuring Homebrew environment"
-    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+    if ! brew_shellenv; then
+      log_error "Homebrew installed but no brew binary found on a known prefix"
+      exit 1
+    fi
+    # Persist for login shells outside our zsh config (bash, first login)
+    echo "eval \"\$(${HOMEBREW_PREFIX}/bin/brew shellenv)\"" >> ~/.zprofile
     log_success "Homebrew installed and configured successfully"
   else
     log_error "Failed to install Homebrew"
     exit 1
   fi
 else
+  brew_shellenv || true
   log_success "Homebrew already installed"
 fi
 
@@ -113,7 +153,7 @@ else
 fi
 
 # Re-source Homebrew env so freshly installed tools (chezmoi, op) are on PATH
-eval "$(/opt/homebrew/bin/brew shellenv)"
+brew_shellenv
 
 log_section "Applying Dotfiles with chezmoi"
 
@@ -227,10 +267,12 @@ fi
 
 log_section "Setting Default Shell"
 
-# Set zsh (Homebrew) as the default shell. Fish remains fully configured and
-# can be launched with `fish` or set as default instead if preferred.
+# Set zsh as the default shell. Prefer Homebrew zsh; fall back to the system
+# zsh (common on Linux where zsh comes from the distro). Fish remains fully
+# configured and can be launched with `fish` or set as default instead.
 log_step "Setting zsh as default shell"
 ZSH_PATH=$(brew --prefix)/bin/zsh
+[[ -x "$ZSH_PATH" ]] || ZSH_PATH="$(command -v zsh || true)"
 if [[ -x "$ZSH_PATH" ]]; then
   if ! grep -q "^${ZSH_PATH}$" /etc/shells; then
     log_info "Adding zsh to /etc/shells..."
@@ -244,7 +286,7 @@ if [[ -x "$ZSH_PATH" ]]; then
     log_success "zsh is already the default shell"
   fi
 else
-  log_warn "Homebrew zsh not found, keeping current shell"
+  log_warn "zsh not found (Homebrew or system), keeping current shell"
 fi
 
 log_section "Setting Up Shell Completions"

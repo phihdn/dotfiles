@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-macOS dotfiles managed with [chezmoi](https://www.chezmoi.io). This repository is the chezmoi **source directory**. A `.chezmoiroot` file at the repo root contains `home`, so chezmoi uses the `home/` subdirectory as the effective source. Everything else at the repo root (`README.md`, `Brewfile`, `bootstrap.sh`, `CLAUDE.md`) is repo tooling, not applied to `$HOME`.
+Cross-platform (macOS + Linux) dotfiles managed with [chezmoi](https://www.chezmoi.io). **Every change must work on both OSes**: guard macOS-only parts with `uname` checks in scripts, `if OS.mac?` in the Brewfile, and `{{ if eq .chezmoi.os "darwin" }}` in chezmoi templates / `.chezmoiignore` (macOS-only app configs like AeroSpace/SketchyBar/JankyBorders are ignored on Linux there). Shells detect the Homebrew prefix at runtime via `HOMEBREW_PREFIX` — never hardcode `/opt/homebrew`. This repository is the chezmoi **source directory**. A `.chezmoiroot` file at the repo root contains `home`, so chezmoi uses the `home/` subdirectory as the effective source. Everything else at the repo root (`README.md`, `Brewfile`, `bootstrap.sh`, `CLAUDE.md`) is repo tooling, not applied to `$HOME`.
 
 ## Commands
 

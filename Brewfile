@@ -1,6 +1,10 @@
 # =============================================================================
-# Brewfile - Package management for macOS development environment
+# Brewfile - Package management for the development environment (macOS + Linux)
 # =============================================================================
+# Cross-platform: plain `brew` formulae install on both macOS and Linuxbrew.
+# macOS-only entries (casks, mac-specific taps/formulae) live inside
+# `if OS.mac?` blocks, which `brew bundle` evaluates natively.
+# On Linux, install GUI apps and Nerd Fonts with the distro package manager.
 
 # Taps
 # -----------------------------------------------------------------------------
@@ -10,10 +14,12 @@
 tap "jesseduffield/lazygit", trusted: true
 tap "arl/arl", trusted: true  # for gitmux
 tap "jorgerojas26/lazysql", trusted: true # Lazysql
-tap "nikitabobko/tap", trusted: true # AeroSpace
-tap "FelixKratz/formulae", trusted: true # Sketchybar and JankyBorders
 tap "oven-sh/bun", trusted: true  # Bun JavaScript runtime
 tap "charmbracelet/tap", trusted: true
+if OS.mac?
+  tap "nikitabobko/tap", trusted: true # AeroSpace
+  tap "FelixKratz/formulae", trusted: true # Sketchybar and JankyBorders
+end
 
 # Essential CLI Tools
 # -----------------------------------------------------------------------------
@@ -33,11 +39,13 @@ brew "glab"  # GitLab CLI
 brew "htop"  # Process viewer
 brew "neofetch"  # System info
 
-# GNU utilities (better versions of macOS defaults)
-brew "coreutils"
-brew "gnu-sed"
-brew "findutils"
-brew "gawk"
+# GNU utilities (better versions of macOS defaults; Linux ships these natively)
+if OS.mac?
+  brew "coreutils"
+  brew "gnu-sed"
+  brew "findutils"
+  brew "gawk"
+end
 
 # Development Tools
 # -----------------------------------------------------------------------------
@@ -78,7 +86,7 @@ brew "k3sup"
 brew "helm"
 brew "ansible"
 # brew "docker"
-cask "gcloud-cli"
+cask "gcloud-cli" if OS.mac?  # Linux: install google-cloud-cli via distro repo
 brew "awscli"
 brew "tailscale"
 
@@ -94,55 +102,56 @@ brew "teamookla/speedtest/speedtest", trusted: true  # Speedtest CLI
 # Specialized tools
 brew "joshmedeski/sesh/sesh", trusted: true
 
-# GUI Applications
+# GUI Applications (macOS only — casks don't exist on Linux;
+# install equivalents with the distro package manager / Flatpak)
 # -----------------------------------------------------------------------------
+if OS.mac?
+  # Window Management
+  cask "aerospace"  # Tiling window manager
+  brew "felixkratz/formulae/borders" # JankyBorders
+  brew "felixkratz/formulae/sketchybar" # SketchyBar
 
-# Window Management
-cask "aerospace"  # Tiling window manager
-brew "felixkratz/formulae/borders" # JankyBorders
-brew "felixkratz/formulae/sketchybar" # SketchyBar
+  # Productivity
+  cask "raycast"     # Spotlight replacement
+  cask "claude"      # Claude Desktop
+  cask "1password"   # Password manager
+  cask "1password-cli"
 
-# Productivity
-cask "raycast"     # Spotlight replacement
-cask "claude"      # Claude Desktop
-cask "1password"   # Password manager
-cask "1password-cli"
+  # Development
+  cask "visual-studio-code"
+  cask "claude-code" # Claude Code assistant
+  # cask "docker-desktop"
+  cask "rancher"
+  cask "postman"     # API testing
+  cask "bruno"
 
-# Development
-cask "visual-studio-code"
-cask "claude-code" # Claude Code assistant
-# cask "docker-desktop"
-cask "rancher"
-cask "postman"     # API testing
-cask "bruno"
+  # Terminals
+  cask "wezterm"     # GPU-accelerated terminal
+  cask "ghostty"     # Fast terminal (if available)
+  cask "kitty"       # Alternative terminal
 
-# Terminals
-cask "wezterm"     # GPU-accelerated terminal
-cask "ghostty"     # Fast terminal (if available)
-cask "kitty"       # Alternative terminal
+  # Browsers
+  cask "google-chrome"
 
-# Browsers
-cask "google-chrome"
+  # Communication
+  cask "discord"
+  cask "zoom"
 
-# Communication
-cask "discord"
-cask "zoom"
+  # Media & Utilities
+  cask "obs"         # Screen recording
+  cask "obsidian"    # Note-taking
+  cask "calibre"     # E-book management
+  cask "audacity"    # Audio editing
+  cask "netnewswire" # RSS reader
+  cask "itsycal"     # Menu bar calendar
+  cask "keycastr"    # Keystroke visualizer
+  cask "balenaetcher" # USB flashing tool
 
-# Media & Utilities
-cask "obs"         # Screen recording
-cask "obsidian"    # Note-taking
-cask "calibre"     # E-book management
-cask "audacity"    # Audio editing
-cask "netnewswire" # RSS reader
-cask "itsycal"     # Menu bar calendar
-cask "keycastr"    # Keystroke visualizer
-cask "balenaetcher" # USB flashing tool
-
-# Fonts
-# -----------------------------------------------------------------------------
-cask "font-jetbrains-mono-nerd-font"
-cask "font-fira-code-nerd-font"
-cask "font-hack-nerd-font"
+  # Fonts (Linux: download Nerd Fonts to ~/.local/share/fonts instead)
+  cask "font-jetbrains-mono-nerd-font"
+  cask "font-fira-code-nerd-font"
+  cask "font-hack-nerd-font"
+end
 
 # Development Dependencies
 # -----------------------------------------------------------------------------

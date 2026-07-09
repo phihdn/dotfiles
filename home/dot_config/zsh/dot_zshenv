@@ -42,6 +42,19 @@ if [[ -d "$NVM_DIR/versions/node" ]]; then
   unset _nvm_alias _nvm_ver
 fi
 
+# ---------- Homebrew prefix ----------
+# Detect across macOS arm64 (/opt/homebrew), macOS Intel (/usr/local), and
+# Linuxbrew, so the PATH entries below work on any machine. Exported so
+# .zshrc and other tools can reuse it (brew itself sets the same variable).
+unset HOMEBREW_PREFIX
+for _brew_prefix in /opt/homebrew /usr/local /home/linuxbrew/.linuxbrew; do
+  if [[ -x "$_brew_prefix/bin/brew" ]]; then
+    export HOMEBREW_PREFIX="$_brew_prefix"
+    break
+  fi
+done
+unset _brew_prefix
+
 # ---------- PATH ----------
 # Deduplicate automatically (keeps the first occurrence).
 typeset -U path PATH
@@ -50,9 +63,11 @@ path=(
   "$HOME/.local/bin"                                   # user scripts
   "$HOME/.rd/bin"                                      # Rancher Desktop
   ${_zsh_nvm_node_bin:+"$_zsh_nvm_node_bin"}           # nvm default node
-  "/opt/homebrew/opt/coreutils/libexec/gnubin"         # GNU coreutils
-  "/opt/homebrew/opt/findutils/libexec/gnubin"         # GNU findutils
-  "/opt/homebrew/opt/python/libexec/bin"               # Homebrew python
+  ${HOMEBREW_PREFIX:+"$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin"}  # GNU coreutils (macOS)
+  ${HOMEBREW_PREFIX:+"$HOMEBREW_PREFIX/opt/findutils/libexec/gnubin"}  # GNU findutils (macOS)
+  ${HOMEBREW_PREFIX:+"$HOMEBREW_PREFIX/opt/python/libexec/bin"}        # Homebrew python
+  ${HOMEBREW_PREFIX:+"$HOMEBREW_PREFIX/bin"}                           # Homebrew
+  ${HOMEBREW_PREFIX:+"$HOMEBREW_PREFIX/sbin"}
   "$HOME/.bun/bin"                                      # Bun
   $path
 )

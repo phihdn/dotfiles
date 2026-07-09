@@ -1,7 +1,15 @@
 # Patterns of target paths chezmoi should never manage.
 # Syntax mirrors .gitignore (patterns are relative to $HOME).
+# This file is a chezmoi template, so sections can be OS-conditional.
 
 .DS_Store
+
+{{ if ne .chezmoi.os "darwin" -}}
+# macOS-only apps — don't write their configs on Linux
+.config/aerospace
+.config/sketchybar
+.config/borders
+{{- end }}
 
 # k9s runtime state (per-machine, not tracked)
 .config/k9s/benchmarks

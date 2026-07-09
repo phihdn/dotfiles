@@ -60,16 +60,10 @@ fi
 # Fuzzy finder key bindings (cross-platform)
 # =========================================================
 
-# macOS / Homebrew (Apple Silicon)
-if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
-  source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
-  source /opt/homebrew/opt/fzf/shell/completion.zsh
-fi
-
-# macOS / Homebrew (Intel)
-if [[ -f /usr/local/opt/fzf/shell/key-bindings.zsh ]]; then
-  source /usr/local/opt/fzf/shell/key-bindings.zsh
-  source /usr/local/opt/fzf/shell/completion.zsh
+# Homebrew (macOS Apple Silicon/Intel, Linuxbrew) — HOMEBREW_PREFIX from .zshenv
+if [[ -n "$HOMEBREW_PREFIX" && -f "$HOMEBREW_PREFIX/opt/fzf/shell/key-bindings.zsh" ]]; then
+  source "$HOMEBREW_PREFIX/opt/fzf/shell/key-bindings.zsh"
+  source "$HOMEBREW_PREFIX/opt/fzf/shell/completion.zsh"
 fi
 
 # Arch

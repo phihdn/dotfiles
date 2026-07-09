@@ -42,6 +42,22 @@ This will:
 Secrets (e.g. the WakaTime API key) are resolved from 1Password at apply time.
 If the `op` CLI isn't signed in yet, sign in and re-run `chezmoi apply`.
 
+### 🐧 Linux support
+
+The repo works on Linux too. `bootstrap.sh` detects the OS: on Linux it skips
+Xcode tools (checks for `curl`/`git`/`gcc` instead — install `build-essential`
+or equivalent first), installs Homebrew to `/home/linuxbrew/.linuxbrew`, and
+falls back to the system zsh for the default shell. OS-specific handling:
+
+- **Brewfile** — casks and mac-only formulae are wrapped in `if OS.mac?`;
+  on Linux install GUI apps and Nerd Fonts via your distro/Flatpak.
+- **chezmoi templates** — `~/.gitconfig*` pick the right 1Password
+  `op-ssh-sign` path per OS (`/opt/1Password/op-ssh-sign` on Linux), and
+  `home/.chezmoiignore` skips macOS-only app configs (AeroSpace, SketchyBar,
+  JankyBorders) on Linux.
+- **Shells** — zsh and fish detect the Homebrew prefix at runtime
+  (`HOMEBREW_PREFIX`), so PATH works with macOS arm64/Intel brew and Linuxbrew.
+
 ## 📦 What Gets Installed
 
 ### 🧰 Essential CLI Tools
