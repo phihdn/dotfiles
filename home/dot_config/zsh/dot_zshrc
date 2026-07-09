@@ -108,3 +108,11 @@ nvm() {
 if command -v uv >/dev/null 2>&1; then
   eval "$(uv generate-shell-completion zsh)"
 fi
+
+# =========================================================
+# Machine-local overrides
+# =========================================================
+
+# Per-machine config (secrets, host-specific exports) lives outside chezmoi:
+# ~/.config/zsh/local.zsh is never managed or committed.
+[[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"

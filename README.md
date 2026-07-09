@@ -171,6 +171,7 @@ other file lives there and `$HOME` stays clean.
 | `bindings.zsh` | Key-bindings and vi-mode cursor settings. Defines the `zvm_after_init` hook **before** plugins load so custom bindings survive zsh-vi-mode's reset. |
 | `plugins.zsh` | Self-contained plugin manager: clones plugins into `~/.config/zsh/plugins` on first launch and sources them. Run `zplugin-update` to update. |
 | `prompt.zsh` | Initializes the Starship prompt (or a minimal `$` prompt inside Cursor Agent). |
+| `local.zsh` | **Optional, per-machine, not managed by chezmoi.** Sourced last by `.zshrc` if it exists — put machine-specific exports and secrets here; it never lands in this repo. |
 
 Plugins loaded by `plugins.zsh` (in order):
 
