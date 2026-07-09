@@ -4,6 +4,11 @@
 
 .DS_Store
 
+# ~/.zshrc is unused (ZDOTDIR moves the real .zshrc to ~/.config/zsh) but
+# Rancher Desktop keeps recreating it with a PATH snippet; leftover chezmoi
+# state from the old top-level dot_zshrc would otherwise delete it on apply.
+.zshrc
+
 {{ if ne .chezmoi.os "darwin" -}}
 # macOS-only apps — don't write their configs on Linux
 .config/aerospace
