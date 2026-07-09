@@ -40,7 +40,10 @@ This will:
 6. Set zsh as the default shell (fish stays available via `fish`)
 
 Secrets (e.g. the WakaTime API key) are resolved from 1Password at apply time.
-If the `op` CLI isn't signed in yet, sign in and re-run `chezmoi apply`.
+Until the `op` CLI has an account configured, the secret-bearing files
+(`~/.wakatime.cfg`, `~/.gitconfig-work`) are skipped via `.chezmoiignore` so a
+fresh machine applies cleanly — set up `op`, then re-run `chezmoi apply` to
+create them.
 
 ### 🐧 Linux support
 

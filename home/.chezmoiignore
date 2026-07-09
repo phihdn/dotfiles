@@ -2,6 +2,18 @@
 # Syntax mirrors .gitignore (patterns are relative to $HOME).
 # This file is a chezmoi template, so sections can be OS-conditional.
 
+# Secret-bearing targets are managed only once the 1Password CLI has an
+# account configured (`op account list`; unlike `op whoami` it doesn't need an
+# unlocked session, which the desktop-app integration rarely keeps open).
+# Guarding here (not inside the templates) matters: an in-template guard would
+# render the files empty whenever 1Password is unavailable and blank real
+# secrets; ignored targets are simply left untouched instead. After setting up
+# `op` on a new machine, run `chezmoi apply` to (re)create them.
+{{ if ne (output "sh" "-c" "op account list 2>/dev/null | grep -q . && echo ok || true" | trim) "ok" -}}
+.wakatime.cfg
+.gitconfig-work
+{{- end }}
+
 .DS_Store
 
 # ~/.zshrc is unused (ZDOTDIR moves the real .zshrc to ~/.config/zsh) but
