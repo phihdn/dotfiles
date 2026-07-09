@@ -235,6 +235,9 @@ if [[ ! -d "$HOME/.config/nvm" ]]; then
     # Install latest LTS Node.js and set as default (run once during installation)
     log_step "Installing latest LTS Node.js and setting as default"
     export NVM_DIR="$HOME/.config/nvm"
+    # nvm.sh reads variables before assigning them and breaks under `set -u`
+    # (e.g. "PROVIDED_VERSION: unbound variable"); relax nounset around it.
+    set +u
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
     if nvm install --lts && nvm use --lts && nvm alias default node; then
@@ -242,6 +245,7 @@ if [[ ! -d "$HOME/.config/nvm" ]]; then
     else
       log_warn "Node.js installation encountered issues (may need manual setup)"
     fi
+    set -u
   else
     log_error "Failed to install nvm"
     exit 1

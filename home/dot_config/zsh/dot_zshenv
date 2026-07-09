@@ -34,8 +34,12 @@ if [[ -d "$NVM_DIR/versions/node" ]]; then
   _nvm_alias="$(< "$NVM_DIR/alias/default" 2>/dev/null)"
   case "$_nvm_alias" in
     v*) _nvm_ver="$_nvm_alias" ;;                       # pinned version
-    *)  # "node"/"lts/*"/empty -> newest installed version
-        _nvm_ver="${${(f)$(print -l "$NVM_DIR"/versions/node/*(/N:t) | sort -V)}[-1]}" ;;
+    *)  # "node"/"lts/*"/empty -> newest installed version.
+        # Assign to an array first: with a single version, ${(f)$(...)}[-1]
+        # would be scalar indexing and return the last *character*.
+        _nvm_vers=(${(f)"$(print -l "$NVM_DIR"/versions/node/*(/N:t) | sort -V)"})
+        (( ${#_nvm_vers} )) && _nvm_ver="${_nvm_vers[-1]}"
+        unset _nvm_vers ;;
   esac
   [[ -x "$NVM_DIR/versions/node/$_nvm_ver/bin/node" ]] \
     && _zsh_nvm_node_bin="$NVM_DIR/versions/node/$_nvm_ver/bin"
