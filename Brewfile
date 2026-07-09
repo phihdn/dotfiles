@@ -29,6 +29,7 @@ brew "fd"    # Better find
 brew "jq"    # JSON processor
 brew "yq"    # YAML processor
 brew "gh"    # GitHub CLI
+brew "glab"  # GitLab CLI
 brew "htop"  # Process viewer
 brew "neofetch"  # System info
 
