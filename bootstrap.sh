@@ -280,8 +280,13 @@ if [[ -x "$ZSH_PATH" ]]; then
   fi
   if [[ "$SHELL" != "$ZSH_PATH" ]]; then
     log_info "Changing default shell to zsh..."
-    chsh -s "$ZSH_PATH"
-    log_success "Default shell changed to zsh"
+    # chsh can prompt for a password (Linux PAM) and fail non-interactively;
+    # don't let that abort the rest of the bootstrap.
+    if chsh -s "$ZSH_PATH"; then
+      log_success "Default shell changed to zsh"
+    else
+      log_warn "chsh failed; change manually with: chsh -s $ZSH_PATH"
+    fi
   else
     log_success "zsh is already the default shell"
   fi

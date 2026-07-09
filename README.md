@@ -129,7 +129,7 @@ home/
 ├── dot_zshenv                    → ~/.zshenv               zsh bootstrap (points ZDOTDIR at ~/.config/zsh)
 ├── dot_gitconfig                 → ~/.gitconfig            git identity + 1Password SSH signing
 ├── dot_gitconfig-personal        → ~/.gitconfig-personal   included for repos under ~/ws/personal/
-├── dot_gitconfig-work       → ~/.gitconfig-work  included for repos under ~/ws/work/work/
+├── private_dot_gitconfig-work.tmpl → ~/.gitconfig-work     included for repos under ~/ws/work/ (content pulled from 1Password, 0600)
 ├── private_dot_wakatime.cfg.tmpl → ~/.wakatime.cfg         WakaTime (API key pulled from 1Password, 0600)
 ├── dot_local/bin/executable_*    → ~/.local/bin/*          user scripts (brew-sync, sesh_start, git-bare-clone, ...)
 └── dot_config/                   → ~/.config/
