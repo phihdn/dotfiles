@@ -50,6 +50,7 @@ end
 # Development Tools
 # -----------------------------------------------------------------------------
 brew "neovim", args: ["HEAD"]
+brew "tree-sitter-cli"  # required by nvim-treesitter (main branch) to install parsers
 brew "tmux"
 brew "gitmux"
 brew "git-lfs"

@@ -1,27 +1,14 @@
 return {
-  "nvim-treesitter/nvim-treesitter",
-  event = { "BufReadPre", "BufNewFile" },
-  build = ":TSUpdate",
-  dependencies = {
-    "windwp/nvim-ts-autotag",
-  },
-  config = function()
-    -- import nvim-treesitter plugin
-    local treesitter = require("nvim-treesitter.configs")
-
-    -- configure treesitter
-    treesitter.setup({ -- enable syntax highlighting
-      highlight = {
-        enable = true,
-      },
-      -- enable indentation
-      indent = { enable = true },
-      -- enable autotagging (w/ nvim-ts-autotag plugin)
-      autotag = {
-        enable = true,
-      },
-      -- ensure these language parsers are installed
-      ensure_installed = {
+  {
+    "nvim-treesitter/nvim-treesitter",
+    -- the archived master branch predates the query API removal in nvim 0.13-dev;
+    -- main is the supported rewrite for nightly builds
+    branch = "main",
+    lazy = false,
+    build = ":TSUpdate",
+    config = function()
+      -- language parsers to install (main branch has no ensure_installed option)
+      require("nvim-treesitter").install({
         "json",
         "javascript",
         "typescript",
@@ -46,16 +33,24 @@ return {
         "terraform",
         "proto",
         "regex",
-      },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = "<Enter>",
-          node_incremental = "<Enter>",
-          scope_incremental = false,
-          node_decremental = "<Backspace>",
-        },
-      },
-    })
-  end,
+      })
+
+      -- main branch enables highlighting/indentation per buffer instead of globally;
+      -- pcall skips filetypes whose parser isn't installed
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("phihdn.treesitter", { clear = true }),
+        callback = function(args)
+          if pcall(vim.treesitter.start, args.buf) then
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
+    end,
+  },
+  {
+    -- autotag no longer hooks into nvim-treesitter's setup; it configures itself
+    "windwp/nvim-ts-autotag",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {},
+  },
 }
