@@ -2,6 +2,8 @@
 # tmux session-created hook: apply a layout based on the session's path.
 # Wired up in tmux.conf via:
 #   set-hook -g session-created 'run-shell "~/.local/bin/tmux-session-layout #{q:hook_session_name} #{q:session_path}"'
+# Repo sessions under ~/ws/work|personal get:
+#   1: claude (focused)   2: nvim + bottom terminal pane (dev layout)   3: lazygit
 # Add more `case` branches to give other path patterns their own layout.
 
 session="$1"
@@ -18,7 +20,21 @@ case "$path" in
 esac
 
 # Skip if the session already has a claude window (e.g. sesh config sessions).
-if ! tmux list-windows -t "=$session" -F '#{window_name}' | grep -qx claude; then
-  tmux new-window -d -t "=$session" -n claude -c "$path" \
-    "CLAUDE_CONFIG_DIR=$claude_cfg claude"
-fi
+tmux list-windows -t "=$session" -F '#{window_name}' | grep -q '^claude' && exit 0
+
+# sesh sends its startup command (nvim) into window 1 right after creating the
+# session; wait until it's running so we don't shuffle windows mid-send.
+for _ in $(seq 1 30); do
+  [ "$(tmux display -p -t "=$session:1.1" '#{pane_current_command}')" = nvim ] && break
+  sleep 0.1
+done
+
+# Dev layout for the nvim window: editor on top, terminal below.
+tmux split-window -d -v -l 25% -t "=$session:1.1" -c "$path"
+tmux rename-window -t "=$session:1" nvim
+tmux new-window -d -t "=$session" -n claude -c "$path" \
+  "CLAUDE_CONFIG_DIR=$claude_cfg claude"
+tmux new-window -d -t "=$session" -n git -c "$path" lazygit
+# Swap so the order is claude(1), nvim(2), git(3), then land on claude.
+tmux swap-window -d -s "=$session:1" -t "=$session:2"
+tmux select-window -t "=$session:1"

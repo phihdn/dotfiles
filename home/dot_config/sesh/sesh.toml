@@ -6,8 +6,10 @@ import = [
   "~/.config/sesh/configs/windows.toml",
 ]
 
+# Open nvim with the snacks file picker (LazyVim's Telescope equivalent) so a
+# new session starts by browsing the dir; scheduled so the UI is ready first.
 [default_session]
-startup_command = "nvim"
+startup_command = "nvim -c 'lua vim.schedule(Snacks.picker.files)'"
 preview_command = "eza --all --git --icons --color=always {}"
 
 [[session]]
