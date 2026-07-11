@@ -1,0 +1,20 @@
+# Reusable sesh windows — referenced from sesh.toml via `windows = ["name"]`.
+# A window inherits the session's path unless it sets its own `path`.
+
+[[window]]
+name = "git"
+startup_script = "git pull && lazygit"
+
+# Claude Code per account (matches the claude-work/claude-personal aliases)
+[[window]]
+name = "claude-work"
+startup_script = "CLAUDE_CONFIG_DIR=$HOME/.claude-work claude"
+
+[[window]]
+name = "claude-personal"
+startup_script = "CLAUDE_CONFIG_DIR=$HOME/.claude-personal claude"
+
+# Pane layouts aren't supported in TOML — script them with tmux instead.
+[[window]]
+name = "dev"
+startup_script = "~/.local/bin/sesh-dev-layout"

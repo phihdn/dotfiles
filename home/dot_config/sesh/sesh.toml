@@ -1,0 +1,43 @@
+# sesh configuration — https://github.com/joshmedeski/sesh
+# Sessions defined here appear in the picker (prefix+K, then ctrl-g for configs only).
+# Windows are defined in configs/windows.toml and referenced by name.
+
+import = [
+  "~/.config/sesh/configs/windows.toml",
+]
+
+[default_session]
+startup_command = "nvim"
+preview_command = "eza --all --git --icons --color=always {}"
+
+[[session]]
+name = "home"
+path = "~"
+
+[[session]]
+name = "dotfiles"
+path = "~/dotfiles"
+startup_command = "nvim"
+windows = ["claude-work", "git"]
+
+[[session]]
+name = "tmux config"
+path = "~/dotfiles/home/dot_config/tmux"
+startup_command = "nvim tmux.conf"
+preview_command = "bat --language=bash --style=snip --color=always ~/dotfiles/home/dot_config/tmux/tmux.conf"
+
+[[session]]
+name = "nvim config"
+path = "~/dotfiles/home/dot_config/nvim"
+startup_command = "nvim init.lua"
+
+# NOTE: these are folders of repos, not git repos — no "git" or "claude"
+# windows here. Repo sessions under ~/ws get their claude window from the
+# tmux session-created hook instead (see ~/.local/bin/tmux-session-layout).
+[[session]]
+name = "work"
+path = "~/ws/work"
+
+[[session]]
+name = "personal"
+path = "~/ws/personal"

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Pane layout for the sesh "dev" window: editor on top, shell below.
+# Runs inside the new window, so $PWD is the session/window path.
+tmux split-window -v -l 25% -c "$PWD"
+tmux select-pane -t 1
+exec nvim

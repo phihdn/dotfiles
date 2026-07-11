@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# tmux session-created hook: apply a layout based on the session's path.
+# Wired up in tmux.conf via:
+#   set-hook -g session-created 'run-shell "~/.local/bin/tmux-session-layout #{q:hook_session_name} #{q:session_path}"'
+# Add more `case` branches to give other path patterns their own layout.
+
+session="$1"
+path="$2"
+{ [ -n "$session" ] && [ -d "$path" ]; } || exit 0
+
+# Only lay out real repos, not umbrella folders like ~/ws/work.
+git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
+
+case "$path" in
+  "$HOME/ws/work/"*)     claude_cfg="$HOME/.claude-work" ;;
+  "$HOME/ws/personal/"*) claude_cfg="$HOME/.claude-personal" ;;
+  *) exit 0 ;;
+esac
+
+# Skip if the session already has a claude window (e.g. sesh config sessions).
+if ! tmux list-windows -t "=$session" -F '#{window_name}' | grep -qx claude; then
+  tmux new-window -d -t "=$session" -n claude -c "$path" \
+    "CLAUDE_CONFIG_DIR=$claude_cfg claude"
+fi
