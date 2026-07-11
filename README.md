@@ -9,7 +9,7 @@ A lean, modern development environment for macOS that brings the best terminal-f
 * 🐟 **Fish shell** — user-friendly shell with great defaults (alternative)
 * 🧠 **Raycast** — fast launcher & automation
 * 🪟 **AeroSpace** — tiling window management (like i3, for Mac)
-* 🧑‍💻 **Neovim** — full-featured, modern editor configuration
+* 🧑‍💻 **Neovim** — [LazyVim](https://www.lazyvim.org) distro, near-stock with language extras
 * 🖋️ **chezmoi** — declarative, template-aware dotfile management
 * 🧰 **Essential CLI tools** — ripgrep, fzf, bat, eza, and more
 * 🚀 **Zsh** — default shell with a modular XDG config (`~/.config/zsh`) and a self-contained plugin manager
@@ -138,7 +138,7 @@ home/
 └── dot_config/                   → ~/.config/
     ├── zsh/           zsh shell config — modular (see "zsh configuration" below)
     ├── fish/          fish shell config (config.fish, conf.d/, functions/)
-    ├── nvim/          Neovim — Lua config under lua/phihdn/{core,plugins}
+    ├── nvim/          Neovim — LazyVim starter (see "Neovim (LazyVim)" below)
     ├── tmux/          tmux config + gitmux + catppuccin theme
     ├── starship.toml  Starship prompt (shared by zsh and fish)
     ├── aerospace/     AeroSpace tiling window manager
@@ -258,6 +258,32 @@ case $- in *i*) echo interactive;; *) echo non-interactive;; esac
 
 With the setup above, `node` resolves to nvm's version in **all** of those
 modes, so it shouldn't matter — but this is how you'd confirm.
+
+### Neovim (LazyVim)
+
+`~/.config/nvim` is the stock [LazyVim starter](https://github.com/LazyVim/starter)
+with **no hand-written plugin specs** — the goal is zero config maintenance and
+letting the distro handle upgrades. The only customization is language extras
+enabled in `lazyvim.json` (LazyVim's own mechanism, same as `:LazyExtras`):
+
+* `lang.typescript`, `lang.go`, `lang.python` — IDE setup (LSP, formatters, DAP, tests)
+* `lang.markdown` — for reviewing AI-generated code plans/docs
+
+`lazy-lock.json` is intentionally **not** managed by chezmoi (see
+`.chezmoiignore`): lazy.nvim rewrites it on every `:Lazy update`, which would
+otherwise produce constant chezmoi diff noise.
+
+**Previous hand-rolled config**: the pre-LazyVim setup (custom Lua config under
+`lua/phihdn/{core,plugins}` — kanagawa theme, telescope, fzf-lua, oil,
+blink-cmp, conform, etc.) is preserved on the branch
+[`20260710-nvim-pre-lazyvim`](https://github.com/phihdn/dotfiles/tree/20260710-nvim-pre-lazyvim/home/dot_config/nvim),
+at `home/dot_config/nvim/`. To compare or port old behavior (keymaps, options,
+plugin settings) into LazyVim:
+
+```bash
+git diff 20260710-nvim-pre-lazyvim main -- home/dot_config/nvim
+git show 20260710-nvim-pre-lazyvim:home/dot_config/nvim/lua/phihdn/core/keymaps.lua
+```
 
 ## 🤖 Claude Code — multiple accounts
 
@@ -593,7 +619,7 @@ uv run --python 3.12 python script.py
 | **lf** | lf file manager configuration and settings |
 | **lsd** | lsd (ls deluxe) configuration and colors |
 | **neofetch** | Neofetch system information display configuration |
-| **nvim** | Neovim configuration with Lua and plugins |
+| **nvim** | Neovim — LazyVim distro with language extras |
 | **scripts** | Custom utility scripts and tools |
 | **sesh** | Sesh tmux session manager configuration |
 | **starship** | Starship cross-shell prompt configuration |
