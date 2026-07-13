@@ -55,6 +55,8 @@ brew "tmux"
 brew "gitmux"
 brew "git-lfs"
 brew "lazygit"
+brew "git-delta"   # Syntax-highlighting git pager (lazygit diff pager)
+brew "difftastic"  # Structural language-aware diffs (lazygit alt pager, cycle with |)
 brew "lazydocker"
 brew "lazysql"
 brew "charmbracelet/tap/crush"
