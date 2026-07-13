@@ -26,6 +26,7 @@
 .config/aerospace
 .config/sketchybar
 .config/borders
+.config/karabiner
 {{- end }}
 
 # k9s runtime state (per-machine, not tracked)
