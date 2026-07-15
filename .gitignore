@@ -36,6 +36,9 @@ Brewfile.lock.json
 personal/
 private/
 
+# Local planning artifacts (not part of the dotfiles)
+plans/
+
 home/dot_config/nvim/*lock.json
 
 # k9s runtime state

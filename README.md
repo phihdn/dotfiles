@@ -325,25 +325,26 @@ for dir in ~/.claude-work ~/.claude-personal; do
 done
 ```
 
-### Installing skills with claudekit-cli (`ck`)
+### Installing skills with AgentKit (`ak`)
 
-[`claudekit-cli`](https://github.com/mrgoonie/claudekit-cli) (`ck`) installs
-global skills/commands/agents to `$CLAUDE_CONFIG_DIR` if set, otherwise to
-`~/.claude` (verified against its `PathResolver.getGlobalKitDir()`). Since the
-`claude-work`/`claude-personal` aliases only export `CLAUDE_CONFIG_DIR` for the
-`claude` process, a plain terminal leaves it unset — so **`ck` installs to
-`~/.claude`, and the symlinks above propagate everything to both accounts
-automatically**. Install once, no per-account runs:
+[AgentKit](https://agentkit.best/docs) (`ak`, formerly `claudekit-cli`/`ck`)
+installs global skills/agents/hooks to `$CLAUDE_CONFIG_DIR` if set, otherwise
+to `~/.claude`. Since the `claude-work`/`claude-personal` aliases only export
+`CLAUDE_CONFIG_DIR` for the `claude` process, a plain terminal leaves it unset
+— so **`ak` installs to `~/.claude`, and the symlinks above propagate
+everything to both accounts automatically**. Install once, no per-account
+runs:
 
 ```bash
-ck init -g   # writes to ~/.claude → both accounts see it via the symlinks
-ck skills
+curl -fsSL https://agentkit.best/install.sh | sh   # one-time: installs the ak binary to ~/.local/bin
+ak kit init engineer   # writes to ~/.claude → both accounts see it via the symlinks
 ```
 
 Cautions:
-- **Don't run `ck` from inside a `claude-work`/`claude-personal` session** — there `CLAUDE_CONFIG_DIR` is exported, so `ck` would target the account dir instead of `~/.claude`. Use a plain terminal.
-- **Don't run `ck init --fresh` / `ck uninstall` with `CLAUDE_CONFIG_DIR` pointed at an account dir** — those delete config subdirs and could recurse through the symlinks into your real `~/.claude`. Run them against `~/.claude`.
-- If `ck` ever adds a **new** top-level dir (e.g. `workflows/`), re-run the seeding snippet above to symlink it into the account dirs.
+- **Don't run `ak` from inside a `claude-work`/`claude-personal` session** — there `CLAUDE_CONFIG_DIR` is exported, so `ak` would target the account dir instead of `~/.claude`. Use a plain terminal.
+- **Don't run `ak uninstall` with `CLAUDE_CONFIG_DIR` pointed at an account dir** — that could recurse through the symlinks into your real `~/.claude`. Run it against `~/.claude`.
+- If `ak` ever adds a **new** top-level dir, re-run the seeding snippet above to symlink it into the account dirs.
+- Migrated from `ck` via `ak migrate --from=ck` — it archives the legacy kit under `~/.agentkit/archives/legacy-kit-migration/` before rewriting, and `ak migrate rollback` can undo it if needed.
 
 **First-time login** — run each alias once and sign in with the matching
 account:
@@ -355,6 +356,40 @@ claude-personal   # then: /login  (personal account)
 
 After that, each alias remembers its own login. Use the alias that matches the
 repo you're in.
+
+### Backing up `~/.claude` (separate private repo)
+
+`~/.claude` is **not** tracked by this (public) dotfiles repo — it holds the
+paid AgentKit kit, so it lives in its own **private** repo
+([`phihdn/dotfiles-claude`](https://github.com/phihdn/dotfiles-claude)). That
+repo commits the restorable config (ak layer snapshot + custom `CLAUDE.md` +
+`rules/markdown-formatting.md` + `settings.json` + `agent-memory/`) and
+**gitignores every secret and machine-state path** (`.env`, `history.jsonl`,
+`projects/`, `sessions/`, `cache/`, `telemetry/`, `plugins/`, …). It is a
+standalone repo cloned by `bootstrap.sh`, not a git submodule.
+
+**Restore on a new machine** (handled automatically by `bootstrap.sh`, needs
+GitHub SSH/`gh` auth first):
+
+```bash
+git clone git@github.com:phihdn/dotfiles-claude.git ~/.claude
+ak kit refresh core --yes && ak kit refresh engineer --yes && ak kit refresh marketing --yes
+# then bootstrap seeds the ~/.claude-work / ~/.claude-personal symlinks
+```
+
+The cloned snapshot works immediately; `ak kit refresh` then overwrites the ak
+files with the latest release (your own edits are kept unless you pass
+`--force`).
+
+**Ongoing backup** — commit and push new config changes from `~/.claude`:
+
+```bash
+git -C ~/.claude add -A && git -C ~/.claude commit -m "chore: update claude config" && git -C ~/.claude push
+```
+
+Anything you author yourself should use a `phi-` prefix (e.g.
+`skills/phi-*`, `hooks/phi-*.cjs`) so it's easy to tell apart from ak content
+and survives `ak kit refresh` untouched.
 
 ## 🚀 Usage
 

@@ -316,6 +316,38 @@ fi
 
 log_section "Setting Up Claude Code Accounts"
 
+# ~/.claude is backed up in a SEPARATE PRIVATE repo (not this public dotfiles
+# repo) because it contains the paid AgentKit kit. Secrets/state are gitignored
+# there; the ak layer is refreshed to the latest release below. This restore
+# needs git + GitHub SSH/gh auth already configured on the machine.
+CLAUDE_BACKUP_REPO="git@github.com:phihdn/dotfiles-claude.git"
+log_step "Restoring ~/.claude from private backup"
+if [[ -d "$HOME/.claude/.git" ]]; then
+  log_info "~/.claude already a git repo; skipping clone (git -C ~/.claude pull to update)"
+elif [[ -d "$HOME/.claude" ]]; then
+  log_warn "~/.claude exists but is not a git repo; skipping clone to avoid clobbering it"
+elif git clone "$CLAUDE_BACKUP_REPO" "$HOME/.claude"; then
+  log_success "Cloned ~/.claude from $CLAUDE_BACKUP_REPO"
+else
+  log_warn "Could not clone $CLAUDE_BACKUP_REPO (check SSH/gh auth). If a partial ~/.claude was left behind, run: rm -rf ~/.claude && re-run bootstrap"
+fi
+
+# Refresh the AgentKit layer to the latest release. `ak kit refresh` overwrites
+# ak-owned files but skips files you modified (unless --force). No-op if ak is
+# absent — the cloned snapshot still works until ak is installed.
+if command -v ak &>/dev/null; then
+  log_step "Refreshing AgentKit kits to latest (core, engineer, marketing)"
+  for kit in core engineer marketing; do
+    if ak kit refresh "$kit" --yes >/dev/null; then
+      log_success "ak kit refresh $kit"
+    else
+      log_warn "ak kit refresh $kit failed (see stderr above; kit not installed / auth / network?)"
+    fi
+  done
+else
+  log_info "ak not found; skipping AgentKit refresh (install ak, then run: ak kit refresh <kit> --yes)"
+fi
+
 # Two Claude Code accounts (work + personal) via separate CLAUDE_CONFIG_DIRs.
 # The `claude-work` / `claude-personal` aliases (in zsh & fish) point Claude at
 # these dirs so logins, history, projects, and sessions stay isolated. Shared
