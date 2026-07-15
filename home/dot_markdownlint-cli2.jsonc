@@ -1,0 +1,12 @@
+{
+  // Global fallback config for markdownlint-cli2 (used by nvim via nvim-lint,
+  // see home/dot_config/nvim/lua/plugins/markdown-lint.lua, which passes this
+  // path explicitly since markdownlint-cli2 doesn't auto-discover configs
+  // above the current working directory).
+  "config": {
+    "default": true,
+    // Hard-wrapping prose at a fixed column conflicts with normal writing and
+    // with how Claude Code / LLMs produce text -- disable line-length checks.
+    "MD013": false
+  }
+}
