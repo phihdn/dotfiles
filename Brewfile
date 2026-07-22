@@ -160,6 +160,7 @@ end
 # -----------------------------------------------------------------------------
 brew "gcc"
 brew "openssl"
+brew "libpq", link: true  # PostgreSQL client tools (psql, pg_dump, ...) without the server; keg-only so force-link
 
 # Optional/Project-specific (commented out by default)
 # -----------------------------------------------------------------------------
