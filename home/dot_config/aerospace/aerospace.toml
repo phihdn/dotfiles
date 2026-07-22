@@ -96,13 +96,11 @@ automatically-unhide-macos-hidden-apps = false
 
     # All possible commands: https://nikitabobko.github.io/AeroSpace/commands
 
-    # 'hyper' = cmd-ctrl-alt-shift, sent by holding right Cmd (remapped via Karabiner
-    # to a hyper key). Used for all single-key main-mode binds below so plain Alt
-    # stays free for apps (e.g. nvim/Snacks picker's <A-h>/<A-f>) instead of being
-    # grabbed globally by AeroSpace. Binds that already combine alt with shift
-    # (move, join-with, mode switches) are left as-is since they never collided
-    # with anything and hyper already includes shift, so it can't distinguish a
-    # second variant on the same letter.
+    # 'hyper' = cmd-ctrl-alt-shift, sent by holding right Cmd or Tab (remapped via
+    # Karabiner). Every bind lives under hyper so plain Alt stays free for apps
+    # (e.g. nvim/Snacks picker's <A-h>/<A-f>). Hyper already includes shift, so a
+    # "hyper+shift" move-variant can't exist — instead all move actions live in a
+    # dedicated 'move' binding mode (hyper-m), keeping one consistent modifier.
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
     # You can uncomment the following lines to open up terminal with hyper + enter shortcut
@@ -115,20 +113,17 @@ automatically-unhide-macos-hidden-apps = false
     # '''
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#layout
+    # Accordion lives on 'a', not the stock 'comma': ctrl-opt-cmd-shift-comma/period
+    # are hardcoded macOS sysdiagnose keychords — the OS flashes the screen, dumps a
+    # ~400MB archive to /var/tmp, and never delivers the event to apps.
     cmd-ctrl-alt-shift-slash = 'layout tiles horizontal vertical'
-    cmd-ctrl-alt-shift-comma = 'layout accordion horizontal vertical'
+    cmd-ctrl-alt-shift-a = 'layout accordion horizontal vertical'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#focus
     cmd-ctrl-alt-shift-h = 'focus left'
     cmd-ctrl-alt-shift-j = 'focus down'
     cmd-ctrl-alt-shift-k = 'focus up'
     cmd-ctrl-alt-shift-l = 'focus right'
-
-    # See: https://nikitabobko.github.io/AeroSpace/commands#move
-    alt-shift-h = 'move left'
-    alt-shift-j = 'move down'
-    alt-shift-k = 'move up'
-    alt-shift-l = 'move right'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#resize
     cmd-ctrl-alt-shift-minus = 'resize smart -50'
@@ -147,26 +142,40 @@ automatically-unhide-macos-hidden-apps = false
     cmd-ctrl-alt-shift-9 = 'workspace 9'
     cmd-ctrl-alt-shift-t = 'workspace T'
 
-    # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-    alt-shift-1 = 'move-node-to-workspace 1'
-    alt-shift-2 = 'move-node-to-workspace 2'
-    alt-shift-3 = 'move-node-to-workspace 3'
-    alt-shift-4 = 'move-node-to-workspace 4'
-    alt-shift-5 = 'move-node-to-workspace 5'
-    alt-shift-6 = 'move-node-to-workspace 6'
-    alt-shift-7 = 'move-node-to-workspace 7'
-    alt-shift-8 = 'move-node-to-workspace 8'
-    alt-shift-9 = 'move-node-to-workspace 9'
-    alt-shift-t = 'move-node-to-workspace T'
-
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
     cmd-ctrl-alt-shift-tab = 'workspace-back-and-forth'
-    # See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
-    alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
-    alt-shift-semicolon = 'mode service'
-    alt-shift-r = 'mode resize'
+    # All move actions (window nudges, throw-to-workspace, workspace-to-monitor)
+    # live in the 'move' mode below, entered with hyper-m.
+    cmd-ctrl-alt-shift-m = 'mode move'
+    cmd-ctrl-alt-shift-semicolon = 'mode service'
+    cmd-ctrl-alt-shift-r = 'mode resize'
+
+# 'move' binding mode: everything that relocates windows/workspaces.
+# h/j/k/l keep the mode active for repeated nudges; workspace throws and the
+# monitor move exit back to main since they're one-shot actions.
+[mode.move.binding]
+    h = 'move left'
+    j = 'move down'
+    k = 'move up'
+    l = 'move right'
+
+    1 = ['move-node-to-workspace 1', 'mode main']
+    2 = ['move-node-to-workspace 2', 'mode main']
+    3 = ['move-node-to-workspace 3', 'mode main']
+    4 = ['move-node-to-workspace 4', 'mode main']
+    5 = ['move-node-to-workspace 5', 'mode main']
+    6 = ['move-node-to-workspace 6', 'mode main']
+    7 = ['move-node-to-workspace 7', 'mode main']
+    8 = ['move-node-to-workspace 8', 'mode main']
+    9 = ['move-node-to-workspace 9', 'mode main']
+    t = ['move-node-to-workspace T', 'mode main']
+
+    tab = ['move-workspace-to-monitor --wrap-around next', 'mode main']
+
+    enter = 'mode main'
+    esc = 'mode main'
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -179,10 +188,10 @@ automatically-unhide-macos-hidden-apps = false
     # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
     #s = ['layout sticky tiling', 'mode main']
 
-    alt-shift-h = ['join-with left', 'mode main']
-    alt-shift-j = ['join-with down', 'mode main']
-    alt-shift-k = ['join-with up', 'mode main']
-    alt-shift-l = ['join-with right', 'mode main']
+    h = ['join-with left', 'mode main']
+    j = ['join-with down', 'mode main']
+    k = ['join-with up', 'mode main']
+    l = ['join-with right', 'mode main']
 
     down = 'volume down'
     up = 'volume up'
