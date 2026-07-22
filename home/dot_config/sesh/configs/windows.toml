@@ -1,18 +1,22 @@
 # Reusable sesh windows — referenced from sesh.toml via `windows = ["name"]`.
 # A window inherits the session's path unless it sets its own `path`.
+# Every startup_script ends with "; exec $SHELL" so exiting the app returns to
+# a shell in that window instead of closing it.
 
+# --autostash stashes/restores dirty changes around the rebase pull; the `;`
+# still opens lazygit if the pull fails anyway (offline, conflicts, ...).
 [[window]]
 name = "git"
-startup_script = "git pull && lazygit"
+startup_script = "git pull --autostash; lazygit; exec $SHELL"
 
 # Claude Code per account (matches the claude-work/claude-personal aliases)
 [[window]]
 name = "claude-work"
-startup_script = "CLAUDE_CONFIG_DIR=$HOME/.claude-work claude"
+startup_script = "CLAUDE_CONFIG_DIR=$HOME/.claude-work claude; exec $SHELL"
 
 [[window]]
 name = "claude-personal"
-startup_script = "CLAUDE_CONFIG_DIR=$HOME/.claude-personal claude"
+startup_script = "CLAUDE_CONFIG_DIR=$HOME/.claude-personal claude; exec $SHELL"
 
 # Pane layouts aren't supported in TOML — script them with tmux instead.
 [[window]]

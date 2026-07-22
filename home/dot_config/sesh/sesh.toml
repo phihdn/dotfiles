@@ -8,8 +8,9 @@ import = [
 
 # Open nvim with the snacks file picker (LazyVim's Telescope equivalent) so a
 # new session starts by browsing the dir; scheduled so the UI is ready first.
+# "; exec $SHELL" returns to a shell instead of closing the window/session on exit.
 [default_session]
-startup_command = "nvim -c 'lua vim.schedule(Snacks.picker.files)'"
+startup_command = "nvim -c 'lua vim.schedule(Snacks.picker.files)'; exec $SHELL"
 preview_command = "eza --all --git --icons --color=always {}"
 
 [[session]]
