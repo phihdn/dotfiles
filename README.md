@@ -2,26 +2,26 @@
 
 A lean, modern development environment for macOS that brings the best terminal-first, keyboard-driven workflow to Mac — with minimal fuss.
 
-*Inspired by [NLaundry/MacAutoSetup](https://github.com/NLaundry/MacAutoSetup)*
+_Inspired by [NLaundry/MacAutoSetup](https://github.com/NLaundry/MacAutoSetup)_
 
 ## ✨ Core Features
 
-* 🐟 **Fish shell** — user-friendly shell with great defaults (alternative)
-* 🧠 **Raycast** — fast launcher & automation
-* 🪟 **AeroSpace** — tiling window management (like i3, for Mac)
-* 🧑‍💻 **Neovim** — [LazyVim](https://www.lazyvim.org) distro, near-stock with language extras
-* 🖋️ **chezmoi** — declarative, template-aware dotfile management
-* 🧰 **Essential CLI tools** — ripgrep, fzf, bat, eza, and more
-* 🚀 **Zsh** — default shell with a modular XDG config (`~/.config/zsh`) and a self-contained plugin manager
-* 🌟 **Starship** — beautiful, fast cross-shell prompt
+- 🐟 **Fish shell** — user-friendly shell with great defaults (alternative)
+- 🧠 **Raycast** — fast launcher & automation
+- 🪟 **AeroSpace** — tiling window management (like i3, for Mac)
+- 🧑‍💻 **Neovim** — [LazyVim](https://www.lazyvim.org) distro, near-stock with language extras
+- 🖋️ **chezmoi** — declarative, template-aware dotfile management
+- 🧰 **Essential CLI tools** — ripgrep, fzf, bat, eza, and more
+- 🚀 **Zsh** — default shell with a modular XDG config (`~/.config/zsh`) and a self-contained plugin manager
+- 🌟 **Starship** — beautiful, fast cross-shell prompt
 
 ## 🎯 Philosophy
 
-* **Terminal-first, keyboard-driven workflow**
-* **Get up and running fast** — minimal configuration overhead
-* **Modular, understandable configuration** — no hidden magic
-* **Leverage community standards** — use well-maintained tools
-* **Dotfile hygiene** — organized, clean, and portable
+- **Terminal-first, keyboard-driven workflow**
+- **Get up and running fast** — minimal configuration overhead
+- **Modular, understandable configuration** — no hidden magic
+- **Leverage community standards** — use well-maintained tools
+- **Dotfile hygiene** — organized, clean, and portable
 
 ## 🚀 Installation
 
@@ -32,6 +32,7 @@ cd ~/dotfiles
 ```
 
 This will:
+
 1. Install Xcode CLI tools (if needed)
 2. Install Homebrew (if needed)
 3. Install packages from Brewfile (including chezmoi)
@@ -39,31 +40,20 @@ This will:
 5. Install nvm (zsh plugins self-install on first launch)
 6. Set zsh as the default shell (fish stays available via `fish`)
 
-Secrets (e.g. the WakaTime API key) are resolved from 1Password at apply time.
-Until the `op` CLI has an account configured, the secret-bearing files
-(`~/.wakatime.cfg`, `~/.gitconfig-work`) are skipped via `.chezmoiignore` so a
-fresh machine applies cleanly — set up `op`, then re-run `chezmoi apply` to
-create them.
+Secrets (e.g. the WakaTime API key) are resolved from 1Password at apply time. Until the `op` CLI has an account configured, the secret-bearing files (`~/.wakatime.cfg`, `~/.gitconfig-work`) are skipped via `.chezmoiignore` so a fresh machine applies cleanly — set up `op`, then re-run `chezmoi apply` to create them.
 
 ### 🐧 Linux support
 
-The repo works on Linux too. `bootstrap.sh` detects the OS: on Linux it skips
-Xcode tools (checks for `curl`/`git`/`gcc` instead — install `build-essential`
-or equivalent first), installs Homebrew to `/home/linuxbrew/.linuxbrew`, and
-falls back to the system zsh for the default shell. OS-specific handling:
+The repo works on Linux too. `bootstrap.sh` detects the OS: on Linux it skips Xcode tools (checks for `curl`/`git`/`gcc` instead — install `build-essential` or equivalent first), installs Homebrew to `/home/linuxbrew/.linuxbrew`, and falls back to the system zsh for the default shell. OS-specific handling:
 
-- **Brewfile** — casks and mac-only formulae are wrapped in `if OS.mac?`;
-  on Linux install GUI apps and Nerd Fonts via your distro/Flatpak.
-- **chezmoi templates** — `~/.gitconfig*` pick the right 1Password
-  `op-ssh-sign` path per OS (`/opt/1Password/op-ssh-sign` on Linux), and
-  `home/.chezmoiignore` skips macOS-only app configs (AeroSpace, SketchyBar,
-  JankyBorders) on Linux.
-- **Shells** — zsh and fish detect the Homebrew prefix at runtime
-  (`HOMEBREW_PREFIX`), so PATH works with macOS arm64/Intel brew and Linuxbrew.
+- **Brewfile** — casks and mac-only formulae are wrapped in `if OS.mac?`; on Linux install GUI apps and Nerd Fonts via your distro/Flatpak.
+- **chezmoi templates** — `~/.gitconfig*` pick the right 1Password `op-ssh-sign` path per OS (`/opt/1Password/op-ssh-sign` on Linux), and `home/.chezmoiignore` skips macOS-only app configs (AeroSpace, SketchyBar, JankyBorders) on Linux.
+- **Shells** — zsh and fish detect the Homebrew prefix at runtime (`HOMEBREW_PREFIX`), so PATH works with macOS arm64/Intel brew and Linuxbrew.
 
 ## 📦 What Gets Installed
 
 ### 🧰 Essential CLI Tools
+
 - **git**, **gh** — Version control and GitHub CLI
 - **fzf**, **ripgrep**, **bat** — Modern search and file tools
 - **eza**, **fd**, **lsd** — Better ls and find alternatives
@@ -74,6 +64,7 @@ falls back to the system zsh for the default shell. OS-specific handling:
 - **lf** — Terminal file manager
 
 ### 🛠️ Development Tools
+
 - **neovim** — Modern Vim-based editor with Lua config
 - **lazygit**, **lazydocker** — TUI for Git and Docker
 - **kubectl**, **k9s**, **helm** — Kubernetes tools
@@ -81,6 +72,7 @@ falls back to the system zsh for the default shell. OS-specific handling:
 - **wakatime** — Development time tracking
 
 ### 💻 GUI Applications
+
 - **AeroSpace** — Tiling window manager for macOS
 - **Raycast** — Spotlight replacement
 - **1Password** — Password manager with CLI
@@ -90,15 +82,16 @@ falls back to the system zsh for the default shell. OS-specific handling:
 - **Obsidian** — Note-taking
 
 ### 🖥️ Fonts
+
 - **JetBrains Mono Nerd Font** — Coding font with icons
 - **Fira Code Nerd Font** — Alternative coding font with ligatures
 - **Hack Nerd Font** — Clean coding font option
 
 ## 📁 Dotfiles Structure
 
-Dotfiles are managed using **chezmoi**. This repository is the chezmoi *source directory*. A `.chezmoiroot` file at the repo root contains `home`, so chezmoi treats the `home/` subdirectory as the source and applies it to `$HOME`.
+Dotfiles are managed using **chezmoi**. This repository is the chezmoi _source directory_. A `.chezmoiroot` file at the repo root contains `home`, so chezmoi treats the `home/` subdirectory as the source and applies it to `$HOME`.
 
-```
+```text
 .
 ├── .chezmoiroot        # contains "home" → chezmoi source is home/
 ├── Brewfile            # Homebrew packages
@@ -116,18 +109,18 @@ Dotfiles are managed using **chezmoi**. This repository is the chezmoi *source d
 
 chezmoi's naming conventions encode file attributes:
 
-| Source name | Target | Meaning |
-|-------------|--------|---------|
-| `dot_config/` | `~/.config/` | leading dot |
-| `executable_foo` | `~/foo` (`+x`) | executable bit |
-| `private_foo` | `~/foo` (`0600`) | restricted perms |
-| `foo.tmpl` | `~/foo` | Go template (secrets, host vars) |
+| Source name      | Target           | Meaning                          |
+| ---------------- | ---------------- | -------------------------------- |
+| `dot_config/`    | `~/.config/`     | leading dot                      |
+| `executable_foo` | `~/foo` (`+x`)   | executable bit                   |
+| `private_foo`    | `~/foo` (`0600`) | restricted perms                 |
+| `foo.tmpl`       | `~/foo`          | Go template (secrets, host vars) |
 
 ### Configuration reference
 
 Annotated view of what each managed config is for:
 
-```
+```text
 home/
 ├── dot_zshenv                    → ~/.zshenv               zsh bootstrap (points ZDOTDIR at ~/.config/zsh)
 ├── dot_gitconfig                 → ~/.gitconfig            git identity + 1Password SSH signing
@@ -159,12 +152,10 @@ home/
 
 ### zsh configuration (`~/.config/zsh`, `ZDOTDIR`)
 
-The zsh config is split into small, single-purpose modules. `~/.zshenv` is the
-only zsh file kept in `$HOME`; it sets `ZDOTDIR` to `~/.config/zsh` so every
-other file lives there and `$HOME` stays clean.
+The zsh config is split into small, single-purpose modules. `~/.zshenv` is the only zsh file kept in `$HOME`; it sets `ZDOTDIR` to `~/.config/zsh` so every other file lives there and `$HOME` stays clean.
 
 | File | Purpose |
-|------|---------|
+| --- | --- |
 | `~/.zshenv` (`dot_zshenv`) | Minimal bootstrap. Sets `XDG_CONFIG_HOME` and `ZDOTDIR=~/.config/zsh`, then sources `$ZDOTDIR/.zshenv`. Read by **every** zsh invocation. |
 | `.zshenv` | Environment for all shells: XDG dirs, `EDITOR`/`VISUAL=nvim`, `MANPAGER=bat`, `GPG_TTY`, `KUBECONFIG`, `K9S_CONFIG_DIR`, and a deduplicated `PATH` (including nvm's default node — see below). |
 | `.zprofile` | Login shells only. Re-prepends nvm's node to `PATH` after macOS `path_helper` reorders it (see [node / nvm on PATH](#node--nvm-on-path)). |
@@ -187,7 +178,7 @@ Plugins loaded by `plugins.zsh` (in order):
 
 zsh reads its startup files in a fixed order. With `ZDOTDIR` set, ours load like this:
 
-```
+```text
 1. /etc/zshenv                    (system, if present)
 2. ~/.zshenv                      → sets ZDOTDIR, then sources:
      └─ ~/.config/zsh/.zshenv     (environment: XDG, PATH incl. nvm node, ...)
@@ -203,6 +194,7 @@ zsh reads its startup files in a fixed order. With `ZDOTDIR` set, ours load like
 ```
 
 Why the order matters:
+
 - **`.zshenv` runs for every shell** (including non-interactive scripts), so it holds only environment/`PATH` — nothing interactive.
 - **`.zshrc` runs only for interactive shells** — aliases, keybindings, prompt.
 - **`bindings.zsh` is sourced before `plugins.zsh`** because `zsh-vi-mode` clears keymaps on init and only re-applies custom bindings registered via the `zvm_after_init` hook.
@@ -210,15 +202,9 @@ Why the order matters:
 
 #### node / nvm on PATH
 
-Node is managed by [nvm](https://github.com/nvm-sh/nvm), but nvm's own
-`node`/`npm`/`npx` only land on `PATH` after `nvm.sh` is sourced — and `nvm.sh`
-is slow (100 ms+) and is only sourced from `.zshrc`, i.e. **interactive shells
-only**. That meant non-interactive tools (scripts, editors, AI coding agents
-like Claude Code) fell back to a *different* node (e.g. `/usr/local/bin/node`)
-with none of your nvm-installed global packages.
+Node is managed by [nvm](https://github.com/nvm-sh/nvm), but nvm's own `node`/`npm`/`npx` only land on `PATH` after `nvm.sh` is sourced — and `nvm.sh` is slow (100 ms+) and is only sourced from `.zshrc`, i.e. **interactive shells only**. That meant non-interactive tools (scripts, editors, AI coding agents like Claude Code) fell back to a _different_ node (e.g. `/usr/local/bin/node`) with none of your nvm-installed global packages.
 
-To fix this without paying nvm's startup cost, `.zshenv` resolves nvm's
-**default** node version and prepends its `bin` directory to `PATH` directly:
+To fix this without paying nvm's startup cost, `.zshenv` resolves nvm's **default** node version and prepends its `bin` directory to `PATH` directly:
 
 ```bash
 export NVM_DIR="$HOME/.config/nvm"
@@ -226,20 +212,11 @@ export NVM_DIR="$HOME/.config/nvm"
 # "$NVM_DIR/versions/node/<ver>/bin" to PATH
 ```
 
-Because `.zshenv` is read by **every** zsh invocation, all shells — interactive,
-non-interactive, login, and non-login — now use the same node. The `nvm`
-*command* itself stays lazy-loaded in `.zshrc` (a one-line function that sources
-`nvm.sh` on first use), since you only need it occasionally for `nvm use` /
-`nvm install`. `uv` is a fast standalone binary already on `PATH`, so `.zshrc`
-just loads its completion eagerly — no wrapper needed.
+Because `.zshenv` is read by **every** zsh invocation, all shells — interactive, non-interactive, login, and non-login — now use the same node. The `nvm` _command_ itself stays lazy-loaded in `.zshrc` (a one-line function that sources `nvm.sh` on first use), since you only need it occasionally for `nvm use` / `nvm install`. `uv` is a fast standalone binary already on `PATH`, so `.zshrc` just loads its completion eagerly — no wrapper needed.
 
-**macOS login-shell caveat.** On macOS, `/etc/zprofile` runs `path_helper`,
-which rebuilds `PATH` *after* `.zshenv` and pushes system dirs like
-`/usr/local/bin` back to the front. `~/.config/zsh/.zprofile` runs after that
-and re-prepends nvm's node, so login shells stay consistent too.
+**macOS login-shell caveat.** On macOS, `/etc/zprofile` runs `path_helper`, which rebuilds `PATH` _after_ `.zshenv` and pushes system dirs like `/usr/local/bin` back to the front. `~/.config/zsh/.zprofile` runs after that and re-prepends nvm's node, so login shells stay consistent too.
 
-**How do I know which shell type a tool (e.g. Claude Code) uses?** The pragmatic
-test is to just run this inside the tool's shell:
+**How do I know which shell type a tool (e.g. Claude Code) uses?** The pragmatic test is to just run this inside the tool's shell:
 
 ```bash
 command -v node   # nvm path = good; /usr/local/bin/node = wrong node
@@ -256,29 +233,18 @@ shopt -q login_shell && echo login || echo non-login
 case $- in *i*) echo interactive;; *) echo non-interactive;; esac
 ```
 
-With the setup above, `node` resolves to nvm's version in **all** of those
-modes, so it shouldn't matter — but this is how you'd confirm.
+With the setup above, `node` resolves to nvm's version in **all** of those modes, so it shouldn't matter — but this is how you'd confirm.
 
 ### Neovim (LazyVim)
 
-`~/.config/nvim` is the stock [LazyVim starter](https://github.com/LazyVim/starter)
-with **no hand-written plugin specs** — the goal is zero config maintenance and
-letting the distro handle upgrades. The only customization is language extras
-enabled in `lazyvim.json` (LazyVim's own mechanism, same as `:LazyExtras`):
+`~/.config/nvim` is the stock [LazyVim starter](https://github.com/LazyVim/starter) with **no hand-written plugin specs** — the goal is zero config maintenance and letting the distro handle upgrades. The only customization is language extras enabled in `lazyvim.json` (LazyVim's own mechanism, same as `:LazyExtras`):
 
-* `lang.typescript`, `lang.go`, `lang.python` — IDE setup (LSP, formatters, DAP, tests)
-* `lang.markdown` — for reviewing AI-generated code plans/docs
+- `lang.typescript`, `lang.go`, `lang.python` — IDE setup (LSP, formatters, DAP, tests)
+- `lang.markdown` — for reviewing AI-generated code plans/docs
 
-`lazy-lock.json` is intentionally **not** managed by chezmoi (see
-`.chezmoiignore`): lazy.nvim rewrites it on every `:Lazy update`, which would
-otherwise produce constant chezmoi diff noise.
+`lazy-lock.json` is intentionally **not** managed by chezmoi (see `.chezmoiignore`): lazy.nvim rewrites it on every `:Lazy update`, which would otherwise produce constant chezmoi diff noise.
 
-**Previous hand-rolled config**: the pre-LazyVim setup (custom Lua config under
-`lua/phihdn/{core,plugins}` — kanagawa theme, telescope, fzf-lua, oil,
-blink-cmp, conform, etc.) is preserved on the branch
-[`20260710-nvim-pre-lazyvim`](https://github.com/phihdn/dotfiles/tree/20260710-nvim-pre-lazyvim/home/dot_config/nvim),
-at `home/dot_config/nvim/`. To compare or port old behavior (keymaps, options,
-plugin settings) into LazyVim:
+**Previous hand-rolled config**: the pre-LazyVim setup (custom Lua config under `lua/phihdn/{core,plugins}` — kanagawa theme, telescope, fzf-lua, oil, blink-cmp, conform, etc.) is preserved on the branch [`20260710-nvim-pre-lazyvim`](https://github.com/phihdn/dotfiles/tree/20260710-nvim-pre-lazyvim/home/dot_config/nvim), at `home/dot_config/nvim/`. To compare or port old behavior (keymaps, options, plugin settings) into LazyVim:
 
 ```bash
 git diff 20260710-nvim-pre-lazyvim main -- home/dot_config/nvim
@@ -287,10 +253,7 @@ git show 20260710-nvim-pre-lazyvim:home/dot_config/nvim/lua/phihdn/core/keymaps.
 
 ## 🤖 Claude Code — multiple accounts
 
-Run two Claude Code accounts (e.g. work + personal) on one machine without them
-colliding. Claude Code ties all of an account's state to a single config
-directory, selectable via the `CLAUDE_CONFIG_DIR` environment variable
-([technique reference](https://frontendhire.com/learn/ai/courses/using-multiple-claude-accounts/overview)).
+Run two Claude Code accounts (e.g. work + personal) on one machine without them colliding. Claude Code ties all of an account's state to a single config directory, selectable via the `CLAUDE_CONFIG_DIR` environment variable ([technique reference](https://frontendhire.com/learn/ai/courses/using-multiple-claude-accounts/overview)).
 
 Two aliases (in both `zsh` and `fish`) point Claude at per-account dirs:
 
@@ -299,12 +262,9 @@ claude-work       # CLAUDE_CONFIG_DIR=~/.claude-work claude
 claude-personal   # CLAUDE_CONFIG_DIR=~/.claude-personal claude
 ```
 
-**What's isolated vs shared.** Each dir keeps its own login (on macOS the login
-lives in the Keychain, keyed per config dir), `history.jsonl`, `projects/`, and
-`sessions/`. Shared, read-mostly config is **symlinked** from `~/.claude` into
-each account dir so there's a single source of truth:
+**What's isolated vs shared.** Each dir keeps its own login (on macOS the login lives in the Keychain, keyed per config dir), `history.jsonl`, `projects/`, and `sessions/`. Shared, read-mostly config is **symlinked** from `~/.claude` into each account dir so there's a single source of truth:
 
-```
+```text
 ~/.claude-work/skills   -> ~/.claude/skills
 ~/.claude-work/agents   -> ~/.claude/agents
 ~/.claude-work/commands -> ~/.claude/commands
@@ -312,8 +272,7 @@ each account dir so there's a single source of truth:
 #          schemas, scripts, plugins, CLAUDE.md
 ```
 
-`bootstrap.sh` creates the dirs and symlinks automatically (guarded on
-`~/.claude` existing). To set it up manually or on another machine:
+`bootstrap.sh` creates the dirs and symlinks automatically (guarded on `~/.claude` existing). To set it up manually or on another machine:
 
 ```bash
 for dir in ~/.claude-work ~/.claude-personal; do
@@ -327,13 +286,7 @@ done
 
 ### Installing skills with AgentKit (`ak`)
 
-[AgentKit](https://agentkit.best/docs) (`ak`, formerly `claudekit-cli`/`ck`)
-installs global skills/agents/hooks to `$CLAUDE_CONFIG_DIR` if set, otherwise
-to `~/.claude`. Since the `claude-work`/`claude-personal` aliases only export
-`CLAUDE_CONFIG_DIR` for the `claude` process, a plain terminal leaves it unset
-— so **`ak` installs to `~/.claude`, and the symlinks above propagate
-everything to both accounts automatically**. Install once, no per-account
-runs:
+[AgentKit](https://agentkit.best/docs) (`ak`, formerly `claudekit-cli`/`ck`) installs global skills/agents/hooks to `$CLAUDE_CONFIG_DIR` if set, otherwise to `~/.claude`. Since the `claude-work`/`claude-personal` aliases only export `CLAUDE_CONFIG_DIR` for the `claude` process, a plain terminal leaves it unset — so **`ak` installs to `~/.claude`, and the symlinks above propagate everything to both accounts automatically**. Install once, no per-account runs:
 
 ```bash
 curl -fsSL https://agentkit.best/install.sh | sh   # one-time: installs the ak binary to ~/.local/bin
@@ -341,35 +294,26 @@ ak kit init engineer   # writes to ~/.claude → both accounts see it via the sy
 ```
 
 Cautions:
+
 - **Don't run `ak` from inside a `claude-work`/`claude-personal` session** — there `CLAUDE_CONFIG_DIR` is exported, so `ak` would target the account dir instead of `~/.claude`. Use a plain terminal.
 - **Don't run `ak uninstall` with `CLAUDE_CONFIG_DIR` pointed at an account dir** — that could recurse through the symlinks into your real `~/.claude`. Run it against `~/.claude`.
 - If `ak` ever adds a **new** top-level dir, re-run the seeding snippet above to symlink it into the account dirs.
 - Migrated from `ck` via `ak migrate --from=ck` — it archives the legacy kit under `~/.agentkit/archives/legacy-kit-migration/` before rewriting, and `ak migrate rollback` can undo it if needed.
 
-**First-time login** — run each alias once and sign in with the matching
-account:
+**First-time login** — run each alias once and sign in with the matching account:
 
 ```bash
 claude-work       # then: /login  (work account)
 claude-personal   # then: /login  (personal account)
 ```
 
-After that, each alias remembers its own login. Use the alias that matches the
-repo you're in.
+After that, each alias remembers its own login. Use the alias that matches the repo you're in.
 
 ### Backing up `~/.claude` (separate private repo)
 
-`~/.claude` is **not** tracked by this (public) dotfiles repo — it holds the
-paid AgentKit kit, so it lives in its own **private** repo
-([`phihdn/dotfiles-claude`](https://github.com/phihdn/dotfiles-claude)). That
-repo commits the restorable config (ak layer snapshot + custom `CLAUDE.md` +
-`rules/markdown-formatting.md` + `settings.json` + `agent-memory/`) and
-**gitignores every secret and machine-state path** (`.env`, `history.jsonl`,
-`projects/`, `sessions/`, `cache/`, `telemetry/`, `plugins/`, …). It is a
-standalone repo cloned by `bootstrap.sh`, not a git submodule.
+`~/.claude` is **not** tracked by this (public) dotfiles repo — it holds the paid AgentKit kit, so it lives in its own **private** repo ([`phihdn/dotfiles-claude`](https://github.com/phihdn/dotfiles-claude)). That repo commits the restorable config (ak layer snapshot + custom `CLAUDE.md` + `rules/markdown-formatting.md` + `settings.json` + `agent-memory/`) and **gitignores every secret and machine-state path** (`.env`, `history.jsonl`, `projects/`, `sessions/`, `cache/`, `telemetry/`, `plugins/`, …). It is a standalone repo cloned by `bootstrap.sh`, not a git submodule.
 
-**Restore on a new machine** (handled automatically by `bootstrap.sh`, needs
-GitHub SSH/`gh` auth first):
+**Restore on a new machine** (handled automatically by `bootstrap.sh`, needs GitHub SSH/`gh` auth first):
 
 ```bash
 git clone git@github.com:phihdn/dotfiles-claude.git ~/.claude
@@ -377,9 +321,7 @@ ak kit refresh core --yes && ak kit refresh engineer --yes && ak kit refresh mar
 # then bootstrap seeds the ~/.claude-work / ~/.claude-personal symlinks
 ```
 
-The cloned snapshot works immediately; `ak kit refresh` then overwrites the ak
-files with the latest release (your own edits are kept unless you pass
-`--force`).
+The cloned snapshot works immediately; `ak kit refresh` then overwrites the ak files with the latest release (your own edits are kept unless you pass `--force`).
 
 **Ongoing backup** — commit and push new config changes from `~/.claude`:
 
@@ -387,18 +329,18 @@ files with the latest release (your own edits are kept unless you pass
 git -C ~/.claude add -A && git -C ~/.claude commit -m "chore: update claude config" && git -C ~/.claude push
 ```
 
-Anything you author yourself should use a `phi-` prefix (e.g.
-`skills/phi-*`, `hooks/phi-*.cjs`) so it's easy to tell apart from ak content
-and survives `ak kit refresh` untouched.
+Anything you author yourself should use a `phi-` prefix (e.g. `skills/phi-*`, `hooks/phi-*.cjs`) so it's easy to tell apart from ak content and survives `ak kit refresh` untouched.
 
 ## 🚀 Usage
 
 ### Install everything
+
 ```bash
 ./bootstrap.sh
 ```
 
 ### Preview / apply changes
+
 ```bash
 chezmoi diff              # See what would change in $HOME
 chezmoi apply             # Apply changes
@@ -406,17 +348,20 @@ chezmoi apply --dry-run -v
 ```
 
 ### Edit a managed file
+
 ```bash
 chezmoi edit ~/.config/zsh/.zshrc   # edits the source under home/, then run chezmoi apply
 ```
 
 ### Start managing a new file
+
 ```bash
 chezmoi add ~/.config/newapp/config
 chezmoi add --template ~/.config/app/secret.conf   # add as a template
 ```
 
 ### Homebrew Package Management
+
 ```bash
 # Sync packages with Brewfile (install + cleanup)
 brew-sync
@@ -436,48 +381,29 @@ brew-sync force
 
 ### Git worktree workflow (`git-bare-clone`)
 
-A custom script at `~/.local/bin/git-bare-clone` (source:
-`home/dot_local/bin/executable_git-bare-clone`) sets up a repo for working
-**exclusively from [git worktrees](https://git-scm.com/docs/git-worktree)** —
-one directory per branch, no stashing to switch context. Invoke it as:
+A custom script at `~/.local/bin/git-bare-clone` (source: `home/dot_local/bin/executable_git-bare-clone`) sets up a repo for working **exclusively from [git worktrees](https://git-scm.com/docs/git-worktree)** — one directory per branch, no stashing to switch context. Invoke it as:
 
 ```bash
 mkdir my-repo && cd my-repo
 git bare-clone git@gitlab.example.com:group/my-repo.git
 ```
 
-**How `git bare-clone` / `git wt` resolve to these scripts** — no links, no
-registration; three plain mechanisms chained:
+**How `git bare-clone` / `git wt` resolve to these scripts** — no links, no registration; three plain mechanisms chained:
 
-1. chezmoi applies `home/dot_local/bin/executable_git-*` as **real files**
-   (not symlinks) at `~/.local/bin/git-*`; the `executable_` prefix sets `+x`.
+1. chezmoi applies `home/dot_local/bin/executable_git-*` as **real files** (not symlinks) at `~/.local/bin/git-*`; the `executable_` prefix sets `+x`.
 2. `~/.local/bin` is on `PATH` (zsh: `dot_zshenv`; fish: `conf.d/path.fish`).
-3. git's external-subcommand convention: an unknown subcommand `git foo` makes
-   git search `PATH` for an executable named `git-foo` and exec it with the
-   remaining args. The filename *is* the integration — same mechanism as
-   `git lfs` or `git flow`.
+3. git's external-subcommand convention: an unknown subcommand `git foo` makes git search `PATH` for an executable named `git-foo` and exec it with the remaining args. The filename _is_ the integration — same mechanism as `git lfs` or `git flow`.
 
 How it works (three steps):
 
-1. Clones the repo **bare** (no working tree) into a `.bare/` subdirectory
-   (override the location with `-l`/`--location`).
-2. Sets the origin fetch refspec to
-   `+refs/heads/*:refs/remotes/origin/*` — bare clones don't track remote
-   branches by default, so without this `git fetch` would never create
-   `origin/<branch>` refs.
-3. Writes a `.git` *file* (not directory) in the parent folder containing
-   `gitdir: ./.bare`, which makes the parent directory the repo root — git
-   commands work there, but there's no checkout of its own.
+1. Clones the repo **bare** (no working tree) into a `.bare/` subdirectory (override the location with `-l`/`--location`).
+2. Sets the origin fetch refspec to `+refs/heads/*:refs/remotes/origin/*` — bare clones don't track remote branches by default, so without this `git fetch` would never create `origin/<branch>` refs.
+3. Writes a `.git` _file_ (not directory) in the parent folder containing `gitdir: ./.bare`, which makes the parent directory the repo root — git commands work there, but there's no checkout of its own.
 
-On top of it, `~/.local/bin/git-wt` (source:
-`home/dot_local/bin/executable_git-wt`) automates the day-to-day workflow.
-The model distinguishes two classes of worktrees:
+On top of it, `~/.local/bin/git-wt` (source: `home/dot_local/bin/executable_git-wt`) automates the day-to-day workflow. The model distinguishes two classes of worktrees:
 
-* **Fixed** — one per long-lived branch, dir name == branch name (`develop/`,
-  `prod/`). Never deleted (created locked, so `git worktree remove` refuses).
-  Treat as read-mostly: `git pull`, run, debug — branch off for changes.
-* **Ephemeral** — one per task (feature, hotfix, MR review). Created on
-  demand, removed when merged.
+- **Fixed** — one per long-lived branch, dir name == branch name (`develop/`, `prod/`). Never deleted (created locked, so `git worktree remove` refuses). Treat as read-mostly: `git pull`, run, debug — branch off for changes.
+- **Ephemeral** — one per task (feature, hotfix, MR review). Created on demand, removed when merged.
 
 ```bash
 # One-time per repo: bare-clone + locked fixed worktrees (default: develop prod)
@@ -498,12 +424,9 @@ git wt done BE-1234
 git wt ls                                 # list all worktrees
 ```
 
-Shell shortcuts: `gwt` → `git wt`, `gwtl` → `git wt ls` (zsh aliases + fish
-abbrs).
+Shell shortcuts: `gwt` → `git wt`, `gwtl` → `git wt ls` (zsh aliases + fish abbrs).
 
-Resulting layout — each subfolder is an independent checkout sharing one
-object store, so `develop`, a hotfix, and an MR review can all be open at
-once:
+Resulting layout — each subfolder is an independent checkout sharing one object store, so `develop`, a hotfix, and an MR review can all be open at once:
 
 ```text
 my-repo/
@@ -517,17 +440,11 @@ my-repo/
 
 Gotchas the script handles or you should know:
 
-* `.env*` files are untracked, so new worktrees start without them —
-  `git wt new` seeds them from the first fixed worktree that has any.
-* `node_modules` is per-worktree (gitignored ⇒ invisible to git). Each
-  worktree needs its own install; `pnpm` makes this cheap via its global
-  hard-linked store.
-* Git config, hooks, and signing live in `.bare/config` — shared by all
-  worktrees automatically.
-* A branch can be checked out in only **one** worktree at a time; reviews use
-  detached HEAD to sidestep this.
-* `git wt` refuses to run in a normal clone (worktrees would show up as
-  untracked dirs there — the bare layout has no parent checkout).
+- `.env*` files are untracked, so new worktrees start without them — `git wt new` seeds them from the first fixed worktree that has any.
+- `node_modules` is per-worktree (gitignored ⇒ invisible to git). Each worktree needs its own install; `pnpm` makes this cheap via its global hard-linked store.
+- Git config, hooks, and signing live in `.bare/config` — shared by all worktrees automatically.
+- A branch can be checked out in only **one** worktree at a time; reviews use detached HEAD to sidestep this.
+- `git wt` refuses to run in a normal clone (worktrees would show up as untracked dirs there — the bare layout has no parent checkout).
 
 ## 🐍🟢 Language Version Management
 
@@ -537,7 +454,8 @@ This setup includes modern tools for managing Node.js and Python versions:
 
 **nvm** (Node Version Manager) is automatically installed and configured for Node.js version management.
 
-#### Basic Usage
+#### nvm Basics
+
 ```bash
 # List available Node.js versions
 nvm list-remote
@@ -562,6 +480,7 @@ npm install -g pnpm yarn typescript
 ```
 
 #### Project-specific Node versions
+
 ```bash
 # Create .nvmrc file in project root
 echo "18.19.0" > .nvmrc
@@ -577,7 +496,8 @@ cd my-project  # Automatically switches to .nvmrc version
 
 **uv** is a fast Python package installer and resolver that replaces pip, pip-tools, and virtualenv.
 
-#### Basic Usage
+#### uv Basics
+
 ```bash
 # Install Python versions
 uv python install 3.12
@@ -606,6 +526,7 @@ source .venv/bin/activate  # or use uv shell
 ```
 
 #### Advanced uv Usage
+
 ```bash
 # Create project with specific Python version
 uv init --python 3.11 my-project
@@ -631,7 +552,8 @@ uv tool list
 ```
 
 #### Project Structure with uv
-```
+
+```text
 my-python-project/
 ├── pyproject.toml     # Project metadata and dependencies
 ├── uv.lock           # Lockfile with exact versions
@@ -642,6 +564,7 @@ my-python-project/
 ```
 
 #### Migration from pip/pipenv/poetry
+
 ```bash
 # From requirements.txt
 uv add -r requirements.txt
@@ -656,6 +579,7 @@ uv add package1 package2 package3
 ### 🔄 Switching Between Versions
 
 #### Node.js Version Switching
+
 ```bash
 # Quick version switching
 nvm use 16    # Switch to Node 16
@@ -668,6 +592,7 @@ nvm use  # Uses version from .nvmrc
 ```
 
 #### Python Version Switching
+
 ```bash
 # Project-specific Python (via pyproject.toml)
 [tool.uv]
@@ -683,17 +608,20 @@ uv run --python 3.12 python script.py
 ### 💡 Pro Tips
 
 #### Node.js Tips
+
 - Use `.nvmrc` files for consistent Node versions across team
 - Install global packages after switching Node versions
 - Use `nvm alias` to create shortcuts for frequently used versions
 
-#### Python Tips  
+#### Python Tips
+
 - Use `uv sync` to ensure dependencies match lockfile exactly
 - Leverage `uv run` to avoid manual virtual environment activation
 - Use `uv tool install` for global Python tools (black, ruff, etc.)
 - Pin Python versions in `pyproject.toml` for team consistency
 
 #### Performance
+
 - **uv is 10-100x faster** than pip for package installation
 - **nvm** provides instant Node.js version switching
 - Both tools cache downloads for faster subsequent installs
@@ -703,13 +631,16 @@ uv run --python 3.12 python script.py
 **20 application configs** managed by chezmoi, organized by category:
 
 ### 🖥️ Terminal Emulators
+
 - **ghostty**, **kitty**, **wezterm** - Modern GPU-accelerated terminals
 
-### 🐚 Shells & Prompts  
+### 🐚 Shells & Prompts
+
 - **fish**, **zsh** - Modern shell configurations
 - **starship** - Beautiful cross-shell prompt
 
 ### ⚡ CLI Tools & Utilities
+
 - **bat** - Enhanced cat with syntax highlighting
 - **lf** - Terminal file manager
 - **lsd** - Enhanced ls with colors and icons
@@ -717,6 +648,7 @@ uv run --python 3.12 python script.py
 - **scripts** - Custom utility scripts
 
 ### 🧑‍💻 Development Tools
+
 - **git** - Version control configuration
 - **lazygit** - Git TUI interface
 - **nvim** - Modern Vim-based editor
@@ -724,19 +656,22 @@ uv run --python 3.12 python script.py
 - **sesh** - tmux session manager
 
 ### ☁️ Cloud & DevOps
+
 - **k9s** - Kubernetes cluster management
 
 ### 🔐 Security & Productivity
+
 - **1password** - Password manager and SSH agent
 - **wakatime** - Development time tracking
 
 ### 🪟 Window Management
+
 - **aerospace** - Tiling window manager for macOS
 
 ---
 
 | Config | Description |
-|--------|-------------|
+| --- | --- |
 | **1password** | 1Password CLI and SSH agent configuration |
 | **aerospace** | AeroSpace tiling window manager configuration |
 | **bat** | bat (cat clone) with syntax highlighting themes |
@@ -761,12 +696,13 @@ uv run --python 3.12 python script.py
 ## ✅ Result
 
 After installation, you'll have:
-* **Modern terminal environment** with beautiful, fast tools
-* **Tiling window management** for efficient screen usage
-* **Powerful editor** ready for development
-* **Clean shell** with helpful aliases and functions
-* **Development tools** for Python, Node, Go, Rust, and Kubernetes
-* **Consistent experience** across different machines
+
+- **Modern terminal environment** with beautiful, fast tools
+- **Tiling window management** for efficient screen usage
+- **Powerful editor** ready for development
+- **Clean shell** with helpful aliases and functions
+- **Development tools** for Python, Node, Go, Rust, and Kubernetes
+- **Consistent experience** across different machines
 
 ## 🔄 Updating
 
@@ -781,67 +717,66 @@ git pull         # auto-applies via git hook (see below)
 
 ### Auto-apply git hooks
 
-A `git pull` in this repo automatically runs `chezmoi apply`, so updates
-propagate to `$HOME` without a manual step. Tracked hooks live in `.githooks/`:
+A `git pull` in this repo automatically runs `chezmoi apply`, so updates propagate to `$HOME` without a manual step. Tracked hooks live in `.githooks/`:
 
 - `post-merge` — fires after a merge-style pull.
-- `post-rewrite` — fires after a rebase-style pull (this repo sets
-  `pull.rebase = true`, so pulls rebase and would otherwise skip `post-merge`).
-  It only runs for rebases, not `git commit --amend`.
+- `post-rewrite` — fires after a rebase-style pull (this repo sets `pull.rebase = true`, so pulls rebase and would otherwise skip `post-merge`). It only runs for rebases, not `git commit --amend`.
 
-Both are no-ops if `chezmoi` isn't installed. They're enabled by pointing git at
-the tracked hooks directory:
+Both are no-ops if `chezmoi` isn't installed. They're enabled by pointing git at the tracked hooks directory:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-`bootstrap.sh` runs this automatically, so a fresh clone is wired up after the
-first bootstrap. Because `core.hooksPath` lives in the local (uncommitted)
-`.git/config`, each new clone needs bootstrap (or the command above) once. If you
-ever want to apply manually instead, just run `chezmoi apply`.
+`bootstrap.sh` runs this automatically, so a fresh clone is wired up after the first bootstrap. Because `core.hooksPath` lives in the local (uncommitted) `.git/config`, each new clone needs bootstrap (or the command above) once. If you ever want to apply manually instead, just run `chezmoi apply`.
 
 ## 🛠️ Customization
 
 ### Adding new config
+
 ```bash
 chezmoi add ~/.config/newapp/config   # copies into home/ with correct naming
 ```
+
 Then commit the new files under `home/` and push.
 
 ### Modifying existing configs
+
 ```bash
 chezmoi edit ~/.config/zsh/.zshrc   # edit the source under home/
 chezmoi apply                       # write changes to $HOME
 ```
-Note: unlike stow, chezmoi does **not** use symlinks — it writes real files to
-`$HOME`. Always edit the source (via `chezmoi edit` or directly in `home/`) and
-run `chezmoi apply`, not the target files.
+
+Note: unlike stow, chezmoi does **not** use symlinks — it writes real files to `$HOME`. Always edit the source (via `chezmoi edit` or directly in `home/`) and run `chezmoi apply`, not the target files.
 
 ### Ignoring files
-Add target-path patterns to `home/.chezmoiignore` (gitignore syntax) for
-per-machine state that should never be applied.
+
+Add target-path patterns to `home/.chezmoiignore` (gitignore syntax) for per-machine state that should never be applied.
 
 ## 🆘 Troubleshooting
 
 ### Adopt existing $HOME files into the repo
+
 ```bash
 chezmoi add ~/.config/nvim   # import current files as the new source of truth
 ```
 
 ### See exactly what will change
+
 ```bash
 chezmoi diff
 chezmoi apply --dry-run -v
 ```
 
 ### Secret/template errors (e.g. WakaTime)
+
 ```bash
 eval "$(op signin)"   # sign in to 1Password CLI
 chezmoi apply         # re-render templates
 ```
 
 ### Verify chezmoi's state
+
 ```bash
 chezmoi doctor        # diagnose configuration/tooling issues
 chezmoi managed       # list managed files
@@ -861,4 +796,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-**Enjoy your new development setup! 🚀**
+Enjoy your new development setup! 🚀
