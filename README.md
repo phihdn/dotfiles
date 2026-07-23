@@ -439,13 +439,23 @@ brew-sync force
 A custom script at `~/.local/bin/git-bare-clone` (source:
 `home/dot_local/bin/executable_git-bare-clone`) sets up a repo for working
 **exclusively from [git worktrees](https://git-scm.com/docs/git-worktree)** —
-one directory per branch, no stashing to switch context. Because git treats any
-`git-<name>` executable on `PATH` as a subcommand, invoke it as:
+one directory per branch, no stashing to switch context. Invoke it as:
 
 ```bash
 mkdir my-repo && cd my-repo
 git bare-clone git@gitlab.example.com:group/my-repo.git
 ```
+
+**How `git bare-clone` / `git wt` resolve to these scripts** — no links, no
+registration; three plain mechanisms chained:
+
+1. chezmoi applies `home/dot_local/bin/executable_git-*` as **real files**
+   (not symlinks) at `~/.local/bin/git-*`; the `executable_` prefix sets `+x`.
+2. `~/.local/bin` is on `PATH` (zsh: `dot_zshenv`; fish: `conf.d/path.fish`).
+3. git's external-subcommand convention: an unknown subcommand `git foo` makes
+   git search `PATH` for an executable named `git-foo` and exec it with the
+   remaining args. The filename *is* the integration — same mechanism as
+   `git lfs` or `git flow`.
 
 How it works (three steps):
 
