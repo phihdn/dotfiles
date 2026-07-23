@@ -21,6 +21,8 @@ abbr -a gr "git remote"
 abbr -a gra "git remote add"
 abbr -a grv "git remote -v"
 abbr -a gs "git status"
+abbr -a gwt "git wt"
+abbr -a gwtl "git wt ls"
 
 # File listing (lsd)
 abbr -a l "lsd --group-dirs first -A"

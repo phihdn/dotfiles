@@ -434,6 +434,91 @@ brew-sync cleanup
 brew-sync force
 ```
 
+### Git worktree workflow (`git-bare-clone`)
+
+A custom script at `~/.local/bin/git-bare-clone` (source:
+`home/dot_local/bin/executable_git-bare-clone`) sets up a repo for working
+**exclusively from [git worktrees](https://git-scm.com/docs/git-worktree)** —
+one directory per branch, no stashing to switch context. Because git treats any
+`git-<name>` executable on `PATH` as a subcommand, invoke it as:
+
+```bash
+mkdir my-repo && cd my-repo
+git bare-clone git@gitlab.example.com:group/my-repo.git
+```
+
+How it works (three steps):
+
+1. Clones the repo **bare** (no working tree) into a `.bare/` subdirectory
+   (override the location with `-l`/`--location`).
+2. Sets the origin fetch refspec to
+   `+refs/heads/*:refs/remotes/origin/*` — bare clones don't track remote
+   branches by default, so without this `git fetch` would never create
+   `origin/<branch>` refs.
+3. Writes a `.git` *file* (not directory) in the parent folder containing
+   `gitdir: ./.bare`, which makes the parent directory the repo root — git
+   commands work there, but there's no checkout of its own.
+
+On top of it, `~/.local/bin/git-wt` (source:
+`home/dot_local/bin/executable_git-wt`) automates the day-to-day workflow.
+The model distinguishes two classes of worktrees:
+
+* **Fixed** — one per long-lived branch, dir name == branch name (`develop/`,
+  `prod/`). Never deleted (created locked, so `git worktree remove` refuses).
+  Treat as read-mostly: `git pull`, run, debug — branch off for changes.
+* **Ephemeral** — one per task (feature, hotfix, MR review). Created on
+  demand, removed when merged.
+
+```bash
+# One-time per repo: bare-clone + locked fixed worktrees (default: develop prod)
+mkdir my-repo && cd my-repo
+git wt init git@gitlab.example.com:group/my-repo.git
+git wt init <url> main            # explicit fixed branches; missing ones skipped
+
+# Task worktrees — dir = last branch segment (feature/BE-1234 → BE-1234/),
+# base defaults to origin/develop|main|master; copies .env* from a fixed worktree
+git wt new feature/BE-1234                # branch off default base
+git wt new hotfix/BE-1300 origin/prod     # branch off prod
+
+# MR review — detached HEAD, never blocks the author's branch
+git wt review feature/BE-1290             # creates review-BE-1290/
+
+# Finish — removes worktree + deletes the local branch (keeps it if unmerged)
+git wt done BE-1234
+git wt ls                                 # list all worktrees
+```
+
+Shell shortcuts: `gwt` → `git wt`, `gwtl` → `git wt ls` (zsh aliases + fish
+abbrs).
+
+Resulting layout — each subfolder is an independent checkout sharing one
+object store, so `develop`, a hotfix, and an MR review can all be open at
+once:
+
+```text
+my-repo/
+├── .git             # file: "gitdir: ./.bare"
+├── .bare/           # the actual repository (objects, refs, config)
+├── develop/         # FIXED  — latest integration code (locked)
+├── prod/            # FIXED  — reproduce production issues (locked)
+├── BE-1234/         # ephemeral — feature/BE-1234, removed after merge
+└── review-BE-1290/  # ephemeral — detached MR review
+```
+
+Gotchas the script handles or you should know:
+
+* `.env*` files are untracked, so new worktrees start without them —
+  `git wt new` seeds them from the first fixed worktree that has any.
+* `node_modules` is per-worktree (gitignored ⇒ invisible to git). Each
+  worktree needs its own install; `pnpm` makes this cheap via its global
+  hard-linked store.
+* Git config, hooks, and signing live in `.bare/config` — shared by all
+  worktrees automatically.
+* A branch can be checked out in only **one** worktree at a time; reviews use
+  detached HEAD to sidestep this.
+* `git wt` refuses to run in a normal clone (worktrees would show up as
+  untracked dirs there — the bare layout has no parent checkout).
+
 ## 🐍🟢 Language Version Management
 
 This setup includes modern tools for managing Node.js and Python versions:

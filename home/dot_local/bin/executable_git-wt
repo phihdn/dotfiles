@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+usage() {
+  cat << EOF # remove the space between << and EOF, this is due to web plugin issue
+Usage: git wt <command> [args]
+
+Automates the bare-repo worktree workflow (see git-bare-clone):
+fixed worktrees for long-lived branches, ephemeral worktrees per task.
+
+Commands:
+
+  init <repo-url> [branch...]   Bare-clone a repo and create locked "fixed"
+                                worktrees for long-lived branches
+                                (default: develop prod; missing ones skipped).
+  new <branch> [base-ref]       Ephemeral worktree for a new branch. Dir name is
+                                the last path segment (feature/BE-1234 -> BE-1234).
+                                Base defaults to origin/develop|main|master.
+                                Copies .env* from a fixed worktree if present.
+  review <branch>               Detached-HEAD worktree "review-<name>" on
+                                origin/<branch> — never blocks the author's branch.
+  done <dir>                    Remove an ephemeral worktree and delete its local
+                                branch (refuses dirty/locked worktrees).
+  ls                            List all worktrees.
+
+Options:
+
+  -h, --help      Print this help and exit
+EOF
+  exit
+}
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+}
+
+setup_colors() {
+  if [[ -t 2 ]] && [[ -z "${NO_COLOR-}" ]] && [[ "${TERM-}" != "dumb" ]]; then
+    NOFORMAT='\033[0m' RED='\033[0;31m' GREEN='\033[0;32m' YELLOW='\033[1;33m'
+  else
+    NOFORMAT='' RED='' GREEN='' YELLOW=''
+  fi
+}
+
+msg() {
+  echo >&2 -e "${1-}"
+}
+
+die() {
+  local msg=$1
+  local code=${2-1} # default exit status 1
+  msg "${RED}${msg}${NOFORMAT}"
+  exit "$code"
+}
+
+# Resolve the repo root (the dir holding .bare + all worktrees) and guard
+# against running inside a normal clone, where worktrees would pollute the
+# checkout as untracked dirs.
+repo_root() {
+  local common_dir
+  common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) \
+    || die "Not inside a git repository."
+  ROOT=$(dirname "$common_dir")
+  if [[ "$(basename "$common_dir")" == ".git" && -d "$common_dir" ]]; then
+    die "This looks like a normal clone. git wt expects the bare layout from 'git bare-clone' (a .bare dir + worktree siblings)."
+  fi
+}
+
+# First long-lived remote branch that exists — used as the default base for new
+# worktrees when no base-ref is given.
+default_base() {
+  local b
+  for b in develop main master; do
+    if git show-ref --verify --quiet "refs/remotes/origin/$b"; then
+      echo "origin/$b"
+      return
+    fi
+  done
+  die "No origin/develop|main|master found. Pass a base-ref explicitly."
+}
+
+# .env* files are untracked, so new worktrees start without them — seed them
+# from the first fixed worktree that has any.
+copy_env_files() {
+  local dest=$1 src
+  for src in develop main prod; do
+    if compgen -G "$ROOT/$src/.env*" > /dev/null; then
+      cp "$ROOT/$src"/.env* "$dest"/
+      msg "${YELLOW}Copied .env* from $src/ into $(basename "$dest")/${NOFORMAT}"
+      return
+    fi
+  done
+}
+
+cmd_init() {
+  [[ $# -ge 1 ]] || die "Usage: git wt init <repo-url> [branch...]"
+  local url=$1
+  shift
+  local branches=("${@:-}")
+  [[ -n "${branches[0]}" ]] || branches=(develop prod)
+
+  command -v git-bare-clone > /dev/null || die "git-bare-clone not found on PATH."
+  git bare-clone "$url"
+  git fetch origin
+
+  local b
+  for b in "${branches[@]}"; do
+    if git show-ref --verify --quiet "refs/remotes/origin/$b"; then
+      git worktree add "$b" "$b"
+      git worktree lock "$b" --reason "fixed worktree — do not remove"
+      msg "${GREEN}Fixed worktree: $b/ (locked)${NOFORMAT}"
+    else
+      msg "${YELLOW}Skipped '$b' — no origin/$b on the remote.${NOFORMAT}"
+    fi
+  done
+  msg "${GREEN}Done. Add task worktrees with: git wt new <branch>${NOFORMAT}"
+}
+
+cmd_new() {
+  [[ $# -ge 1 ]] || die "Usage: git wt new <branch> [base-ref]"
+  repo_root
+  local branch=$1 dir base
+  dir="$ROOT/${branch##*/}"
+  [[ -e "$dir" ]] && die "Directory ${branch##*/}/ already exists."
+
+  git fetch origin
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    # Branch already exists locally (e.g. reopening after 'done' kept it) —
+    # check it out instead of creating it.
+    git worktree add "$dir" "$branch"
+  else
+    base=${2:-$(default_base)}
+    git worktree add "$dir" -b "$branch" "$base"
+  fi
+  copy_env_files "$dir"
+  msg "${GREEN}Worktree ready: cd $dir${NOFORMAT}"
+}
+
+cmd_review() {
+  [[ $# -ge 1 ]] || die "Usage: git wt review <branch>"
+  repo_root
+  local branch=$1 dir
+  dir="$ROOT/review-${branch##*/}"
+  [[ -e "$dir" ]] && die "Directory $(basename "$dir")/ already exists."
+
+  git fetch origin "$branch"
+  # Detached HEAD: reviewing never claims the branch, so the author (or another
+  # worktree) can still check it out.
+  git worktree add --detach "$dir" "origin/$branch"
+  msg "${GREEN}Review worktree ready (detached): cd $dir${NOFORMAT}"
+  msg "${YELLOW}Remove with: git wt done $(basename "$dir")${NOFORMAT}"
+}
+
+cmd_done() {
+  [[ $# -ge 1 ]] || die "Usage: git wt done <dir>"
+  repo_root
+  local dir="$ROOT/${1%/}" branch
+  [[ -d "$dir" ]] || die "No worktree directory: $1"
+
+  # Capture the checked-out branch before removal so we can delete it after.
+  branch=$(git -C "$dir" symbolic-ref --short -q HEAD || true)
+  git worktree remove "$dir" # refuses dirty or locked (fixed) worktrees
+  msg "${GREEN}Removed worktree: $1${NOFORMAT}"
+  if [[ -n "$branch" ]]; then
+    if git branch -d "$branch" 2>/dev/null; then
+      msg "${GREEN}Deleted branch: $branch${NOFORMAT}"
+    else
+      msg "${YELLOW}Kept branch '$branch' (unmerged). Delete with: git branch -D $branch${NOFORMAT}"
+    fi
+  fi
+}
+
+setup_colors
+
+case "${1-}" in
+  -h | --help | '') usage ;;
+  init) shift; cmd_init "$@" ;;
+  new) shift; cmd_new "$@" ;;
+  review) shift; cmd_review "$@" ;;
+  done) shift; cmd_done "$@" ;;
+  ls) shift; git worktree list ;;
+  *) die "Unknown command: $1 (see git wt --help)" ;;
+esac

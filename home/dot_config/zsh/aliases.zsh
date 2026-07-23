@@ -86,6 +86,10 @@ alias grv="git remote -v"
 alias gs="git status"
 alias gst="git status"
 
+# Worktree workflow (git-wt script: init / new / review / done / ls)
+alias gwt="git wt"
+alias gwtl="git wt ls"
+
 # Pretty git logs (from radley's config)
 alias glog='PAGER="less -F -X" git log'
 alias gadog='PAGER="less -F -X" git log --all --decorate --oneline --graph'
