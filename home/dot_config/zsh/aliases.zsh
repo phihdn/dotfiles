@@ -37,7 +37,7 @@ alias -- -='cd -'  # `-- ` stops - being read as a flag; `cd -` jumps to previou
 # =========================================================
 
 alias ld="lazydocker"
-alias lg="lazygit"
+# lg (lazygit) is a script — ~/.local/bin/lg, bare-repo worktree aware.
 
 # =========================================================
 # Session management (sesh)

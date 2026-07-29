@@ -5,9 +5,10 @@
 
 # --autostash stashes/restores dirty changes around the rebase pull; the `;`
 # still opens lazygit if the pull fails anyway (offline, conflicts, ...).
+# `lg` (~/.local/bin) wraps lazygit to handle bare-repo worktree roots.
 [[window]]
 name = "git"
-startup_script = "git pull --autostash; lazygit; exec $SHELL"
+startup_script = "git pull --autostash; lg; exec $SHELL"
 
 # Claude Code per account (matches the claude-work/claude-personal aliases)
 [[window]]

@@ -30,7 +30,7 @@ abbr -a ll "lsd --group-dirs first -Al"
 abbr -a lt "lsd --group-dirs last -A --tree"
 
 # Tools
-abbr -a lg lazygit
+# lg (lazygit) is a script — ~/.local/bin/lg, bare-repo worktree aware
 abbr -a ld lazydocker
 
 # Session management

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# lg: lazygit, aware of the bare-repo worktree layout (git-bare-clone/git-wt).
+#
+# At the project root of a bare-clone layout the repo is bare (no work tree),
+# which lazygit refuses to open — instead pick a worktree with fzf (auto-picked
+# when there's only one) and open lazygit there via -p. Anywhere else this is
+# plain lazygit. Lives on PATH (not a shell function) so tmux/sesh window
+# templates and both shells all share the same behavior.
+
+if [[ "$(git rev-parse --is-bare-repository 2>/dev/null)" == "true" ]]; then
+  # Parse `worktree list --porcelain` blocks, dropping the one flagged `bare` —
+  # keys on the attribute, not the path, so custom bare locations still work.
+  wt=$(git worktree list --porcelain \
+    | awk '/^worktree /{path=substr($0,10)} /^bare$/{path=""} /^$/{if(path!="")print path; path=""} END{if(path!="")print path}' \
+    | fzf --height 40% --reverse --select-1 --exit-0 --prompt="worktree> ") || exit 0
+  [[ -n "$wt" ]] && exec lazygit -p "$wt"
+  exit 0
+fi
+
+exec lazygit "$@"
