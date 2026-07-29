@@ -17,9 +17,9 @@ alias l="lsd --group-dirs first -A"
 alias ll="lsd --group-dirs first -Al"
 alias lt="lsd --group-dirs last -A --tree"
 
-alias ls='eza --icons'
-alias la='eza -lah --icons --git'
-alias tree='eza --tree --icons'
+alias ls='eza --icons=auto'
+alias la='eza -lah --icons=auto --git'
+alias tree='eza --tree --icons=auto'
 compdef eza=ls 2>/dev/null
 
 # =========================================================
