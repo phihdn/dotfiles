@@ -24,6 +24,9 @@ return {
     vim.api.nvim_create_autocmd({ "FileType", "BufWritePost", "InsertLeave" }, {
       group = vim.api.nvim_create_augroup("phihdn-nvim-lint", { clear = true }),
       callback = function()
+        if vim.b.bigfile then
+          return
+        end
         require("lint").try_lint(nil, { ignore_errors = true })
       end,
     })

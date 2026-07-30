@@ -1,5 +1,6 @@
 return {
   "MeanderingProgrammer/render-markdown.nvim",
+  ft = { "markdown" },
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
     "nvim-tree/nvim-web-devicons",
@@ -38,6 +39,8 @@ return {
     -- anti_conceal re-renders the cursor line on every CursorMoved, which
     -- makes holding j/k laggy in large files; static decorations instead
     anti_conceal = { enabled = false },
+    -- align with the bigfile guard in core/autocmds.lua
+    max_file_size = 1.5,
     heading = {
       sign = false,
       icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },

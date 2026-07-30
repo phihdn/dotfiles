@@ -80,7 +80,9 @@ return {
           [vim.diagnostic.severity.HINT] = "󰌶 ",
         },
       },
-      virtual_text = { source = "if_many", spacing = 2 },
+      -- short one-liners on other lines, full multi-line panel under the cursor line
+      virtual_text = { source = "if_many", spacing = 2, current_line = false },
+      virtual_lines = { current_line = true },
     })
 
     -- broadcast blink.cmp's extra completion capabilities to every server

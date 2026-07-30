@@ -94,7 +94,7 @@ vim.opt.title = true
 vim.opt.titlestring = "Neovim - %t"
 
 -- vim.opt.nrformats:append("alpha") -- increment letters
-vim.opt.shortmess:append("IsF")
+vim.opt.shortmess:append("sF") -- no "I": keep nvim's default intro screen on empty start
 -- vim.o.shortmess = "filnxstToOFS"
 
 vim.filetype.add({
@@ -110,3 +110,11 @@ vim.filetype.add({
     ["%.env%.[%w_.-]+"] = "dotenv",
   },
 })
+
+-- folding via treesitter's native foldexpr; everything open by default,
+-- za/zc fold on demand (buffers without a parser simply get no folds)
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldtext = ""
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99

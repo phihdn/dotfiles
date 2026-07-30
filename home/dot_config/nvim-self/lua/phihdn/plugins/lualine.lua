@@ -70,9 +70,7 @@ return {
     "nvim-tree/nvim-web-devicons",
     "meuter/lualine-so-fancy.nvim",
   },
-  enabled = true,
-  lazy = false,
-  event = { "BufReadPost", "BufNewFile", "VeryLazy" },
+  event = "VeryLazy",
   config = function()
     -- local custom_gruvbox = require("lualine.themes.gruvbox")
     -- Change the background of lualine_c section for normal mode
