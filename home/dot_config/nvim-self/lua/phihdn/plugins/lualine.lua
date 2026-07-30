@@ -5,26 +5,22 @@ local function truncateCondition()
   return vim.o.columns >= lualine_trunc_margin
 end
 
+-- Fixed-width position fields so the section doesn't resize while moving the
+-- cursor. The current line is padded to exactly the digit count of the
+-- buffer's total ("320|799", " 32|799"), so no dead space is reserved.
 local function getColumnPosition()
-  local col = "%v"
-  local max_col = "%{virtcol('$')-1}"
   if not truncateCondition() then
-    return string.format("%s", col)
-  else
-    -- return string.format("%s\u{23ae}%s", col, max_col)
-    return string.format("%s|%s", col, max_col)
+    return "%2v"
   end
+  return "%2v|%3{virtcol('$')-1}"
 end
 
 local function getRowPosition()
-  local row = "%l"
-  local max_row = "%L"
+  local width = #tostring(vim.api.nvim_buf_line_count(0))
   if not truncateCondition() then
-    return string.format("%s", row)
-  else
-    -- return string.format("%s\u{23ae}%s", row, max_row)
-    return string.format("%s|%s", row, max_row)
+    return "%" .. width .. "l"
   end
+  return "%" .. width .. "l|%L"
 end
 
 -- Contextual components — each renders empty (hides) when there is nothing to say
