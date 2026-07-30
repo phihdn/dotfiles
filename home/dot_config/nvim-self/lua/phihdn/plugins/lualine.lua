@@ -139,11 +139,8 @@ return {
         section_separators = { left = "", right = "" },
         disabled_filetypes = {
           statusline = {
-            "alfa-nvim",
             "help",
-            "neo-tree",
             "Trouble",
-            "spectre_panel",
             "toggleterm",
           },
           winbar = {},
@@ -209,7 +206,7 @@ return {
         lualine_z = {},
       },
       tabline = {},
-      extensions = { "oil", "neo-tree", "lazy", "nvim-tree", "trouble", "quickfix", "mason" },
+      extensions = { "oil", "lazy", "trouble", "quickfix", "mason" },
     })
   end,
 }
