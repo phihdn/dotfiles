@@ -57,6 +57,7 @@ brew "git-lfs"
 brew "lazygit"
 brew "git-delta"   # Syntax-highlighting git pager (lazygit diff pager)
 brew "difftastic"  # Structural language-aware diffs (lazygit alt pager, cycle with |)
+brew "tuicr"       # Code review TUI — local diffs + GitLab MRs via glab (self-hosted OK)
 brew "lazydocker"
 brew "lazysql"
 brew "charmbracelet/tap/crush"
