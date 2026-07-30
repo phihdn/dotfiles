@@ -2,6 +2,9 @@ return {
   {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },
+    keys = {
+      { "<leader>uB", "<cmd>Gitsigns toggle_current_line_blame<cr>", desc = "Toggle inline git blame" },
+    },
     opts = function()
       return {
         signs = {
@@ -30,15 +33,15 @@ return {
         },
         auto_attach = true,
         attach_to_untracked = false,
-        current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+        current_line_blame = true, -- GitLens-style inline blame; <leader>uB toggles it
         current_line_blame_opts = {
           virt_text = true,
           virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
-          delay = 2000,
+          delay = 500, -- ms of cursor rest before the annotation appears
           ignore_whitespace = false,
           virt_text_priority = 100,
         },
-        current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d> - <summary>",
+        current_line_blame_formatter = "<author>, <author_time:%R> • <summary>",
         sign_priority = 6,
         update_debounce = 100,
         status_formatter = nil, -- Use default

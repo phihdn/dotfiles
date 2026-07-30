@@ -41,55 +41,55 @@ return {
     -- Change the background of lualine_c section for normal mode
     -- custom_gruvbox.normal.c.bg = "#112233"
 
-    local custom_kanagawa = require("lualine.themes.gruvbox") -- start with gruvbox
+    local custom_gruvbox = require("lualine.themes.gruvbox") -- start with gruvbox
 
-    -- Define Kanagawa Dragon-inspired colors
+    -- Gruvbox Material palette, matching the catppuccin color_overrides in
+    -- plugins/catppuccin-gruvbox.lua
     local colors = {
-      bg = "#16161D",
-      fg = "#DCD7BA",
-      yellow = "#E6C384",
-      cyan = "#7FB4CA",
-      darkblue = "#223249",
-      green = "#76946A",
-      orange = "#FFA066",
-      violet = "#957FB8",
-      magenta = "#D27E99",
-      blue = "#7E9CD8",
-      red = "#C34043",
+      bg = "#1d2021",
+      fg = "#ebdbb2",
+      yellow = "#d8a657",
+      cyan = "#89b482",
+      darkblue = "#292929",
+      green = "#a9b665",
+      orange = "#e78a4e",
+      violet = "#d3869b",
+      magenta = "#d3869b",
+      blue = "#7daea3",
+      red = "#ea6962",
     }
 
-    -- Apply Kanagawa colors to lualine sections
-    custom_kanagawa.normal = {
+    custom_gruvbox.normal = {
       a = { fg = colors.bg, bg = colors.blue, gui = "bold" },
       b = { fg = colors.fg, bg = colors.darkblue },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_kanagawa.insert = {
+    custom_gruvbox.insert = {
       a = { fg = colors.bg, bg = colors.green, gui = "bold" },
       b = { fg = colors.fg, bg = colors.darkblue },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_kanagawa.visual = {
+    custom_gruvbox.visual = {
       a = { fg = colors.bg, bg = colors.magenta, gui = "bold" },
       b = { fg = colors.fg, bg = colors.darkblue },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_kanagawa.replace = {
+    custom_gruvbox.replace = {
       a = { fg = colors.bg, bg = colors.red, gui = "bold" },
       b = { fg = colors.fg, bg = colors.darkblue },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_kanagawa.command = {
+    custom_gruvbox.command = {
       a = { fg = colors.bg, bg = colors.yellow, gui = "bold" },
       b = { fg = colors.fg, bg = colors.darkblue },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_kanagawa.inactive = {
+    custom_gruvbox.inactive = {
       a = { fg = colors.fg, bg = colors.bg, gui = "bold" },
       b = { fg = colors.fg, bg = colors.bg },
       c = { fg = colors.fg, bg = colors.bg },
@@ -100,7 +100,7 @@ return {
       options = {
         -- theme = "auto",
         -- theme = "gruvbox-material",
-        theme = custom_kanagawa,
+        theme = custom_gruvbox,
         globalstatus = true,
         icons_enabled = true,
         component_separators = { left = "│", right = "│" },

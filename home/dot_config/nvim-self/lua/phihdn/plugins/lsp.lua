@@ -118,6 +118,8 @@ return {
         "postgres-language-server",
         "typescript-language-server",
         "yaml-language-server",
+        -- linters (used by nvim-lint)
+        "markdownlint-cli2",
         -- formatters (used by conform.nvim)
         "stylua",
         "prettierd",

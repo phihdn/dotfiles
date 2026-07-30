@@ -1,75 +1,43 @@
 return {
   "MeanderingProgrammer/render-markdown.nvim",
-  enabled = true,
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
     "nvim-tree/nvim-web-devicons",
   },
   ---@module 'render-markdown'
-  -- ft = { "markdown", "norg", "rmd", "org" },
   init = function()
-    -- Define colors
-    -- local color1_bg = "#ff757f"
-    -- local color2_bg = "#4fd6be"
-    -- local color3_bg = "#7dcfff"
-    -- local color4_bg = "#ff9e64"
-    -- local color5_bg = "#7aa2f7"
-    -- local color6_bg = "#c0caf5"
-    -- local color_fg = "#1F2335"
-    -- Heading background
-    -- vim.cmd(string.format([[highlight Headline1Bg guifg=%s guibg=%s gui=bold]], color_fg, color1_bg))
-    -- vim.cmd(string.format([[highlight Headline2Bg guifg=%s guibg=%s gui=bold]], color_fg, color2_bg))
-    -- vim.cmd(string.format([[highlight Headline3Bg guifg=%s guibg=%s gui=bold]], color_fg, color3_bg))
-    -- vim.cmd(string.format([[highlight Headline4Bg guifg=%s guibg=%s gui=bold]], color_fg, color4_bg))
-    -- vim.cmd(string.format([[highlight Headline5Bg guifg=%s guibg=%s gui=bold]], color_fg, color5_bg))
-    -- vim.cmd(string.format([[highlight Headline6Bg guifg=%s guibg=%s gui=bold]], color_fg, color6_bg))
-
-    -- Heading fg
-    -- vim.cmd(string.format([[highlight Headline1Fg guifg=%s gui=bold]], colors.color1_bg))
-    -- vim.cmd(string.format([[highlight Headline2Fg guifg=%s gui=bold]], colors.color2_bg))
-    -- vim.cmd(string.format([[highlight Headline3Fg guifg=%s gui=bold]], colors.color3_bg))
-    -- vim.cmd(string.format([[highlight Headline4Fg guifg=%s gui=bold]], colors.color4_bg))
-    -- vim.cmd(string.format([[highlight Headline5Fg guifg=%s gui=bold]], colors.color5_bg))
-    -- vim.cmd(string.format([[highlight Headline6Fg guifg=%s gui=bold]], colors.color6_bg))
-
-    -- These colors are from the Kanagawa Dragon theme palette
-    local kanagawa = {
-      sumiInk0 = "#16161D",
-      sumiInk1 = "#1F1F28",
-      sumiInk2 = "#2A2A37",
-      dragonBlue = "#8BA4B0",
-      dragonRed = "#C34043",
-      dragonGreen = "#76946A",
-      dragonYellow = "#C0A36E",
-      dragonAqua = "#6A9589",
-      dragonOrange = "#FFA066",
-      fg = "#DCD7BA",
+    -- Gruvbox Material palette, matching the catppuccin color_overrides in
+    -- plugins/catppuccin-gruvbox.lua
+    local palette = {
+      bg = "#1d2021",
+      red = "#ea6962",
+      green = "#a9b665",
+      yellow = "#d8a657",
+      blue = "#7daea3",
+      aqua = "#89b482",
+      orange = "#e78a4e",
     }
 
-    -- Headline backgrounds (rotate through Kanagawa accent colors)
-    vim.cmd(string.format([[highlight Headline1Bg guifg=%s guibg=%s gui=bold]], kanagawa.sumiInk0, kanagawa.dragonRed))
-    vim.cmd(
-      string.format([[highlight Headline2Bg guifg=%s guibg=%s gui=bold]], kanagawa.sumiInk0, kanagawa.dragonGreen)
-    )
-    vim.cmd(
-      string.format([[highlight Headline3Bg guifg=%s guibg=%s gui=bold]], kanagawa.sumiInk0, kanagawa.dragonYellow)
-    )
-    vim.cmd(string.format([[highlight Headline4Bg guifg=%s guibg=%s gui=bold]], kanagawa.sumiInk0, kanagawa.dragonBlue))
-    vim.cmd(string.format([[highlight Headline5Bg guifg=%s guibg=%s gui=bold]], kanagawa.sumiInk0, kanagawa.dragonAqua))
-    vim.cmd(
-      string.format([[highlight Headline6Bg guifg=%s guibg=%s gui=bold]], kanagawa.sumiInk0, kanagawa.dragonOrange)
-    )
+    -- Headline backgrounds (rotate through the accent colors)
+    vim.cmd(string.format([[highlight Headline1Bg guifg=%s guibg=%s gui=bold]], palette.bg, palette.red))
+    vim.cmd(string.format([[highlight Headline2Bg guifg=%s guibg=%s gui=bold]], palette.bg, palette.green))
+    vim.cmd(string.format([[highlight Headline3Bg guifg=%s guibg=%s gui=bold]], palette.bg, palette.yellow))
+    vim.cmd(string.format([[highlight Headline4Bg guifg=%s guibg=%s gui=bold]], palette.bg, palette.blue))
+    vim.cmd(string.format([[highlight Headline5Bg guifg=%s guibg=%s gui=bold]], palette.bg, palette.aqua))
+    vim.cmd(string.format([[highlight Headline6Bg guifg=%s guibg=%s gui=bold]], palette.bg, palette.orange))
 
-    -- Optional: Foreground highlights (if you want them)
-    vim.cmd(string.format([[highlight Headline1Fg guifg=%s gui=bold]], kanagawa.dragonRed))
-    vim.cmd(string.format([[highlight Headline2Fg guifg=%s gui=bold]], kanagawa.dragonGreen))
-    vim.cmd(string.format([[highlight Headline3Fg guifg=%s gui=bold]], kanagawa.dragonYellow))
-    vim.cmd(string.format([[highlight Headline4Fg guifg=%s gui=bold]], kanagawa.dragonBlue))
-    vim.cmd(string.format([[highlight Headline5Fg guifg=%s gui=bold]], kanagawa.dragonAqua))
-    vim.cmd(string.format([[highlight Headline6Fg guifg=%s gui=bold]], kanagawa.dragonOrange))
+    vim.cmd(string.format([[highlight Headline1Fg guifg=%s gui=bold]], palette.red))
+    vim.cmd(string.format([[highlight Headline2Fg guifg=%s gui=bold]], palette.green))
+    vim.cmd(string.format([[highlight Headline3Fg guifg=%s gui=bold]], palette.yellow))
+    vim.cmd(string.format([[highlight Headline4Fg guifg=%s gui=bold]], palette.blue))
+    vim.cmd(string.format([[highlight Headline5Fg guifg=%s gui=bold]], palette.aqua))
+    vim.cmd(string.format([[highlight Headline6Fg guifg=%s gui=bold]], palette.orange))
   end,
   opts = {
     render_modes = { "n", "c", "t" },
+    -- anti_conceal re-renders the cursor line on every CursorMoved, which
+    -- makes holding j/k laggy in large files; static decorations instead
+    anti_conceal = { enabled = false },
     heading = {
       sign = false,
       icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },
@@ -96,32 +64,7 @@ return {
       right_pad = 1,
     },
     bullet = {
-      -- Turn on / off list bullet rendering
       enabled = true,
     },
-    -- checkbox = {
-    --     -- Turn on / off checkbox state rendering
-    --     enabled = true,
-    --     -- Determines how icons fill the available space:
-    --     --  inline:  underlying text is concealed resulting in a left aligned icon
-    --     --  overlay: result is left padded with spaces to hide any additional text
-    --     position = "inline",
-    --     unchecked = {
-    --         -- Replaces '[ ]' of 'task_list_marker_unchecked'
-    --         icon = "   󰄱 ",
-    --         -- Highlight for the unchecked icon
-    --         highlight = "RenderMarkdownUnchecked",
-    --         -- Highlight for item associated with unchecked checkbox
-    --         scope_highlight = nil,
-    --     },
-    --     checked = {
-    --         -- Replaces '[x]' of 'task_list_marker_checked'
-    --         icon = "   󰱒 ",
-    --         -- Highlight for the checked icon
-    --         highlight = "RenderMarkdownChecked",
-    --         -- Highlight for item associated with checked checkbox
-    --         scope_highlight = nil,
-    --     },
-    -- },
   },
 }
