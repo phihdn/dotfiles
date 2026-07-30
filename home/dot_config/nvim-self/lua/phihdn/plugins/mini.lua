@@ -73,6 +73,16 @@ return {
           width_preview = 40,
         },
       })
+      -- <CR> on a file opens it AND closes the explorer; on a directory it
+      -- just navigates in (go_in's close_on_file only acts on files)
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniFilesBufferCreate",
+        callback = function(args)
+          vim.keymap.set("n", "<CR>", function()
+            MiniFiles.go_in({ close_on_file = true })
+          end, { buffer = args.data.buf_id, desc = "Go in (close on file)" })
+        end,
+      })
       nmap("<leader>ee", function()
         if not MiniFiles.close() then
           MiniFiles.open()
