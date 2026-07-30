@@ -27,6 +27,43 @@ local function getRowPosition()
   end
 end
 
+-- Contextual components — each renders empty (hides) when there is nothing to say
+local function sleuthIndent()
+  -- indent as detected by vim-sleuth; makes a wrong guess visible at a glance
+  if vim.bo.buftype ~= "" then
+    return ""
+  end
+  local sw = vim.bo.shiftwidth ~= 0 and vim.bo.shiftwidth or vim.bo.tabstop
+  return vim.bo.expandtab and (sw .. "sp") or "tab"
+end
+
+local function markdownWordcount()
+  if vim.bo.filetype ~= "markdown" then
+    return ""
+  end
+  return vim.fn.wordcount().words .. "w"
+end
+
+local function autoformatOff()
+  -- conform.nvim format-on-save honors these toggles; warn while it's off
+  if vim.g.disable_autoformat or vim.b.disable_autoformat then
+    return "fmt!"
+  end
+  return ""
+end
+
+local function abnormalEncoding()
+  local enc = vim.bo.fileencoding
+  return (enc ~= "" and enc ~= "utf-8") and enc or ""
+end
+
+local function abnormalFileformat()
+  if vim.bo.fileformat == "unix" then
+    return ""
+  end
+  return vim.bo.fileformat == "dos" and "CRLF" or vim.bo.fileformat
+end
+
 return {
   "nvim-lualine/lualine.nvim",
   dependencies = {
@@ -141,6 +178,13 @@ return {
         lualine_x = {
           { "fancy_macro" },
           {
+            require("lazy.status").updates,
+            cond = require("lazy.status").has_updates,
+            color = { fg = colors.orange },
+          },
+          { markdownWordcount },
+          { autoformatOff, color = { fg = colors.red, gui = "bold" } },
+          {
             "fancy_diagnostics",
             sources = { "nvim_lsp" },
             symbols = {
@@ -152,6 +196,9 @@ return {
           { "fancy_lsp_servers" },
         },
         lualine_y = {
+          { sleuthIndent, cond = truncateCondition },
+          { abnormalEncoding, color = { fg = colors.red, gui = "bold" } },
+          { abnormalFileformat, color = { fg = colors.red, gui = "bold" } },
           { "fancy_filetype", ts_icon = "" },
         },
         lualine_z = {
