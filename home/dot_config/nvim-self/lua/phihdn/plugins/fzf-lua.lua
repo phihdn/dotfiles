@@ -1,11 +1,18 @@
 return {
   "ibhagwan/fzf-lua",
-  enabled = false,
-  -- optional for icon support
-  -- dependencies = { "nvim-tree/nvim-web-devicons" },
-  -- or if using mini.icons/mini.nvim
-  dependencies = { "echasnovski/mini.icons" },
-  opts = {},
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+  config = function(_, opts)
+    local fzf = require("fzf-lua")
+    fzf.setup(opts)
+    -- replace vim.ui.select (code actions, etc.) with an fzf-lua picker
+    fzf.register_ui_select()
+  end,
+  opts = {
+    files = { cwd_prompt = false },
+    grep = {
+      rg_opts = "--column --line-number --no-heading --color=always --smart-case --hidden --glob=!.git/ --max-columns=4096 -e",
+    },
+  },
   keys = {
     {
       "<leader>ff",
@@ -45,9 +52,16 @@ return {
     {
       "<leader>fb",
       function()
+        require("fzf-lua").buffers()
+      end,
+      desc = "[F]ind [B]uffers",
+    },
+    {
+      "<leader>fz",
+      function()
         require("fzf-lua").builtin()
       end,
-      desc = "[F]ind [B]uiltin FZF",
+      desc = "[F]ind f[z]f-lua builtin pickers",
     },
     {
       "<leader>fw",
@@ -68,7 +82,14 @@ return {
       function()
         require("fzf-lua").diagnostics_document()
       end,
-      desc = "[F]ind [D]iagnostics",
+      desc = "[F]ind buffer [D]iagnostics",
+    },
+    {
+      "<leader>fD",
+      function()
+        require("fzf-lua").diagnostics_workspace()
+      end,
+      desc = "[F]ind workspace [D]iagnostics",
     },
     {
       "<leader>fr",
@@ -85,11 +106,25 @@ return {
       desc = "[F]ind [O]ld Files",
     },
     {
+      '<leader>f"',
+      function()
+        require("fzf-lua").registers()
+      end,
+      desc = '[F]ind ["]Registers',
+    },
+    {
+      "<leader>:",
+      function()
+        require("fzf-lua").command_history()
+      end,
+      desc = "Command History",
+    },
+    {
       "<leader><leader>",
       function()
         require("fzf-lua").buffers()
       end,
-      desc = "[,] Find existing buffers",
+      desc = "[ ] Find existing buffers",
     },
     {
       "<leader>/",
@@ -97,6 +132,20 @@ return {
         require("fzf-lua").lgrep_curbuf()
       end,
       desc = "[/] Live grep the current buffer",
+    },
+    {
+      "<leader>gc",
+      function()
+        require("fzf-lua").git_commits()
+      end,
+      desc = "Search [g]it [c]ommits",
+    },
+    {
+      "<leader>gs",
+      function()
+        require("fzf-lua").git_status()
+      end,
+      desc = "Search [g]it [s]tatus",
     },
   },
 }

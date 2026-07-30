@@ -15,7 +15,7 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "moves lines up in visual 
 
 vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines and keep cursor in the middle" })
 
--- Remap for dealing with visual line wraps
+-- Move by screen line when wrapping, but keep real-line motion for counts (5j)
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true })
 
@@ -23,55 +23,46 @@ vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true })
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
-vim.keymap.set({ "n", "v", "x" }, "<leader>y", [["+y]], { desc = "Copy to clipboard" })
+vim.keymap.set({ "n", "x" }, "<leader>y", [["+y]], { desc = "Copy to clipboard" })
 vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Copy line to clipboard" })
 
--- paste over currently selected text without yanking it
-vim.keymap.set("v", "p", [["_dp]]) -- p puts text after the cursor
-vim.keymap.set("v", "P", [["_dP]]) -- P puts text before the cursor
+-- paste over selection without clobbering the unnamed register
+-- (builtin visual P has done this natively since nvim 0.10)
+vim.keymap.set("x", "p", "P")
 
--- Move line on the screen rather than by line in the file
-vim.keymap.set("n", "j", "gj", opts)
-vim.keymap.set("n", "k", "gk", opts)
-
--- Exit on jj and jk
-vim.keymap.set("i", "jj", "<ESC>", opts)
+-- Exit insert mode with jk
 vim.keymap.set("i", "jk", "<ESC>", opts)
 
 -- Navigate buffers
 vim.keymap.set("n", "<S-l>", ":bnext<CR>", opts)
 vim.keymap.set("n", "<S-h>", ":bprevious<CR>", opts)
+vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
 
-vim.keymap.set("n", "n", "nzz", opts)
-vim.keymap.set("n", "N", "Nzz", opts)
-vim.keymap.set("n", "*", "*zz", opts)
-vim.keymap.set("n", "#", "#zz", opts)
-vim.keymap.set("n", "g*", "g*zz", opts)
-vim.keymap.set("n", "g#", "g#zz", opts)
+-- Center screen (and reopen folds) when jumping between matches
+vim.keymap.set("n", "n", "nzzzv", opts)
+vim.keymap.set("n", "N", "Nzzzv", opts)
+vim.keymap.set("n", "*", "*zzzv", opts)
+vim.keymap.set("n", "#", "#zzzv", opts)
+vim.keymap.set("n", "g*", "g*zzzv", opts)
+vim.keymap.set("n", "g#", "g#zzzv", opts)
 
--- Split line with X: remove from the cursor til the end
+-- Split line at cursor (shadows builtin X = delete char before cursor)
 vim.keymap.set("n", "X", ":keeppatterns substitute/\\s*\\%#\\s*/\\r/e <bar> normal! ==^<cr>", { silent = true })
 
-vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", opts)
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR><Esc>", opts)
 
 -- delete single character without copying into register
 vim.keymap.set("n", "x", '"_x', opts)
 
 --split management
 vim.keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
--- split window vertically
 vim.keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" })
--- split window horizontally
-vim.keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" }) -- make split windows equal width & height
--- close current split window
+vim.keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" })
 vim.keymap.set("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close current split" })
-
--- Executes shell command from in here making file executable (conflict with trouble keys)
--- vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true, desc = "makes file executable" })
 
 -- Copy filepath to the clipboard
 vim.keymap.set("n", "<leader>fp", function()
-  local filePath = vim.fn.expand("%:~") -- Gets the file path relative to the home directory
-  vim.fn.setreg("+", filePath) -- Copy the file path to the clipboard register
-  print("File path copied to clipboard: " .. filePath) -- Optional: print message to confirm
+  local filePath = vim.fn.expand("%:~")
+  vim.fn.setreg("+", filePath)
+  print("File path copied to clipboard: " .. filePath)
 end, { desc = "Copy file path to clipboard" })
