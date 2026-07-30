@@ -9,7 +9,7 @@ _Inspired by [NLaundry/MacAutoSetup](https://github.com/NLaundry/MacAutoSetup)_
 - 🐟 **Fish shell** — user-friendly shell with great defaults (alternative)
 - 🧠 **Raycast** — fast launcher & automation
 - 🪟 **AeroSpace** — tiling window management (like i3, for Mac)
-- 🧑‍💻 **Neovim** — [LazyVim](https://www.lazyvim.org) distro, near-stock with language extras
+- 🧑‍💻 **Neovim** — self-maintained config (nvim 0.11+ native LSP, fzf-lua, mini.nvim); LazyVim kept as a fallback profile (`nvl`)
 - 🖋️ **chezmoi** — declarative, template-aware dotfile management
 - 🧰 **Essential CLI tools** — ripgrep, fzf, bat, eza, and more
 - 🚀 **Zsh** — default shell with a modular XDG config (`~/.config/zsh`) and a self-contained plugin manager
@@ -131,7 +131,8 @@ home/
 └── dot_config/                   → ~/.config/
     ├── zsh/           zsh shell config — modular (see "zsh configuration" below)
     ├── fish/          fish shell config (config.fish, conf.d/, functions/)
-    ├── nvim/          Neovim — LazyVim starter (see "Neovim (LazyVim)" below)
+    ├── nvim/          Neovim — self-maintained config (see "Neovim" below)
+    ├── nvim-lazyvim/  Neovim — LazyVim fallback profile (run with `nvl`)
     ├── tmux/          tmux config + gitmux + catppuccin theme
     ├── starship.toml  Starship prompt (shared by zsh and fish)
     ├── aerospace/     AeroSpace tiling window manager
@@ -154,18 +155,18 @@ home/
 
 The zsh config is split into small, single-purpose modules. `~/.zshenv` is the only zsh file kept in `$HOME`; it sets `ZDOTDIR` to `~/.config/zsh` so every other file lives there and `$HOME` stays clean.
 
-| File | Purpose |
-| --- | --- |
-| `~/.zshenv` (`dot_zshenv`) | Minimal bootstrap. Sets `XDG_CONFIG_HOME` and `ZDOTDIR=~/.config/zsh`, then sources `$ZDOTDIR/.zshenv`. Read by **every** zsh invocation. |
-| `.zshenv` | Environment for all shells: XDG dirs, `EDITOR`/`VISUAL=nvim`, `MANPAGER=bat`, `GPG_TTY`, `KUBECONFIG`, `K9S_CONFIG_DIR`, and a deduplicated `PATH` (including nvm's default node — see below). |
-| `.zprofile` | Login shells only. Re-prepends nvm's node to `PATH` after macOS `path_helper` reorders it (see [node / nvm on PATH](#node--nvm-on-path)). |
-| `.zshrc` | Interactive setup: history, shell options, completion (`compinit`), `zoxide`, fzf key-bindings, `kubectl` completion, lazy `nvm` + `uv` completion, then sources the modules below. |
-| `fzf.zsh` | fzf defaults (`fd` source, `bat` preview, UI options) and the `Ctrl-F` file-picker widget. |
-| `aliases.zsh` | Aliases (git, kubernetes, `lsd`/`eza`, `bat`, `rg`, sesh) and helper functions (`lf` dir-follow). |
-| `bindings.zsh` | Key-bindings and vi-mode cursor settings. Defines the `zvm_after_init` hook **before** plugins load so custom bindings survive zsh-vi-mode's reset. |
-| `plugins.zsh` | Self-contained plugin manager: clones plugins into `~/.config/zsh/plugins` on first launch and sources them. Run `zplugin-update` to update. |
-| `prompt.zsh` | Initializes the Starship prompt (or a minimal `$` prompt inside Cursor Agent). |
-| `local.zsh` | **Optional, per-machine, not managed by chezmoi.** Sourced last by `.zshrc` if it exists — put machine-specific exports and secrets here; it never lands in this repo. |
+| File                       | Purpose                                                                                                                                                                                        |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `~/.zshenv` (`dot_zshenv`) | Minimal bootstrap. Sets `XDG_CONFIG_HOME` and `ZDOTDIR=~/.config/zsh`, then sources `$ZDOTDIR/.zshenv`. Read by **every** zsh invocation.                                                      |
+| `.zshenv`                  | Environment for all shells: XDG dirs, `EDITOR`/`VISUAL=nvim`, `MANPAGER=bat`, `GPG_TTY`, `KUBECONFIG`, `K9S_CONFIG_DIR`, and a deduplicated `PATH` (including nvm's default node — see below). |
+| `.zprofile`                | Login shells only. Re-prepends nvm's node to `PATH` after macOS `path_helper` reorders it (see [node / nvm on PATH](#node--nvm-on-path)).                                                      |
+| `.zshrc`                   | Interactive setup: history, shell options, completion (`compinit`), `zoxide`, fzf key-bindings, `kubectl` completion, lazy `nvm` + `uv` completion, then sources the modules below.            |
+| `fzf.zsh`                  | fzf defaults (`fd` source, `bat` preview, UI options) and the `Ctrl-F` file-picker widget.                                                                                                     |
+| `aliases.zsh`              | Aliases (git, kubernetes, `lsd`/`eza`, `bat`, `rg`, sesh) and helper functions (`lf` dir-follow).                                                                                              |
+| `bindings.zsh`             | Key-bindings and vi-mode cursor settings. Defines the `zvm_after_init` hook **before** plugins load so custom bindings survive zsh-vi-mode's reset.                                            |
+| `plugins.zsh`              | Self-contained plugin manager: clones plugins into `~/.config/zsh/plugins` on first launch and sources them. Run `zplugin-update` to update.                                                   |
+| `prompt.zsh`               | Initializes the Starship prompt (or a minimal `$` prompt inside Cursor Agent).                                                                                                                 |
+| `local.zsh`                | **Optional, per-machine, not managed by chezmoi.** Sourced last by `.zshrc` if it exists — put machine-specific exports and secrets here; it never lands in this repo.                         |
 
 Plugins loaded by `plugins.zsh` (in order):
 
@@ -235,21 +236,13 @@ case $- in *i*) echo interactive;; *) echo non-interactive;; esac
 
 With the setup above, `node` resolves to nvm's version in **all** of those modes, so it shouldn't matter — but this is how you'd confirm.
 
-### Neovim (LazyVim)
+### Neovim
 
-`~/.config/nvim` is the stock [LazyVim starter](https://github.com/LazyVim/starter) with **no hand-written plugin specs** — the goal is zero config maintenance and letting the distro handle upgrades. The only customization is language extras enabled in `lazyvim.json` (LazyVim's own mechanism, same as `:LazyExtras`):
+`~/.config/nvim` is a self-maintained config (custom Lua under `lua/phihdn/{core,plugins}`, one plugin per file), modernized for nvim 0.11+: native `vim.lsp.config()`/`vim.lsp.enable()` (mason installs the binaries; no mason-lspconfig), treesitter `main` branch, fzf-lua as the sole picker, blink.cmp completion, conform + nvim-lint, catppuccin with Gruvbox Material `color_overrides`, oil + mini.files for file management, and mini.ai/mini.surround textobjects. Languages: go, typescript, python (basedpyright), lua, bash, yaml, postgres, markdown.
 
-- `lang.typescript`, `lang.go`, `lang.python` — IDE setup (LSP, formatters, DAP, tests)
-- `lang.markdown` — for reviewing AI-generated code plans/docs
+`lazy-lock.json` **is committed** for this config — the applied target is the source of truth, so after `:Lazy update`, copy it back before committing: `cp ~/.config/nvim/lazy-lock.json home/dot_config/nvim/`.
 
-`lazy-lock.json` is intentionally **not** managed by chezmoi (see `.chezmoiignore`): lazy.nvim rewrites it on every `:Lazy update`, which would otherwise produce constant chezmoi diff noise.
-
-**Previous hand-rolled config**: the pre-LazyVim setup (custom Lua config under `lua/phihdn/{core,plugins}` — kanagawa theme, telescope, fzf-lua, oil, blink-cmp, conform, etc.) is preserved on the branch [`20260710-nvim-pre-lazyvim`](https://github.com/phihdn/dotfiles/tree/20260710-nvim-pre-lazyvim/home/dot_config/nvim), at `home/dot_config/nvim/`. To compare or port old behavior (keymaps, options, plugin settings) into LazyVim:
-
-```bash
-git diff 20260710-nvim-pre-lazyvim main -- home/dot_config/nvim
-git show 20260710-nvim-pre-lazyvim:home/dot_config/nvim/lua/phihdn/core/keymaps.lua
-```
+**LazyVim fallback**: the LazyVim setup used during 2026-07 is kept fully working at `home/dot_config/nvim-lazyvim/` under an isolated `NVIM_APPNAME=nvim-lazyvim` profile — run it with the `nvl` alias (zsh + fish). Its lockfile stays unmanaged (see `.chezmoiignore`). History snapshots: [`20260710-nvim-pre-lazyvim`](https://github.com/phihdn/dotfiles/tree/20260710-nvim-pre-lazyvim/home/dot_config/nvim) (self config before the LazyVim experiment) and `20260730-nvim-pre-self` (LazyVim as main, right before this swap).
 
 ## 🤖 Claude Code — multiple accounts
 
@@ -670,28 +663,28 @@ uv run --python 3.12 python script.py
 
 ---
 
-| Config | Description |
-| --- | --- |
-| **1password** | 1Password CLI and SSH agent configuration |
-| **aerospace** | AeroSpace tiling window manager configuration |
-| **bat** | bat (cat clone) with syntax highlighting themes |
-| **fish** | Fish shell configuration and plugins |
-| **git** | Git configuration, aliases, and settings |
-| **ghostty** | Ghostty terminal emulator configuration |
-| **k9s** | Kubernetes CLI (k9s) configuration and themes |
-| **kitty** | Kitty terminal emulator configuration |
-| **lazygit** | Lazygit TUI configuration and themes |
-| **lf** | lf file manager configuration and settings |
-| **lsd** | lsd (ls deluxe) configuration and colors |
-| **neofetch** | Neofetch system information display configuration |
-| **nvim** | Neovim — LazyVim distro with language extras |
-| **scripts** | Custom utility scripts and tools |
-| **sesh** | Sesh tmux session manager configuration |
-| **starship** | Starship cross-shell prompt configuration |
-| **tmux** | tmux terminal multiplexer configuration and plugins |
-| **wakatime** | WakaTime time tracking configuration |
-| **wezterm** | WezTerm terminal emulator configuration |
-| **zsh** | Modular Zsh config under `~/.config/zsh` (ZDOTDIR) with a self-contained plugin manager |
+| Config        | Description                                                                             |
+| ------------- | --------------------------------------------------------------------------------------- |
+| **1password** | 1Password CLI and SSH agent configuration                                               |
+| **aerospace** | AeroSpace tiling window manager configuration                                           |
+| **bat**       | bat (cat clone) with syntax highlighting themes                                         |
+| **fish**      | Fish shell configuration and plugins                                                    |
+| **git**       | Git configuration, aliases, and settings                                                |
+| **ghostty**   | Ghostty terminal emulator configuration                                                 |
+| **k9s**       | Kubernetes CLI (k9s) configuration and themes                                           |
+| **kitty**     | Kitty terminal emulator configuration                                                   |
+| **lazygit**   | Lazygit TUI configuration and themes                                                    |
+| **lf**        | lf file manager configuration and settings                                              |
+| **lsd**       | lsd (ls deluxe) configuration and colors                                                |
+| **neofetch**  | Neofetch system information display configuration                                       |
+| **nvim**      | Neovim — self-maintained config; LazyVim fallback profile via `nvl`                     |
+| **scripts**   | Custom utility scripts and tools                                                        |
+| **sesh**      | Sesh tmux session manager configuration                                                 |
+| **starship**  | Starship cross-shell prompt configuration                                               |
+| **tmux**      | tmux terminal multiplexer configuration and plugins                                     |
+| **wakatime**  | WakaTime time tracking configuration                                                    |
+| **wezterm**   | WezTerm terminal emulator configuration                                                 |
+| **zsh**       | Modular Zsh config under `~/.config/zsh` (ZDOTDIR) with a self-contained plugin manager |
 
 ## ✅ Result
 
