@@ -13,6 +13,7 @@ return {
       { "<leader>s", group = "split" },
       { "<leader>u", group = "ui/toggles" },
       { "<leader>x", group = "diagnostics" },
+      { "gs", group = "surround" },
     },
   },
   keys = {

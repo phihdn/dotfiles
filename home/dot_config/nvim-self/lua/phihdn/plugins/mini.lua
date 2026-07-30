@@ -27,6 +27,37 @@ return {
       require("mini.cursorword").setup()
       vim.cmd("hi! MiniCursorwordCurrent guifg=NONE guibg=NONE gui=NONE cterm=NONE") -- disable highlight of the word under the cursor
 
+      -- around/inside textobjects: vif/vaf (function), vic/vac (class),
+      -- via (argument), vio (block/loop/conditional), plus counts and
+      -- next/last variants (e.g. vinq = inside next quote). Replaces the
+      -- manual nvim-treesitter-textobjects select keymaps.
+      local ai = require("mini.ai")
+      ai.setup({
+        n_lines = 500,
+        custom_textobjects = {
+          o = ai.gen_spec.treesitter({
+            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
+            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
+          }),
+          f = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }),
+          c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }),
+        },
+      })
+
+      -- surround on the gs prefix because flash owns plain s:
+      -- gsa" (add), gsd" (delete), gsr"' (replace " with ')
+      require("mini.surround").setup({
+        mappings = {
+          add = "gsa",
+          delete = "gsd",
+          find = "gsf",
+          find_left = "gsF",
+          highlight = "gsh",
+          replace = "gsr",
+          update_n_lines = "gsn",
+        },
+      })
+
       -- local MiniFiles = require("mini.files")
       -- MiniFiles.setup({
       --   mappings = {
