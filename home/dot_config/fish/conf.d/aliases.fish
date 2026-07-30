@@ -1,8 +1,8 @@
 # Aliases - for commands that need arguments or complex behavior
 
 alias v nvim
-# trial run of the self-maintained config (plans/260729-2304-nvim-self-config-revival)
-alias nvs "env NVIM_APPNAME=nvim-self nvim"
+# LazyVim fallback profile (main config is self-maintained)
+alias nvl "env NVIM_APPNAME=nvim-lazyvim nvim"
 alias grep "grep --color"
 alias please sudo
 

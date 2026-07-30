@@ -30,7 +30,7 @@ alias grep='rg --color=auto'
 alias diff='diff --color=auto'
 alias df='df -h'
 alias vim='nvim'
-alias nvs='NVIM_APPNAME=nvim-self nvim'  # trial run of the self-maintained config (plans/260729-2304-nvim-self-config-revival)
+alias nvl='NVIM_APPNAME=nvim-lazyvim nvim'  # LazyVim fallback profile (main config is self-maintained)
 alias -- -='cd -'  # `-- ` stops - being read as a flag; `cd -` jumps to previous dir
 
 # =========================================================

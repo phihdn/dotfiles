@@ -40,6 +40,7 @@
 # tmux plugins are cloned at runtime by tpm
 .config/tmux/plugins
 
-# lazy.nvim rewrites the lockfile on every plugin update; treat it as
-# per-machine state so chezmoi never fights lazy.nvim over it
-.config/nvim/lazy-lock.json
+# The main nvim config commits its lazy-lock.json (target is the source of
+# truth: copy it back to the repo after :Lazy update). The LazyVim fallback
+# profile's lockfile stays per-machine state, like it always was.
+.config/nvim-lazyvim/lazy-lock.json
