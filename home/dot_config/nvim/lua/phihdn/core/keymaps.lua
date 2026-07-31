@@ -25,6 +25,10 @@ vim.keymap.set("v", ">", ">gv")
 
 vim.keymap.set({ "n", "x" }, "<leader>y", [["+y]], { desc = "Copy to clipboard" })
 vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Copy line to clipboard" })
+vim.keymap.set("n", "<leader>ym", function()
+  vim.fn.setreg("+", vim.fn.execute("messages"))
+  vim.notify("Messages copied to clipboard")
+end, { desc = "Yank :messages to clipboard" })
 
 -- paste over selection without clobbering the unnamed register
 -- (builtin visual P has done this natively since nvim 0.10)
