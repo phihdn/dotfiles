@@ -12,7 +12,11 @@ export VISUAL="nvim"
 
 # ---------- Pager ----------
 if command -v bat >/dev/null 2>&1; then
-  export MANPAGER="bat -l man -p"
+  # col -bx strips man's backspace-overstrike bold/underline, which bat
+  # doesn't interpret (they'd render as literal ^H boxes).
+  export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+  # groff (Linux man) only: emit plain overstrike, not SGR escapes.
+  export MANROFFOPT="-c"
 fi
 
 # ---------- GPG ----------
