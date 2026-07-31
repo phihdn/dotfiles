@@ -439,6 +439,29 @@ Gotchas the script handles or you should know:
 - A branch can be checked out in only **one** worktree at a time; reviews use detached HEAD to sidestep this.
 - `git wt` refuses to run in a normal clone (worktrees would show up as untracked dirs there — the bare layout has no parent checkout).
 
+### tmux session layouts (sesh + hook script)
+
+Sessions are opened through [sesh](https://github.com/joshmedeski/sesh): the `s` alias in a plain shell (runs `~/.local/bin/sesh_start`, an fzf picker) or `prefix+K` inside tmux (same picker via `fzf-tmux`, defined in `tmux.conf`). `prefix+L` jumps back to the last session.
+
+Layouts come from **two mechanisms**, so changes go in different places depending on which kind of session you're editing:
+
+| Session kind | Layout source | Edit |
+| --- | --- | --- |
+| Pre-defined sessions (`dotfiles`, `tmux config`, `nvim config`, ...) | Declarative TOML | `~/.config/sesh/sesh.toml` + `~/.config/sesh/configs/windows.toml` |
+| Ad-hoc repo sessions under `~/ws/work/` or `~/ws/personal/` | tmux `session-created` hook script | `~/.local/bin/tmux-session-layout` |
+
+**Declarative (sesh TOML)** — `sesh.toml` defines named sessions (path, startup command) and references reusable windows from `configs/windows.toml` by name (`git`, `claude-work`, `claude-personal`, `dev`). sesh's TOML can't describe pane splits, so windows that need panes call a script instead: the `dev` window runs `~/.local/bin/sesh-dev-layout` (nvim on top, 25% shell pane below).
+
+**Dynamic (hook script)** — `tmux.conf` sets a global `session-created` hook that runs `~/.local/bin/tmux-session-layout` for _every_ new session (sesh-created or not). For git repos under `~/ws/work/` or `~/ws/personal/` it builds a standard dev layout and lands on window 1:
+
+```text
+1: claude   # Claude Code, CLAUDE_CONFIG_DIR picked from the path (work → ~/.claude-work, personal → ~/.claude-personal)
+2: nvim     # editor on top + 25% terminal pane below
+3: git      # lazygit (via the `lg` wrapper, handles bare-repo worktree roots)
+```
+
+The script exits early for anything else: non-git paths, umbrella folders like `~/ws/work` itself, and sessions that already have a `claude` window (so it doesn't fight the sesh-defined sessions above). To give another path pattern its own layout, add a `case` branch in `tmux-session-layout`.
+
 ## 🐍🟢 Language Version Management
 
 This setup includes modern tools for managing Node.js and Python versions:
