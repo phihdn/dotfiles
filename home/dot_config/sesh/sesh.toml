@@ -11,7 +11,7 @@ import = [
 # "; exec $SHELL" returns to a shell instead of closing the window/session on exit.
 [default_session]
 startup_command = "nvim -c 'lua vim.schedule(function() require(\"fzf-lua\").files() end)'; exec $SHELL"
-preview_command = "eza --all --git --icons --color=always {}"
+preview_command = "lsd --almost-all --icon=always --color=always {}"
 
 [[session]]
 name = "home"

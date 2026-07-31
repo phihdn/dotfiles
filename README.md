@@ -11,7 +11,7 @@ _Inspired by [NLaundry/MacAutoSetup](https://github.com/NLaundry/MacAutoSetup)_
 - 🪟 **AeroSpace** — tiling window management (like i3, for Mac)
 - 🧑‍💻 **Neovim** — self-maintained config (nvim 0.11+ native LSP, fzf-lua, mini.nvim); LazyVim kept as a fallback profile (`nvl`)
 - 🖋️ **chezmoi** — declarative, template-aware dotfile management
-- 🧰 **Essential CLI tools** — ripgrep, fzf, bat, eza, and more
+- 🧰 **Essential CLI tools** — ripgrep, fzf, bat, lsd, and more
 - 🚀 **Zsh** — default shell with a modular XDG config (`~/.config/zsh`) and a self-contained plugin manager
 - 🌟 **Starship** — beautiful, fast cross-shell prompt
 
@@ -56,7 +56,7 @@ The repo works on Linux too. `bootstrap.sh` detects the OS: on Linux it skips Xc
 
 - **git**, **gh** — Version control and GitHub CLI
 - **fzf**, **ripgrep**, **bat** — Modern search and file tools
-- **eza**, **fd**, **lsd** — Better ls and find alternatives
+- **fd**, **lsd** — Better ls and find alternatives
 - **htop**, **neofetch** — System monitoring and info
 - **tmux**, **sesh**, **starship** — Terminal multiplexer and prompt
 - **chezmoi** — Dotfile management
@@ -162,7 +162,7 @@ The zsh config is split into small, single-purpose modules. `~/.zshenv` is the o
 | `.zprofile`                | Login shells only. Re-prepends nvm's node to `PATH` after macOS `path_helper` reorders it (see [node / nvm on PATH](#node--nvm-on-path)).                                                      |
 | `.zshrc`                   | Interactive setup: history, shell options, completion (`compinit`), `zoxide`, fzf key-bindings, `kubectl` completion, lazy `nvm` + `uv` completion, then sources the modules below.            |
 | `fzf.zsh`                  | fzf defaults (`fd` source, `bat` preview, UI options) and the `Ctrl-F` file-picker widget.                                                                                                     |
-| `aliases.zsh`              | Aliases (git, kubernetes, `lsd`/`eza`, `bat`, `rg`, sesh) and helper functions (`lf` dir-follow).                                                                                              |
+| `aliases.zsh`              | Aliases (git, kubernetes, `lsd`, `bat`, `rg`, sesh) and helper functions (`lf` dir-follow).                                                                                              |
 | `bindings.zsh`             | Key-bindings and vi-mode cursor settings. Defines the `zvm_after_init` hook **before** plugins load so custom bindings survive zsh-vi-mode's reset.                                            |
 | `plugins.zsh`              | Self-contained plugin manager: clones plugins into `~/.config/zsh/plugins` on first launch and sources them. Run `zplugin-update` to update.                                                   |
 | `prompt.zsh`               | Initializes the Starship prompt (or a minimal `$` prompt inside Cursor Agent).                                                                                                                 |

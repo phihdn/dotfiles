@@ -30,7 +30,6 @@ brew "chezmoi"  # For dotfiles management
 brew "fzf"   # Fuzzy finder
 brew "ripgrep"  # Fast grep alternative
 brew "bat"   # Better cat
-brew "eza"   # Better ls
 brew "fd"    # Better find
 brew "jq"    # JSON processor
 brew "yq"    # YAML processor
