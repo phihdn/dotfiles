@@ -5,9 +5,11 @@ trap cleanup SIGINT SIGTERM ERR EXIT
 
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l] repository
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l] repository [directory]
 
 Clone a bare git repo and set up environment for working comfortably and exclusively from worktrees.
+
+Like plain 'git clone', the target directory is derived from the repository URL when omitted (my-repo.git -> my-repo/). Pass '.' to set up in the current directory instead.
 
 Available options:
 
@@ -64,6 +66,7 @@ parse_params() {
   # check required params and arguments
   # [[ -z "${param-}" ]] && die "Missing required parameter: param"
   [[ ${#args[@]} -eq 0 ]] && die "Missing script arguments"
+  [[ ${#args[@]} -gt 2 ]] && die "Too many arguments (expected: repository [directory])"
 
   return 0
 }
@@ -71,8 +74,26 @@ parse_params() {
 parse_params "$@"
 setup_colors
 
+url="${args[0]}"
+dir="${args[1]-}"
+if [[ -z "$dir" ]]; then
+  # Derive the target directory from the URL like plain 'git clone' does:
+  # last path segment (or scp-style colon segment) minus a trailing .git.
+  dir="${url%/}"
+  dir="${dir##*/}"
+  dir="${dir##*:}"
+  dir="${dir%.git}"
+  [[ -n "$dir" ]] || die "Could not derive a directory name from '$url'. Pass one explicitly."
+fi
+if [[ "$dir" != "." ]]; then
+  [[ -e "$dir" ]] && die "Destination '$dir' already exists."
+  msg "${YELLOW}Creating project directory $dir/...${NOFORMAT}"
+  mkdir -p -- "$dir"
+  cd "$dir"
+fi
+
 msg "${YELLOW}Cloning bare repository to $location...${NOFORMAT}"
-git clone --bare "${args[@]}" "$location"
+git clone --bare "$url" "$location"
 pushd "$location" > /dev/null
 msg "${YELLOW}Adjusting origin fetch locations...${NOFORMAT}"
 git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
@@ -80,3 +101,6 @@ popd > /dev/null
 msg "${YELLOW}Setting .git file contents...${NOFORMAT}"
 echo "gitdir: ./$location" > .git
 msg "${GREEN}Success.${NOFORMAT}"
+if [[ "$dir" != "." ]]; then
+  msg "${GREEN}Next: cd $dir${NOFORMAT}"
+fi

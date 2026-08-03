@@ -12,8 +12,9 @@ fixed worktrees for long-lived branches, ephemeral worktrees per task.
 
 Commands:
 
-  init <repo-url> [branch...]   Bare-clone a repo and create locked "fixed"
-                                worktrees for long-lived branches
+  init <repo-url> [branch...]   Bare-clone a repo into a directory derived from
+                                the URL (like plain 'git clone') and create
+                                locked "fixed" worktrees for long-lived branches
                                 (default: develop prod; missing ones skipped).
   new <branch> [base-ref]       Ephemeral worktree for a new branch. Dir name is
                                 the last path segment (feature/BE-1234 -> BE-1234).
@@ -102,7 +103,16 @@ cmd_init() {
   [[ -n "${branches[0]}" ]] || branches=(develop prod)
 
   command -v git-bare-clone > /dev/null || die "git-bare-clone not found on PATH."
+  # git-bare-clone derives the project dir from the URL (my-repo.git -> my-repo/)
+  # and sets up inside it — mirror the derivation here so the rest of init can
+  # cd into it (a script can't change the caller's cwd).
+  local dir
+  dir="${url%/}"
+  dir="${dir##*/}"
+  dir="${dir##*:}"
+  dir="${dir%.git}"
   git bare-clone "$url"
+  cd "$dir"
   git fetch origin
 
   local b
@@ -115,7 +125,7 @@ cmd_init() {
       msg "${YELLOW}Skipped '$b' — no origin/$b on the remote.${NOFORMAT}"
     fi
   done
-  msg "${GREEN}Done. Add task worktrees with: git wt new <branch>${NOFORMAT}"
+  msg "${GREEN}Done. Next: cd $dir, then add task worktrees with: git wt new <branch>${NOFORMAT}"
 }
 
 cmd_new() {

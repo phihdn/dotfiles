@@ -374,11 +374,12 @@ brew-sync force
 
 ### Git worktree workflow (`git-bare-clone`)
 
-A custom script at `~/.local/bin/git-bare-clone` (source: `home/dot_local/bin/executable_git-bare-clone`) sets up a repo for working **exclusively from [git worktrees](https://git-scm.com/docs/git-worktree)** — one directory per branch, no stashing to switch context. Invoke it as:
+A custom script at `~/.local/bin/git-bare-clone` (source: `home/dot_local/bin/executable_git-bare-clone`) sets up a repo for working **exclusively from [git worktrees](https://git-scm.com/docs/git-worktree)** — one directory per branch, no stashing to switch context. Like plain `git clone`, it derives the project directory from the URL and creates it for you:
 
 ```bash
-mkdir my-repo && cd my-repo
-git bare-clone git@gitlab.example.com:group/my-repo.git
+git bare-clone git@gitlab.example.com:group/my-repo.git   # creates my-repo/
+git bare-clone <url> custom-name                          # explicit directory
+git bare-clone <url> .                                    # set up in the current dir
 ```
 
 **How `git bare-clone` / `git wt` resolve to these scripts** — no links, no registration; three plain mechanisms chained:
@@ -387,11 +388,12 @@ git bare-clone git@gitlab.example.com:group/my-repo.git
 2. `~/.local/bin` is on `PATH` (zsh: `dot_zshenv`; fish: `conf.d/path.fish`).
 3. git's external-subcommand convention: an unknown subcommand `git foo` makes git search `PATH` for an executable named `git-foo` and exec it with the remaining args. The filename _is_ the integration — same mechanism as `git lfs` or `git flow`.
 
-How it works (three steps):
+How it works (four steps):
 
-1. Clones the repo **bare** (no working tree) into a `.bare/` subdirectory (override the location with `-l`/`--location`).
-2. Sets the origin fetch refspec to `+refs/heads/*:refs/remotes/origin/*` — bare clones don't track remote branches by default, so without this `git fetch` would never create `origin/<branch>` refs.
-3. Writes a `.git` _file_ (not directory) in the parent folder containing `gitdir: ./.bare`, which makes the parent directory the repo root — git commands work there, but there's no checkout of its own.
+1. Creates the project directory (URL basename minus `.git`, or the explicit second argument) and works inside it — skipped when the target is `.`.
+2. Clones the repo **bare** (no working tree) into a `.bare/` subdirectory (override the location with `-l`/`--location`).
+3. Sets the origin fetch refspec to `+refs/heads/*:refs/remotes/origin/*` — bare clones don't track remote branches by default, so without this `git fetch` would never create `origin/<branch>` refs.
+4. Writes a `.git` _file_ (not directory) in the project folder containing `gitdir: ./.bare`, which makes the project directory the repo root — git commands work there, but there's no checkout of its own.
 
 On top of it, `~/.local/bin/git-wt` (source: `home/dot_local/bin/executable_git-wt`) automates the day-to-day workflow. The model distinguishes two classes of worktrees:
 
@@ -399,8 +401,8 @@ On top of it, `~/.local/bin/git-wt` (source: `home/dot_local/bin/executable_git-
 - **Ephemeral** — one per task (feature, hotfix, MR review). Created on demand, removed when merged.
 
 ```bash
-# One-time per repo: bare-clone + locked fixed worktrees (default: develop prod)
-mkdir my-repo && cd my-repo
+# One-time per repo: bare-clone into my-repo/ + locked fixed worktrees
+# (default: develop prod) — then cd my-repo
 git wt init git@gitlab.example.com:group/my-repo.git
 git wt init <url> main            # explicit fixed branches; missing ones skipped
 
