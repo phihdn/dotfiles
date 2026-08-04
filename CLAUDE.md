@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-Cross-platform (macOS + Linux) dotfiles managed with [chezmoi](https://www.chezmoi.io). **Every change must work on both OSes**: guard macOS-only parts with `uname` checks in scripts, `if OS.mac?` in the Brewfile, and `{{ if eq .chezmoi.os "darwin" }}` in chezmoi templates / `.chezmoiignore` (macOS-only app configs like AeroSpace/SketchyBar/JankyBorders are ignored on Linux there). Shells detect the Homebrew prefix at runtime via `HOMEBREW_PREFIX` — never hardcode `/opt/homebrew`. This repository is the chezmoi **source directory**. A `.chezmoiroot` file at the repo root contains `home`, so chezmoi uses the `home/` subdirectory as the effective source. Everything else at the repo root (`README.md`, `Brewfile`, `bootstrap.sh`, `CLAUDE.md`) is repo tooling, not applied to `$HOME`.
+Cross-platform (macOS + Linux) dotfiles managed with [chezmoi](https://www.chezmoi.io). **Every change must work on both OSes**: guard macOS-only parts with `uname` checks in scripts, `if OS.mac?` in the Brewfile, and `{{ if eq .chezmoi.os "darwin" }}` in chezmoi templates / `.chezmoiignore` (macOS-only app configs like AeroSpace are ignored on Linux there). Shells detect the Homebrew prefix at runtime via `HOMEBREW_PREFIX` — never hardcode `/opt/homebrew`. This repository is the chezmoi **source directory**. A `.chezmoiroot` file at the repo root contains `home`, so chezmoi uses the `home/` subdirectory as the effective source. Everything else at the repo root (`README.md`, `Brewfile`, `bootstrap.sh`, `CLAUDE.md`) is repo tooling, not applied to `$HOME`.
 
 ## Commands
 
@@ -41,7 +41,7 @@ brew-sync force              # Full sync, no prompts
 ### Key Integrations
 - **Shell**: Zsh (default) — modular XDG config under `~/.config/zsh` (`ZDOTDIR`), bootstrapped by a minimal `~/.zshenv`, with a self-contained git-clone plugin manager (no zinit) + Starship prompt
 - **Alt Shell**: Fish + Fisher plugin manager (still fully configured; launch with `fish`)
-- **Window Management**: AeroSpace + JankyBorders + SketchyBar
+- **Window Management**: AeroSpace
 - **Git**: 1Password SSH signing, conditional includes for `~/ws/work/` vs `~/ws/personal/`
 - **Node.js**: nvm (`~/.config/nvm`). `.zshenv` prepends nvm's default node `bin` to `PATH` so `node`/`npm`/`npx` work in **all** shells (interactive, non-interactive, login, non-login) — important for tools/agents that shell out non-interactively. `~/.config/zsh/.zprofile` re-prepends it after macOS `path_helper` in login shells. The `nvm` command itself is lazy-loaded in `.zshrc`.
 - **Python**: uv for package/version management

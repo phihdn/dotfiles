@@ -18,7 +18,6 @@ tap "oven-sh/bun", trusted: true  # Bun JavaScript runtime
 tap "charmbracelet/tap", trusted: true
 if OS.mac?
   tap "nikitabobko/tap", trusted: true # AeroSpace
-  tap "FelixKratz/formulae", trusted: true # Sketchybar and JankyBorders
 end
 
 # Essential CLI Tools
@@ -111,8 +110,6 @@ brew "joshmedeski/sesh/sesh", trusted: true
 if OS.mac?
   # Window Management
   cask "aerospace"  # Tiling window manager
-  brew "felixkratz/formulae/borders" # JankyBorders
-  brew "felixkratz/formulae/sketchybar" # SketchyBar
 
   # Productivity
   cask "raycast"     # Spotlight replacement

@@ -24,8 +24,6 @@
 {{ if ne .chezmoi.os "darwin" -}}
 # macOS-only apps — don't write their configs on Linux
 .config/aerospace
-.config/sketchybar
-.config/borders
 .config/karabiner
 {{- end }}
 

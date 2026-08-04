@@ -47,7 +47,7 @@ Secrets (e.g. the WakaTime API key) are resolved from 1Password at apply time. U
 The repo works on Linux too. `bootstrap.sh` detects the OS: on Linux it skips Xcode tools (checks for `curl`/`git`/`gcc` instead — install `build-essential` or equivalent first), installs Homebrew to `/home/linuxbrew/.linuxbrew`, and falls back to the system zsh for the default shell. OS-specific handling:
 
 - **Brewfile** — casks and mac-only formulae are wrapped in `if OS.mac?`; on Linux install GUI apps and Nerd Fonts via your distro/Flatpak.
-- **chezmoi templates** — `~/.gitconfig*` pick the right 1Password `op-ssh-sign` path per OS (`/opt/1Password/op-ssh-sign` on Linux), and `home/.chezmoiignore` skips macOS-only app configs (AeroSpace, SketchyBar, JankyBorders) on Linux.
+- **chezmoi templates** — `~/.gitconfig*` pick the right 1Password `op-ssh-sign` path per OS (`/opt/1Password/op-ssh-sign` on Linux), and `home/.chezmoiignore` skips macOS-only app configs (AeroSpace) on Linux.
 - **Shells** — zsh and fish detect the Homebrew prefix at runtime (`HOMEBREW_PREFIX`), so PATH works with macOS arm64/Intel brew and Linuxbrew.
 
 ## 📦 What Gets Installed
@@ -136,8 +136,6 @@ home/
     ├── tmux/          tmux config + gitmux + catppuccin theme
     ├── starship.toml  Starship prompt (shared by zsh and fish)
     ├── aerospace/     AeroSpace tiling window manager
-    ├── sketchybar/    menu bar (executable plugins/)
-    ├── borders/       JankyBorders (executable bordersrc)
     ├── ghostty/       terminal emulator
     ├── kitty/         terminal emulator
     ├── wezterm/       terminal emulator (Lua)
