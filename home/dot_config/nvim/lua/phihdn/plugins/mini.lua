@@ -81,6 +81,7 @@ return {
           vim.keymap.set("n", "<CR>", function()
             MiniFiles.go_in({ close_on_file = true })
           end, { buffer = args.data.buf_id, desc = "Go in (close on file)" })
+          vim.keymap.set("n", "<Esc>", MiniFiles.close, { buffer = args.data.buf_id, desc = "Close file explorer" })
         end,
       })
       nmap("<leader>ee", function()
