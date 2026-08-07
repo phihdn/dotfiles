@@ -12,6 +12,16 @@ return {
     grep = {
       rg_opts = "--column --line-number --no-heading --color=always --smart-case --hidden --glob=!.git/ --max-columns=4096 -e",
     },
+    -- vim-tmux-navigator forwards <C-j>/<C-k> straight to the fzf process
+    -- while focused in the picker (it detects ft == "fzf"), so they move the
+    -- list instead of switching to a tmux pane/terminal below. Reclaim them
+    -- for tmux pane navigation; ctrl-n/ctrl-p still move the list.
+    keymap = {
+      fzf = {
+        ["ctrl-j"] = vim.env.TMUX and "execute-silent:tmux select-pane -D" or "down",
+        ["ctrl-k"] = vim.env.TMUX and "execute-silent:tmux select-pane -U" or "up",
+      },
+    },
   },
   keys = {
     {
