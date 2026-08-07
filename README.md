@@ -438,6 +438,7 @@ Gotchas the script handles or you should know:
 - Git config, hooks, and signing live in `.bare/config` — shared by all worktrees automatically.
 - A branch can be checked out in only **one** worktree at a time; reviews use detached HEAD to sidestep this.
 - `git wt` refuses to run in a normal clone (worktrees would show up as untracked dirs there — the bare layout has no parent checkout).
+- The project root (where `.bare/` lives) is plumbing, not a worktree — `cd` into `develop/`, `prod/`, or a task dir to actually work. Standing at the root shows `(bare)` in the Starship prompt (`home/dot_config/starship.toml`, `custom.git_branch` module) instead of a branch name, since the root has no branch of its own — see `docs/git-worktree-bare-clone-workflow.md` for why.
 
 ### tmux session layouts (sesh + hook script)
 
