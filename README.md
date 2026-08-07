@@ -405,9 +405,11 @@ git wt init git@gitlab.example.com:group/my-repo.git
 git wt init <url> main            # explicit fixed branches; missing ones skipped
 
 # Task worktrees — dir = last branch segment (feature/BE-1234 → BE-1234/),
-# base defaults to origin/develop|main|master; copies .env* from a fixed worktree
-git wt new feature/BE-1234                # branch off default base
-git wt new hotfix/BE-1300 origin/prod     # branch off prod
+# base defaults to origin/develop|main|master; copies .env* from a fixed worktree.
+# If origin/<branch> already exists (pushed by you or a teammate) and no
+# base-ref is given, tracks it instead of branching off.
+git wt new feature/BE-1234                # branch off default base, or track it if already pushed
+git wt new hotfix/BE-1300 origin/prod     # explicit base-ref always branches off, never auto-links
 
 # MR review — detached HEAD, never blocks the author's branch
 git wt review feature/BE-1290             # creates review-BE-1290/
@@ -438,6 +440,7 @@ Gotchas the script handles or you should know:
 - Git config, hooks, and signing live in `.bare/config` — shared by all worktrees automatically.
 - A branch can be checked out in only **one** worktree at a time; reviews use detached HEAD to sidestep this.
 - `git wt` refuses to run in a normal clone (worktrees would show up as untracked dirs there — the bare layout has no parent checkout).
+- `git clone --bare` mirrors every branch that existed on the remote at clone time straight into local `refs/heads/*`, with no upstream configured — both `git wt init` (fixed worktrees) and `git wt new <branch>` (reopening one of those branches) check for this and link to `origin/<branch>` via `git branch --set-upstream-to` whenever it's missing.
 - The project root (where `.bare/` lives) is plumbing, not a worktree — `cd` into `develop/`, `prod/`, or a task dir to actually work. Standing at the root shows `(bare)` in the Starship prompt (`home/dot_config/starship.toml`, `custom.git_branch` module) instead of a branch name, since the root has no branch of its own — see `docs/git-worktree-bare-clone-workflow.md` for why.
 
 ### tmux session layouts (sesh + hook script)

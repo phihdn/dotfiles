@@ -16,9 +16,12 @@ Commands:
                                 the URL (like plain 'git clone') and create
                                 locked "fixed" worktrees for long-lived branches
                                 (default: develop prod; missing ones skipped).
-  new <branch> [base-ref]       Ephemeral worktree for a new branch. Dir name is
+  new <branch> [base-ref]       Ephemeral worktree for a branch. Dir name is
                                 the last path segment (feature/BE-1234 -> BE-1234).
-                                Base defaults to origin/develop|main|master.
+                                If origin/<branch> already exists and no
+                                base-ref is given, tracks it instead of
+                                branching off; otherwise branches off base-ref
+                                (default: origin/develop|main|master).
                                 Copies .env* from a fixed worktree if present.
   review <branch>               Detached-HEAD worktree "review-<name>" on
                                 origin/<branch> — never blocks the author's branch.
@@ -119,6 +122,11 @@ cmd_init() {
   for b in "${branches[@]}"; do
     if git show-ref --verify --quiet "refs/remotes/origin/$b"; then
       git worktree add "$b" "$b"
+      # git clone --bare mirrors branches that existed on the remote straight
+      # into local refs/heads, with no upstream configured — link it.
+      if [[ -z "$(git for-each-ref --format='%(upstream)' "refs/heads/$b")" ]]; then
+        git branch --set-upstream-to="origin/$b" "$b"
+      fi
       git worktree lock "$b" --reason "fixed worktree — do not remove"
       msg "${GREEN}Fixed worktree: $b/ (locked)${NOFORMAT}"
     else
@@ -137,9 +145,22 @@ cmd_new() {
 
   git fetch origin
   if git show-ref --verify --quiet "refs/heads/$branch"; then
-    # Branch already exists locally (e.g. reopening after 'done' kept it) —
-    # check it out instead of creating it.
+    # Branch already exists locally — either reopened after 'done', or
+    # mirrored straight into refs/heads at bare-clone time (git clone --bare
+    # copies every branch that existed on the remote then as a local head,
+    # with no upstream configured). Check it out, and link it to its remote
+    # counterpart if that exists but tracking was never set.
     git worktree add "$dir" "$branch"
+    if [[ -z "$(git for-each-ref --format='%(upstream)' "refs/heads/$branch")" ]] \
+      && git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+      git branch --set-upstream-to="origin/$branch" "$branch"
+      msg "${GREEN}Linked to origin/$branch${NOFORMAT}"
+    fi
+  elif [[ -z "${2-}" ]] && git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+    # No explicit base and the branch is already on the remote (pushed by you
+    # or a teammate) — track it instead of branching off develop/main/master.
+    git worktree add "$dir" -b "$branch" "origin/$branch"
+    msg "${GREEN}Linked to origin/$branch${NOFORMAT}"
   else
     base=${2:-$(default_base)}
     git worktree add "$dir" -b "$branch" "$base"
