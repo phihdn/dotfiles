@@ -20,7 +20,7 @@ format = """
 $username\
 $hostname\
 $directory\
-$git_branch\
+${custom.git_branch}\
 $cmd_duration \
 $fill\
 $nodejs \
@@ -145,12 +145,34 @@ number_threshold = 1
 format = "[$symbol]($style)"
 
 [git_branch]
-disabled = false
+disabled = true # replaced by custom.git_branch below — see its comment for why
 symbol = " "
 format = "[$symbol$branch]($style) "
 #truncation_length = 4
 #truncation_symbol = "…/"
 style = "bold green"
+
+# git_branch always resolves through the *bare* repo's own HEAD when standing
+# in the project root of a git-bare-clone / git-wt worktree layout (root has a
+# ".git" file pointing at ./.bare, not a real worktree) — so it shows whatever
+# branch was checked out at bare-clone time (e.g. "develop"), never the branch
+# of whichever worktree you actually cd into. `git rev-parse
+# --is-bare-repository` is true only in that plumbing root, false inside every
+# real worktree, so it's used here to swap in a "(bare)" marker instead of a
+# misleading branch name. See docs/git-worktree-bare-clone-workflow.md.
+[custom.git_branch]
+description = "Git branch, with a (bare) marker at a bare-clone worktree root"
+when = "git rev-parse --git-dir"
+command = '''
+if [ "$(git rev-parse --is-bare-repository 2>/dev/null)" = "true" ]; then
+  echo "(bare)"
+else
+  git branch --show-current
+fi
+'''
+symbol = " "
+style = "bold green"
+format = "[$symbol$output]($style) "
 
 [git_commit]
 disabled = false
