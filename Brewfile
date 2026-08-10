@@ -99,6 +99,7 @@ brew "nmap"  # Network mapper
 brew "cloc"  # Count lines of code
 brew "gum"   # Glamorous shell scripts
 brew "tz"    # Time zone helper
+brew "witr"  # Explain why a process is running
 brew "teamookla/speedtest/speedtest", trusted: true  # Speedtest CLI
 
 # Specialized tools
