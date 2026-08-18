@@ -6,11 +6,10 @@ import = [
   "~/.config/sesh/configs/windows.toml",
 ]
 
-# Open nvim with the fzf-lua file picker so a new session starts by browsing
-# the dir; scheduled so the UI is ready first.
-# "; exec $SHELL" returns to a shell instead of closing the window/session on exit.
+# No startup_command: sessions start as plain shells. Auto-launching nvim per
+# session piles up typescript-language-server/eslint node processes across
+# parallel worktree sessions — start nvim by hand only where you'll edit.
 [default_session]
-startup_command = "nvim -c 'lua vim.schedule(function() require(\"fzf-lua\").files() end)'; exec $SHELL"
 preview_command = "lsd --almost-all --icon=always --color=always {}"
 
 [[session]]
