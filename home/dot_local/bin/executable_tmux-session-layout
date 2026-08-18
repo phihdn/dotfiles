@@ -22,6 +22,11 @@ path="$2"
 # still exits 0. Bare roots stay plain shell hubs for git wt / lg.
 [ "$(git -C "$path" rev-parse --is-inside-work-tree 2>/dev/null)" = true ] || exit 0
 
+# Detached HEAD means a read-only review checkout ("git wt review"): keep just
+# sesh's nvim window for reading — no persistent claude window, no dev split.
+# Lazygit stays reachable via the prefix+g popup.
+git -C "$path" symbolic-ref -q HEAD >/dev/null 2>&1 || exit 0
+
 case "$path" in
   "$HOME/ws/work/"*)     claude_cfg="$HOME/.claude-work" ;;
   "$HOME/ws/personal/"*) claude_cfg="$HOME/.claude-personal" ;;
