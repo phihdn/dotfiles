@@ -6,6 +6,12 @@
 #   1: claude (focused)   2: nvim + bottom terminal pane (dev layout)
 # Lazygit is on demand via the prefix+g popup (see tmux.conf), not a window.
 # Add more `case` branches to give other path patterns their own layout.
+#
+# Session names: sesh already qualifies worktree sessions as <repo>/<worktree>
+# (e.g. user-service/PORTAL-8750) when it detects the .bare layout, so equally
+# named worktrees of different repos never collide — no renaming needed here.
+# All tmux targets below use "=$session..." exact matching, which is safe with
+# a "/" in the session name (verified against a live session).
 
 session="$1"
 path="$2"
