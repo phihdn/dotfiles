@@ -3,7 +3,8 @@
 # Wired up in tmux.conf via:
 #   set-hook -g session-created 'run-shell "~/.local/bin/tmux-session-layout #{q:hook_session_name} #{q:session_path}"'
 # Repo sessions under ~/ws/work|personal get:
-#   1: claude (focused)   2: nvim + bottom terminal pane (dev layout)   3: lazygit
+#   1: claude (focused)   2: nvim + bottom terminal pane (dev layout)
+# Lazygit is on demand via the prefix+g popup (see tmux.conf), not a window.
 # Add more `case` branches to give other path patterns their own layout.
 
 session="$1"
@@ -37,8 +38,6 @@ tmux rename-window -t "=$session:1" nvim
 # "; exec \$SHELL" returns to a shell instead of closing the window on exit.
 tmux new-window -d -t "=$session" -n claude -c "$path" \
   "CLAUDE_CONFIG_DIR=$claude_cfg claude; exec \$SHELL"
-# lg (~/.local/bin) wraps lazygit to handle bare-repo worktree roots.
-tmux new-window -d -t "=$session" -n git -c "$path" "lg; exec \$SHELL"
-# Swap so the order is claude(1), nvim(2), git(3), then land on claude.
+# Swap so the order is claude(1), nvim(2), then land on claude.
 tmux swap-window -d -s "=$session:1" -t "=$session:2"
 tmux select-window -t "=$session:1"
