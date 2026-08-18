@@ -88,6 +88,16 @@ default_base() {
   die "No origin/develop|main|master found. Pass a base-ref explicitly."
 }
 
+# Register/deregister worktree dirs with zoxide so the sesh picker (zoxide-
+# backed) offers them immediately, without a cd into them first — and stops
+# offering them once removed. Best-effort: no-ops when zoxide is absent.
+zoxide_add() {
+  command -v zoxide >/dev/null 2>&1 && zoxide add "$1" || true
+}
+zoxide_forget() {
+  command -v zoxide >/dev/null 2>&1 && zoxide remove "$1" 2>/dev/null || true
+}
+
 # .env* files are untracked, so new worktrees start without them — seed them
 # from the first fixed worktree that has any.
 copy_env_files() {
@@ -169,6 +179,7 @@ cmd_new() {
     git worktree add "$dir" -b "$branch" "$base"
   fi
   copy_env_files "$dir"
+  zoxide_add "$dir"
   msg "${GREEN}Worktree ready: cd $dir${NOFORMAT}"
 }
 
@@ -183,6 +194,7 @@ cmd_review() {
   # Detached HEAD: reviewing never claims the branch, so the author (or another
   # worktree) can still check it out.
   git worktree add --detach "$dir" "origin/$branch"
+  zoxide_add "$dir"
   msg "${GREEN}Review worktree ready (detached): cd $dir${NOFORMAT}"
   msg "${YELLOW}Remove with: git wt done $(basename "$dir")${NOFORMAT}"
 }
@@ -196,6 +208,7 @@ cmd_done() {
   # Capture the checked-out branch before removal so we can delete it after.
   branch=$(git -C "$dir" symbolic-ref --short -q HEAD || true)
   git worktree remove "$dir" # refuses dirty or locked (fixed) worktrees
+  zoxide_forget "$dir"
   msg "${GREEN}Removed worktree: $1${NOFORMAT}"
   if [[ -n "$branch" ]]; then
     if git branch -d "$branch" 2>/dev/null; then
@@ -247,6 +260,7 @@ cmd_prune() {
   [[ "$reply" =~ ^[Yy]$ ]] || { msg "Aborted — nothing removed."; return; }
   for wt in "${candidates[@]}"; do
     git worktree remove "$wt"
+    zoxide_forget "$wt"
     msg "${GREEN}Removed: ${wt#"$ROOT"/}${NOFORMAT}"
   done
 }
