@@ -27,6 +27,9 @@ Commands:
                                 origin/<branch> — never blocks the author's branch.
   done <dir>                    Remove an ephemeral worktree and delete its local
                                 branch (refuses dirty/locked worktrees).
+  prune                         Bulk-remove all clean detached (review) worktrees
+                                after confirmation; keeps dirty ones. Also clears
+                                stale worktree admin entries.
   ls                            List all worktrees.
 
 Options:
@@ -203,6 +206,51 @@ cmd_done() {
   fi
 }
 
+cmd_prune() {
+  repo_root
+  # Candidates: detached worktrees (review checkouts) that are neither bare nor
+  # locked. Branch worktrees are excluded — those are removed deliberately, one
+  # at a time, via 'git wt done' (which also deletes the branch).
+  local candidates=() dirty=() wt
+  while IFS= read -r wt; do
+    if [[ -n "$(git -C "$wt" status --porcelain 2>/dev/null)" ]]; then
+      dirty+=("$wt")
+    else
+      candidates+=("$wt")
+    fi
+  done < <(git worktree list --porcelain | awk '
+    /^worktree /{path=substr($0,10); det=0}
+    /^bare$/{path=""}
+    /^locked/{path=""}
+    /^detached$/{det=1}
+    /^$/{if(path!="" && det)print path; path=""; det=0}
+    END{if(path!="" && det)print path}')
+
+  if [[ ${#dirty[@]} -gt 0 ]]; then
+    for wt in "${dirty[@]}"; do
+      msg "${YELLOW}Kept (dirty): ${wt#"$ROOT"/}${NOFORMAT}"
+    done
+  fi
+  # Always clear admin entries for manually deleted worktree dirs.
+  git worktree prune
+  if [[ ${#candidates[@]} -eq 0 ]]; then
+    msg "${GREEN}No clean detached worktrees to prune.${NOFORMAT}"
+    return
+  fi
+
+  msg "Detached worktrees to remove:"
+  for wt in "${candidates[@]}"; do
+    msg "  ${wt#"$ROOT"/}"
+  done
+  local reply
+  read -r -p "Remove ${#candidates[@]} worktree(s)? [y/N] " reply
+  [[ "$reply" =~ ^[Yy]$ ]] || { msg "Aborted — nothing removed."; return; }
+  for wt in "${candidates[@]}"; do
+    git worktree remove "$wt"
+    msg "${GREEN}Removed: ${wt#"$ROOT"/}${NOFORMAT}"
+  done
+}
+
 setup_colors
 
 case "${1-}" in
@@ -211,6 +259,7 @@ case "${1-}" in
   new) shift; cmd_new "$@" ;;
   review) shift; cmd_review "$@" ;;
   done) shift; cmd_done "$@" ;;
+  prune) shift; cmd_prune "$@" ;;
   ls) shift; git worktree list ;;
   *) die "Unknown command: $1 (see git wt --help)" ;;
 esac
