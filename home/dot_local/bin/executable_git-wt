@@ -91,8 +91,12 @@ default_base() {
 # Register/deregister worktree dirs with zoxide so the sesh picker (zoxide-
 # backed) offers them immediately, without a cd into them first — and stops
 # offering them once removed. Best-effort: no-ops when zoxide is absent.
+# Seed a high score: a default add starts at ~1, which buries the fresh
+# worktree mid-list in the picker behind long-lived dirs (hubs score 400+).
+# Active worktrees belong near the top, and done/prune delete the entry, so
+# the score can't outlive the worktree.
 zoxide_add() {
-  command -v zoxide >/dev/null 2>&1 && zoxide add "$1" || true
+  command -v zoxide >/dev/null 2>&1 && zoxide add --score 100 "$1" || true
 }
 zoxide_forget() {
   command -v zoxide >/dev/null 2>&1 && zoxide remove "$1" 2>/dev/null || true
