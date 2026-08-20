@@ -416,6 +416,7 @@ git wt review feature/BE-1290             # creates review-BE-1290/
 
 # Finish — removes worktree + deletes the local branch (keeps it if unmerged)
 git wt done BE-1234
+git wt prune                              # bulk-remove all clean detached (review) worktrees, after confirmation
 git wt ls                                 # list all worktrees
 ```
 
@@ -438,10 +439,38 @@ Gotchas the script handles or you should know:
 - `.env*` files are untracked, so new worktrees start without them — `git wt new` seeds them from the first fixed worktree that has any.
 - `node_modules` is per-worktree (gitignored ⇒ invisible to git). Each worktree needs its own install; `pnpm` makes this cheap via its global hard-linked store.
 - Git config, hooks, and signing live in `.bare/config` — shared by all worktrees automatically.
-- A branch can be checked out in only **one** worktree at a time; reviews use detached HEAD to sidestep this.
+- A branch can be checked out in only **one** worktree at a time; reviews use detached HEAD to sidestep this — see [Why review worktrees are detached](#why-review-worktrees-are-detached).
+- `git wt new`/`review` register the fresh worktree with zoxide (high seed score), so it shows up in the sesh session picker immediately — no `cd` needed first; `done`/`prune` deregister it again.
 - `git wt` refuses to run in a normal clone (worktrees would show up as untracked dirs there — the bare layout has no parent checkout).
 - `git clone --bare` mirrors every branch that existed on the remote at clone time straight into local `refs/heads/*`, with no upstream configured — both `git wt init` (fixed worktrees) and `git wt new <branch>` (reopening one of those branches) check for this and link to `origin/<branch>` via `git branch --set-upstream-to` whenever it's missing.
 - The project root (where `.bare/` lives) is plumbing, not a worktree — `cd` into `develop/`, `prod/`, or a task dir to actually work. Standing at the root shows `(bare)` in the Starship prompt (`home/dot_config/starship.toml`, `custom.git_branch` module) instead of a branch name, since the root has no branch of its own — see `docs/git-worktree-bare-clone-workflow.md` for why.
+
+#### Why review worktrees are detached
+
+Every checkout has a `HEAD`. Normally it points at a **branch name** — commit something, and the branch moves forward with you; the checkout *owns* that branch:
+
+```text
+HEAD → feature/BE-1234 → commit ab12cd3
+```
+
+Detached HEAD skips the middleman and points **straight at a commit**:
+
+```text
+HEAD → ab12cd3          (no branch involved)
+```
+
+Same files on disk, fully buildable and runnable. The only difference: no branch is claimed, and nothing done in that checkout can move anyone's branch.
+
+Why `git wt review` insists on it:
+
+1. **Git enforces one checkout per branch across all worktrees.** If `feature/BE-1234` is checked out in the `BE-1234/` worktree, `git worktree add review-BE-1234 feature/BE-1234` fails with `fatal: 'feature/BE-1234' is already used by worktree ...`. Detaching is what makes a second checkout of the same commit legal — `BE-1234/ [feature/BE-1234]` and `review-BE-1234/ (detached)` can coexist on the exact same commit.
+2. **A review is a read of a snapshot, not ownership of a branch.** What's being judged is "what's in the MR right now" = `origin/feature/BE-1290`. Detaching at that remote ref gives exactly that. A local branch instead would be a thing that can drift, get committed to by accident, and — worst case — get pushed back over the author's work. Detached HEAD makes the destructive path structurally impossible rather than just discouraged.
+3. **Mid-review updates are trivial.** The author pushes a fix mid-review? `git fetch && git checkout --detach origin/feature/BE-1290` — now on the new snapshot. A local branch would need pulls/resets on a branch that was never wanted.
+4. **Cleanup is nothing.** Removing a detached worktree removes everything — no leftover local branch to remember to delete. Compare `git wt done`, which has to delete the branch after removing a task worktree (and keeps it if unmerged).
+
+Detachment also acts as the **marker for "disposable review checkout"** elsewhere in this setup: `git wt prune` bulk-removes only detached worktrees (no branch → no owned work → safe to sweep; dirty ones are still kept), and `tmux-session-layout` keys its lighter no-agent session layout on detached HEAD rather than the `review-` name — the detachment is the invariant, the name is just convention.
+
+One-line version: **a branch checkout is a claim; a detached checkout is a photograph.** Reviews want the photograph — the same code, none of the ability to move what the author is standing on.
 
 ### tmux session layouts (sesh + hook script)
 
@@ -456,15 +485,14 @@ Layouts come from **two mechanisms**, so changes go in different places dependin
 
 **Declarative (sesh TOML)** — `sesh.toml` defines named sessions (path, startup command) and references reusable windows from `configs/windows.toml` by name (`git`, `claude-work`, `claude-personal`, `dev`). sesh's TOML can't describe pane splits, so windows that need panes call a script instead: the `dev` window runs `~/.local/bin/sesh-dev-layout` (nvim on top, 25% shell pane below).
 
-**Dynamic (hook script)** — `tmux.conf` sets a global `session-created` hook that runs `~/.local/bin/tmux-session-layout` for _every_ new session (sesh-created or not). For git repos under `~/ws/work/` or `~/ws/personal/` it builds a standard dev layout and lands on window 1:
+**Dynamic (hook script)** — `tmux.conf` sets a global `session-created` hook that runs `~/.local/bin/tmux-session-layout` for _every_ new session (sesh-created or not). For git **worktrees** under `~/ws/work/` or `~/ws/personal/` it builds a two-window layout and lands on window 1:
 
 ```text
 1: claude   # Claude Code, CLAUDE_CONFIG_DIR picked from the path (work → ~/.claude-work, personal → ~/.claude-personal)
-2: nvim     # editor on top + 25% terminal pane below
-3: git      # lazygit (via the `lg` wrapper, handles bare-repo worktree roots)
+2: zsh      # plain shell — start nvim by hand when actually editing
 ```
 
-The script exits early for anything else: non-git paths, umbrella folders like `~/ws/work` itself, and sessions that already have a `claude` window (so it doesn't fight the sesh-defined sessions above). To give another path pattern its own layout, add a `case` branch in `tmux-session-layout`.
+nvim is never auto-started (each instance brings up TypeScript LSP node processes, which piles up across parallel worktree sessions), and lazygit is on demand via the `prefix+g` popup instead of a standing window. The script exits early for everything else: non-git paths, umbrella folders like `~/ws/work` itself, bare-clone roots (they stay plain shell hubs for `git wt`), detached review worktrees (read-only — no agent window), and sessions that already have a `claude` window (so it doesn't fight the sesh-defined sessions above). To give another path pattern its own layout, add a `case` branch in `tmux-session-layout`.
 
 ## 🐍🟢 Language Version Management
 
