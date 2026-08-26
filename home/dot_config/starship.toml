@@ -41,9 +41,10 @@ disabled = true
 
 [character]
 disabled = false
-success_symbol = "[](bold fg:blue)"
+# success_symbol = "[](bold fg:blue)"
+success_symbol = "[](bold fg:blue)"
 error_symbol = "[](bold fg:red)"
-vimcmd_symbol = "[](bold fg:subtext1)"
+vimcmd_symbol = "[](bold fg:subtext1)"
 # vimcmd_replace_one_symbol = '[](bold fg:peach)'
 # vimcmd_replace_symbol = '[](bold fg:peach)'
 # vimcmd_visual_symbol = '[](bold fg:color_yellow)'
@@ -170,7 +171,7 @@ else
   git branch --show-current
 fi
 '''
-symbol = " "
+symbol = " "
 style = "bold green"
 format = "[$symbol$output]($style) "
 
