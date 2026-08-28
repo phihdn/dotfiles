@@ -238,7 +238,7 @@ cmd_status() {
   ((${#shown} > title_width)) && shown="${shown:0:title_width-1}…"
 
   when=$(date -r "$start" "+%H:%M")
-  printf '#[%s]󰤙 %s %s %s #[default]' "$style" "$when" "$shown" "$countdown"
+  printf '#[%s]󰃭 %s %s %s #[default]' "$style" "$when" "$shown" "$countdown"
 
   maybe_alert "$diff" "$start" "$title" "$url"
 }
