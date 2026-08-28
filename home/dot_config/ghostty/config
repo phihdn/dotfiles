@@ -16,7 +16,16 @@ font-size = 20
 #theme = Kanagawa Dragon
 theme = Gruvbox Dark
 
+# extra leading for readability. This is safe to raise only because
+# window-padding-balance is off below — with balancing on, the leftover
+# pixels from a non-divisible viewport get split across all four edges,
+# which is what put a gap above the tmux status bar.
 adjust-cell-height = 35%
+# adjust-cell-height's vertical centering leaves text sitting low in the
+# taller cell (most noticeable on solid-bg blocks like the tmux status bar).
+# Nudge the baseline up to rebalance; tune in small steps — each change
+# needs a full Ghostty restart (not just cmd+shift+, reload) to take effect.
+adjust-font-baseline = 15%
 # background-opacity = 0.96
 
 bold-is-bright = true
@@ -24,13 +33,22 @@ cursor-style = block
 mouse-hide-while-typing = true
 mouse-scroll-multiplier = 2
 
+# hides the titlebar while keeping the native frame and rounded corners
 macos-titlebar-style = hidden
 macos-window-shadow = false
 
 window-decoration = true
-window-padding-balance = true
-window-padding-x = 16
-window-padding-y = 10
+# false = the top-left grid cell hugs the window edge; the leftover pixels
+# from a viewport that isn't an exact multiple of the cell size all go to the
+# bottom/right instead of being split onto the top edge. This is what keeps
+# the tmux status bar flush at the top even with a tall adjust-cell-height.
+window-padding-balance = false
+window-padding-x = 10,10
+window-padding-y = 0,0
+# bleed a row's own background into the padding strip — keeps the shell
+# prompt's padding clean (shell-integration prompt rows are excluded from
+# this) while letting the tmux status bar (a fixed-bg row) fill edge-to-edge
+window-padding-color = extend
 window-save-state = always
 window-colorspace = "display-p3"
 
