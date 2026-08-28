@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# tmux-uptime: system uptime for the tmux status line, flipped to an alert
+# style once the machine has been up longer than a threshold (default 7 days).
+# Wired up in tmux.conf via:
+#   set -ag status-right "#(tmux-uptime 'fg=...,bg=...' 'fg=...,bg=...')"
+#
+# tmux interprets #[...] sequences in #() output (the same trick gitmux uses),
+# so the segment emits its own style here — the threshold decides which of the
+# two to use, which tmux's format language can't do against arbitrary text.
+# Both styles are passed in so the gruvbox palette stays in tmux.conf.
+
+normal_style="${1:-default}"
+alert_style="${2:-fg=red}"
+threshold_days="${3:-7}"
+
+# macOS:  " 0:48  up 4 days,  1:49, 2 users, load averages: ..."  -> "4 days"
+# Linux:  " 12:34:56 up 10 days,  3:21,  2 users, load average: ..." -> "10 days"
+# Short uptimes carry no day component: "... up  1:49, ..."       -> "1:49"
+label=$(uptime | awk -F, '{sub(".*up ", "", $1); print $1}' |
+  sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+# Matches both "1 day" and "N days"; anything without a day component is 0.
+days=0
+[[ $label =~ ^([0-9]+)[[:space:]]+day ]] && days=${BASH_REMATCH[1]}
+
+if ((days > threshold_days)); then
+  style="$alert_style"
+else
+  style="$normal_style"
+fi
+
+printf '#[%s] ⏻ %s #[default]' "$style" "$label"
