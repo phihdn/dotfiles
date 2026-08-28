@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+#
+# tmux-sysinfo: CPU and memory utilization segments for the tmux status line.
+# Wired up in tmux.conf via:
+#   set -ag status-right "#(tmux-sysinfo 'fg=...' 'fg=...')"
+#
+# Emits its own #[...] sequences (the same trick tmux-uptime and gitmux use) so
+# one invocation can paint two segments — icon in the accent style, value in the
+# text style. Both styles are passed in so the gruvbox palette stays in
+# tmux.conf.
+#
+# Runs on every status refresh (2s), so each reading must be cheap: no `top -l 2`
+# sampling delay, no subprocess fan-out.
+#
+# Both percentages are right-aligned in a fixed 3-column field ("%3.0f"). Without
+# the padding a reading crossing 9%/99% changes the segment width, which shifts
+# every neighbouring segment sideways twice a second. Keep the width.
+
+accent_style="${1:-fg=blue}"
+value_style="${2:-default}"
+
+os=$(uname -s)
+
+# CPU state file for the Linux delta calculation. Per-user so two accounts on
+# the same box never clobber each other's previous sample.
+cpu_state="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/tmux-sysinfo-cpu.$(id -u)"
+
+# Percentage of total CPU capacity in use, across all logical cores.
+cpu_percent() {
+  case "$os" in
+  Darwin)
+    # macOS has no /proc, but its `ps` %cpu is a decaying average over roughly
+    # the last minute of real time — live enough for a status bar and ~40ms to
+    # read, versus the ~1.4s `top -l 2` costs for its second sample. The sum is
+    # per-core (8 busy cores read as 800), so divide by the core count.
+    local ncpu
+    ncpu=$(sysctl -n hw.logicalcpu)
+    ps -A -o %cpu= | awk -v ncpu="$ncpu" '
+      { total += $1 }
+      END {
+        pct = total / ncpu
+        if (pct > 100) pct = 100
+        printf "%3.0f", pct
+      }'
+    ;;
+  Linux)
+    # /proc/stat counts cumulative jiffies since boot, so utilization is the
+    # delta against the previous refresh. The first run has no previous sample
+    # and falls back to the since-boot average.
+    local -a now prev
+    read -ra now < <(awk '/^cpu /{ $1 = ""; print }' /proc/stat)
+    prev=()
+    [[ -r $cpu_state ]] && read -ra prev < "$cpu_state"
+    printf '%s\n' "${now[*]}" > "$cpu_state"
+
+    awk -v now="${now[*]}" -v prev="${prev[*]}" '
+      BEGIN {
+        n = split(now, a, " ")
+        p = split(prev, b, " ")
+        for (i = 1; i <= n; i++) {
+          # Fields are: user nice system idle iowait irq softirq steal ...
+          # Idle time is fields 4 (idle) and 5 (iowait).
+          d = a[i] - (p == n ? b[i] : 0)
+          total += d
+          if (i == 4 || i == 5) idle += d
+        }
+        pct = (total > 0) ? 100 * (total - idle) / total : 0
+        printf "%3.0f", pct
+      }'
+    ;;
+  esac
+}
+
+# Percentage of physical memory in use.
+mem_percent() {
+  case "$os" in
+  Darwin)
+    # "Used" on macOS means pages that cannot be handed to another process
+    # without swapping: active + wired + compressed. Free, inactive and
+    # speculative pages are all reclaimable, so they count as available.
+    local total
+    total=$(sysctl -n hw.memsize)
+    vm_stat | awk -v total="$total" '
+      /page size of/ { for (i = 1; i <= NF; i++) if ($i == "of") psize = $(i + 1) }
+      /^Pages (active|wired down|occupied by compressor)/ {
+        gsub(/\./, "", $NF)
+        used += $NF
+      }
+      END { printf "%3.0f", 100 * used * psize / total }'
+    ;;
+  Linux)
+    # MemAvailable is the kernel's own estimate of what a new workload can claim
+    # without swapping, which already accounts for reclaimable cache.
+    awk '
+      /^MemTotal:/     { total = $2 }
+      /^MemAvailable:/ { avail = $2 }
+      END { printf "%3.0f", 100 * (total - avail) / total }' /proc/meminfo
+    ;;
+  esac
+}
+
+printf '#[%s] #[%s]%s%% ' "$accent_style" "$value_style" "$(cpu_percent)"
+printf '#[%s] #[%s]%s%% #[default]' "$accent_style" "$value_style" "$(mem_percent)"
