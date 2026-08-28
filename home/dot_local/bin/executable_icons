@@ -76,4 +76,8 @@ switch $argv[1]
         echo " "
     case youtube-dl
         echo 
+    # Fallback: the tmux status line shows the icon alone (no program name),
+    # so an unmatched command must still render something identifiable.
+    case '*'
+        echo 
 end
