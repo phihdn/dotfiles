@@ -1,7 +1,19 @@
 #!/usr/bin/env fish
 # Translates program names to icons, so we an use them in our tmux config.
 # Based on https://github.com/caarlos0/icons
-switch $argv[1]
+
+# tmux names a pane after the basename of its foreground program's executable
+# path. Claude Code's native installer points ~/.local/bin/claude at a binary
+# named after the version (~/.local/share/claude/versions/2.1.250), so the pane
+# command arrives as a bare version number instead of "claude". Map that back
+# before matching; the Homebrew cask install keeps the real name and is
+# unaffected either way.
+set -l cmd $argv[1]
+if string match -qr '^[0-9]+\.[0-9]+\.[0-9]+' -- $cmd
+    set cmd claude
+end
+
+switch $cmd
     case ack fd find fzf grep rg
         echo 
     case atop htop top
