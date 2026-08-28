@@ -74,20 +74,17 @@ return {
 
     local custom_gruvbox = require("lualine.themes.gruvbox") -- start with gruvbox
 
-    -- Gruvbox Material palette, matching the catppuccin color_overrides in
-    -- plugins/catppuccin-gruvbox.lua
+    -- Gruvbox Dark (Medium) palette — https://github.com/morhetz/gruvbox
     local colors = {
-      bg = "#1d2021",
+      bg = "#282828",
       fg = "#ebdbb2",
-      yellow = "#d8a657",
-      cyan = "#89b482",
-      darkblue = "#292929",
-      green = "#a9b665",
-      orange = "#e78a4e",
-      violet = "#d3869b",
+      yellow = "#fabd2f",
+      darkblue = "#3c3836",
+      green = "#b8bb26",
+      orange = "#fe8019",
       magenta = "#d3869b",
-      blue = "#7daea3",
-      red = "#ea6962",
+      blue = "#83a598",
+      red = "#fb4934",
     }
 
     custom_gruvbox.normal = {

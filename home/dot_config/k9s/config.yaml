@@ -1,6 +1,6 @@
 k9s:
   ui:
-    skin: catppuccin-mocha-transparent # https://github.com/catppuccin/k9s
+    skin: gruvbox-dark-transparent # https://github.com/morhetz/gruvbox
   logger:
     tail: 500
     buffer: 5000
