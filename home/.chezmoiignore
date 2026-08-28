@@ -38,6 +38,10 @@
 # tmux plugins are cloned at runtime by tpm
 .config/tmux/plugins
 
+# tmux-meeting's machine-local config: it names the calendars to watch, which
+# are account addresses. Keep it out of this public repo.
+.config/tmux/meeting.env
+
 # The main nvim config commits its lazy-lock.json (target is the source of
 # truth: copy it back to the repo after :Lazy update). The LazyVim fallback
 # profile's lockfile stays per-machine state, like it always was.

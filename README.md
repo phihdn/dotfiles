@@ -494,6 +494,46 @@ Layouts come from **two mechanisms**, so changes go in different places dependin
 
 nvim is never auto-started (each instance brings up TypeScript LSP node processes, which piles up across parallel worktree sessions), and lazygit is on demand via the `prefix+g` popup instead of a standing window. The script exits early for everything else: non-git paths, umbrella folders like `~/ws/work` itself, bare-clone roots (they stay plain shell hubs for `git wt`), detached review worktrees (read-only — no agent window), and sessions that already have a `claude` window (so it doesn't fight the sesh-defined sessions above). To give another path pattern its own layout, add a `case` branch in `tmux-session-layout`.
 
+### tmux status bar (cpu/ram, next meeting)
+
+The right-hand side of the status line reads, left to right: current directory + git state (via gitmux), next meeting, CPU/RAM, date and time, and uptime. Three helper scripts in `~/.local/bin` back the dynamic parts, and each prints its own `#[...]` style sequences rather than plain text — tmux's format language can't pick a color from a threshold, so the script decides while the gruvbox palette stays in `tmux.conf` and is passed in as arguments.
+
+| Script | Segment | Notes |
+| --- | --- | --- |
+| `tmux-sysinfo` | CPU and RAM percentages | `ps` + `vm_stat` on macOS, `/proc/stat` deltas + `/proc/meminfo` on Linux |
+| `tmux-meeting` | Next meeting + countdown | macOS only (icalBuddy); hides itself on Linux |
+| `tmux-uptime` | Uptime | Flips to a red block past 7 days |
+
+The bar refreshes every 2s, so both `tmux-sysinfo` and `tmux-meeting` are built to be cheap: the percentages come from sources that need no sampling delay (`top -l 2` costs 1.4s, and `iostat -c 1` only ever reports since-boot averages), and `tmux-meeting` reads the calendar at most once a minute, recomputing its countdown from a cached start time on every refresh. Numeric fields are padded to a fixed width, so a value going from `9%` to `10%` doesn't shove every neighbouring segment sideways twice a second.
+
+#### Next-meeting setup
+
+`tmux-meeting` reads macOS Calendar.app through [icalBuddy](https://hasseg.org/icalBuddy/). It never talks to Google directly, so a Google Calendar reaches it only by being added as an account in Calendar.app.
+
+1. `brew install ical-buddy` — already in the `Brewfile`, guarded to macOS.
+2. Add the Google account under **System Settings → Internet Accounts** with Calendars enabled, then confirm it shows up in `icalBuddy calendars`.
+3. Approve the macOS Calendar permission prompt. It attaches to whichever process runs the query, so if the segment stays stubbornly empty, run `icalBuddy eventsToday` once from a normal terminal and approve it there.
+4. Create `~/.config/tmux/meeting.env` naming the calendars to watch — for a Google account the calendar name is the address itself.
+
+```bash
+# Untracked on purpose: calendar names are account addresses.
+# The ${VAR:-...} form lets an explicit env var override this for testing.
+TMUX_MEETING_CALENDARS="${TMUX_MEETING_CALENDARS:-you@example.com}"
+```
+
+That file is listed in `.chezmoiignore`, so chezmoi never manages it and the address stays out of this public repo. Leaving `TMUX_MEETING_CALENDARS` unset watches every calendar, which mixes personal events into the bar.
+
+`prefix+M` opens the next meeting's video link — Meet, Zoom, Teams, Webex and friends, matched by host anywhere in the event's url, location, or description, since Google buries the Meet link in the HTML description while others use the location field. Five minutes ahead, a popup announces the meeting once (`j` joins, anything else dismisses); the marker file recording which meeting was announced is what stops a 2s refresh from re-firing it. Everything is tunable through the same file:
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `TMUX_MEETING_SOON_MINUTES` | `10` | Segment turns yellow |
+| `TMUX_MEETING_IMMINENT_MINUTES` | `2` | Segment becomes a red block |
+| `TMUX_MEETING_ALERT_MINUTES` | `5` | Popup fires |
+| `TMUX_MEETING_LOOKAHEAD_DAYS` | `2` | How far ahead to search |
+| `TMUX_MEETING_CACHE_TTL` | `60` | Seconds between calendar reads |
+| `TMUX_MEETING_TITLE_WIDTH` | `24` | Title truncation width |
+
 ## 🐍🟢 Language Version Management
 
 This setup includes modern tools for managing Node.js and Python versions:

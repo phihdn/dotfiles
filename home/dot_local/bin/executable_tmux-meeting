@@ -1,0 +1,283 @@
+#!/usr/bin/env bash
+#
+# tmux-meeting: the next meeting, for the tmux status line.
+#
+# Reads macOS Calendar.app through icalBuddy, so a Google Calendar reaches this
+# by being added under System Settings -> Internet Accounts. Nothing here talks
+# to Google directly; if a calendar is missing from Calendar.app it is invisible
+# here too.
+#
+# Wired up in tmux.conf via:
+#   set -ag status-right "#(tmux-meeting status 'fg=...' 'fg=...' 'fg=...,bg=...')"
+#   bind M run-shell "tmux-meeting join"
+#
+# Modes:
+#   status      the status-line segment (default)
+#   url         the next meeting's video-call link, if it has one
+#   join        open that link in the browser
+#   popup-body  internal — renders the alert popup
+#
+# Like tmux-uptime it emits its own #[...] styles, because which of the three
+# styles applies depends on how near the meeting is, and tmux's format language
+# cannot decide that against arbitrary text.
+#
+# icalBuddy costs ~0.5s per call and the status line refreshes every 2s, so the
+# calendar is read at most once per cache_ttl. The countdown is recomputed from
+# the cached start time on every refresh, which costs nothing.
+
+set -uo pipefail
+
+# Machine-local settings, sourced before anything is read below so the file can
+# set any of the variables here. It holds which calendars to watch, which are
+# account addresses — personal data that has no business in a public dotfiles
+# repo — so it is deliberately untracked and listed in .chezmoiignore. See the
+# tmux section of the README for the two lines it needs.
+#
+# A file rather than an exported shell variable because status-line commands
+# inherit the tmux *server's* environment, which was fixed when the server
+# started; a later `export` in a shell would never reach this.
+#
+# Write its assignments as VAR="${VAR:-value}" so an explicit environment
+# variable still wins — handy for one-off testing without editing the file.
+config_file="${TMUX_MEETING_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/tmux/meeting.env}"
+# shellcheck source=/dev/null
+[[ -r $config_file ]] && . "$config_file"
+
+mode="${1:-status}"
+normal_style="${2:-fg=blue}"
+soon_style="${3:-fg=yellow}"
+imminent_style="${4:-fg=black,bg=red}"
+
+# How far ahead to look for the next meeting. Two days so a Friday evening
+# still shows Monday morning rather than an empty bar.
+lookahead_days="${TMUX_MEETING_LOOKAHEAD_DAYS:-2}"
+# Seconds before the calendar is read again.
+cache_ttl="${TMUX_MEETING_CACHE_TTL:-60}"
+# Minutes out at which the segment turns yellow, then a red block.
+soon_minutes="${TMUX_MEETING_SOON_MINUTES:-10}"
+imminent_minutes="${TMUX_MEETING_IMMINENT_MINUTES:-2}"
+# Minutes out at which the popup fires, once per meeting.
+alert_minutes="${TMUX_MEETING_ALERT_MINUTES:-5}"
+# Titles are truncated so one long event cannot push the bar around.
+title_width="${TMUX_MEETING_TITLE_WIDTH:-24}"
+# Events pulled per read. The first one that has not ended yet wins, so this
+# only needs to exceed the number of events that can already be over today.
+max_events="${TMUX_MEETING_MAX_EVENTS:-24}"
+# Comma-separated calendar names to watch, exactly as icalBuddy prints them in
+# `icalBuddy calendars` (for a Google account that is the address itself).
+# Empty means every calendar, which mixes personal events into a work bar.
+calendars="${TMUX_MEETING_CALENDARS:-}"
+
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/tmux-meeting"
+cache_file="$cache_dir/next"
+alert_file="$cache_dir/alerted"
+
+# icalBuddy is macOS-only and reads a database that exists nowhere else, so on
+# Linux the segment disappears rather than erroring into the status line.
+[[ $(uname -s) == Darwin ]] || exit 0
+command -v icalBuddy > /dev/null 2>&1 || exit 0
+
+# Splits icalBuddy's indented, multi-line output into one tab-separated record
+# per event: start date, start time, end date, end time, title, and every
+# remaining property flattened onto one line for the link search.
+#
+# A title sits at column 0 and everything belonging to it is indented, which is
+# what separates one event from the next.
+parse_events() {
+  awk '
+    function flush() {
+      if (title != "" && sd != "")
+        printf "%s\t%s\t%s\t%s\t%s\t%s\n", sd, st, ed, et, title, props
+      title = ""; sd = ""; st = ""; ed = ""; et = ""; props = ""
+    }
+    { gsub(/\t/, " ") }
+    /^[^ ]/ { flush(); title = $0; sub(/[ \t]+$/, "", title); next }
+    {
+      props = props " " $0
+      if (sd != "") next
+      # "    2026-08-28 at 12:00 - 13:00", or with a second date when the
+      # event runs past midnight.
+      if (match($0, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] at [0-9][0-9]:[0-9][0-9]/)) {
+        s = substr($0, RSTART, RLENGTH)
+        sd = substr(s, 1, 10); st = substr(s, 15, 5)
+        rest = substr($0, RSTART + RLENGTH)
+        if (match(rest, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] at [0-9][0-9]:[0-9][0-9]/)) {
+          e = substr(rest, RSTART, RLENGTH)
+          ed = substr(e, 1, 10); et = substr(e, 15, 5)
+        } else if (match(rest, /[0-9][0-9]:[0-9][0-9]/)) {
+          ed = sd; et = substr(rest, RSTART, RLENGTH)
+        }
+      }
+    }
+    END { flush() }
+  '
+}
+
+# First video-call link found anywhere in the event. Google puts the Meet link
+# in the description, Zoom and Teams usually in the location or url, so search
+# the lot and filter by host rather than trusting one field.
+extract_url() {
+  printf '%s\n' "$1" |
+    grep -oE 'https?://[^[:space:]"<>]+' |
+    grep -iE 'meet\.google\.com|zoom\.us|teams\.microsoft\.com|teams\.live\.com|webex\.com|whereby\.com|chime\.aws' |
+    head -1 |
+    sed 's/[.,;:)]*$//'
+}
+
+# Reads the calendar and caches the next meeting as "start_epoch<TAB>title<TAB>url".
+# An empty cache file means nothing is coming up, which is a real answer and is
+# cached like any other.
+refresh_cache() {
+  local from to raw now sd st ed et title props start_epoch end_epoch url
+  local -a cal_filter=()
+
+  from=$(date +%Y-%m-%d)
+  to=$(date -v+"${lookahead_days}"d +%Y-%m-%d)
+  now=$(date +%s)
+
+  [[ -n $calendars ]] && cal_filter=(--includeCals "$calendars")
+
+  # The ${a[@]+"${a[@]}"} form expands to nothing when the array is empty
+  # instead of tripping `set -u` under the bash 3.2 that ships with macOS.
+  raw=$(icalBuddy \
+    ${cal_filter[@]+"${cal_filter[@]}"} \
+    --noCalendarNames \
+    --bullet "" \
+    --excludeAllDayEvents \
+    --limitItems "$max_events" \
+    --includeEventProps "title,datetime,url,location,notes" \
+    --propertyOrder "title,datetime,url,location,notes" \
+    --dateFormat "%Y-%m-%d" \
+    --timeFormat "%H:%M" \
+    --noRelativeDates \
+    eventsFrom:"$from" to:"$to" 2> /dev/null)
+
+  : > "$cache_file.tmp"
+  # Deliberately not using icalBuddy's --includeOnlyEventsFromNowOn: it filters
+  # on start time, which drops a meeting the moment it begins. Selecting on the
+  # end time instead keeps an in-progress meeting on the bar until it is over.
+  while IFS=$'\t' read -r sd st ed et title props; do
+    [[ -n $ed && -n $et ]] || continue
+    end_epoch=$(date -j -f "%Y-%m-%d %H:%M" "$ed $et" +%s 2> /dev/null) || continue
+    ((end_epoch > now)) || continue
+    start_epoch=$(date -j -f "%Y-%m-%d %H:%M" "$sd $st" +%s 2> /dev/null) || continue
+    url=$(extract_url "$props")
+    printf '%s\t%s\t%s\n' "$start_epoch" "$title" "$url" > "$cache_file.tmp"
+    break
+  done < <(printf '%s\n' "$raw" | parse_events)
+
+  mv -f "$cache_file.tmp" "$cache_file"
+}
+
+ensure_cache() {
+  local age
+  mkdir -p "$cache_dir"
+  if [[ -f $cache_file ]]; then
+    age=$(($(date +%s) - $(stat -f %m "$cache_file")))
+    ((age < cache_ttl)) && return 0
+  fi
+  refresh_cache
+}
+
+# Populates start/title/url from the cache. Non-zero when nothing is upcoming.
+load_meeting() {
+  ensure_cache
+  [[ -s $cache_file ]] || return 1
+  IFS=$'\t' read -r start title url < "$cache_file"
+  [[ -n ${start:-} ]]
+}
+
+# Fires the popup once per meeting. The marker file holds the start time of the
+# meeting already announced, so a 2s refresh cannot re-trigger it; keying on a
+# time window alone would either fire repeatedly or be missed between polls.
+maybe_alert() {
+  local diff="$1" start="$2" title="$3" url="$4" when
+  ((diff > 0 && diff <= alert_minutes * 60)) || return 0
+  [[ -f $alert_file && $(cat "$alert_file" 2> /dev/null) == "$start" ]] && return 0
+  printf '%s' "$start" > "$alert_file"
+
+  when=$(date -r "$start" "+%H:%M")
+  tmux display-popup -E -w 60% -h 30% -T " next meeting " \
+    -e "MEETING_TITLE=$title" \
+    -e "MEETING_WHEN=$when" \
+    -e "MEETING_URL=$url" \
+    "$0" popup-body > /dev/null 2>&1 &
+}
+
+cmd_status() {
+  local now diff style countdown when shown
+  if ! load_meeting; then
+    printf '#[%s]󱁕 #[default]' "$normal_style"
+    return 0
+  fi
+
+  now=$(date +%s)
+  diff=$((start - now))
+
+  if ((diff <= imminent_minutes * 60)); then
+    style="$imminent_style"
+  elif ((diff <= soon_minutes * 60)); then
+    style="$soon_style"
+  else
+    style="$normal_style"
+  fi
+
+  # Right-aligned in a fixed 5-column field for the same reason tmux-sysinfo
+  # pads its percentages: an unpadded countdown changes width as it ticks and
+  # drags every neighbouring segment sideways.
+  if ((diff <= 0)); then
+    countdown="now"
+  elif ((diff < 3600)); then
+    countdown="$(((diff + 59) / 60))m"
+  else
+    countdown="$((diff / 3600))h$(printf '%02d' $(((diff % 3600) / 60)))m"
+  fi
+  countdown=$(printf '%5s' "$countdown")
+
+  shown="$title"
+  ((${#shown} > title_width)) && shown="${shown:0:title_width-1}…"
+
+  when=$(date -r "$start" "+%H:%M")
+  printf '#[%s]󰤙 %s %s %s #[default]' "$style" "$when" "$shown" "$countdown"
+
+  maybe_alert "$diff" "$start" "$title" "$url"
+}
+
+cmd_url() {
+  load_meeting || return 0
+  [[ -n ${url:-} ]] && printf '%s\n' "$url"
+}
+
+cmd_join() {
+  if ! load_meeting; then
+    tmux display-message "no upcoming meeting"
+    return 0
+  fi
+  if [[ -z ${url:-} ]]; then
+    tmux display-message "no video link on: $title"
+    return 0
+  fi
+  open "$url"
+}
+
+cmd_popup_body() {
+  printf '\n  %s\n\n  starts at %s\n' "${MEETING_TITLE:-}" "${MEETING_WHEN:-}"
+  [[ -n ${MEETING_URL:-} ]] && printf '  %s\n' "$MEETING_URL"
+  printf '\n  [enter] dismiss'
+  [[ -n ${MEETING_URL:-} ]] && printf '   [j] join'
+  printf '\n'
+  read -r -n 1 key
+  [[ ${key:-} == j && -n ${MEETING_URL:-} ]] && open "$MEETING_URL"
+  return 0
+}
+
+case "$mode" in
+  status) cmd_status ;;
+  url) cmd_url ;;
+  join) cmd_join ;;
+  popup-body) cmd_popup_body ;;
+  *)
+    printf 'usage: %s [status|url|join]\n' "${0##*/}" >&2
+    exit 64
+    ;;
+esac
