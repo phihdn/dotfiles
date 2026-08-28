@@ -41,8 +41,17 @@ tmux list-windows -t "=$session" -F '#{window_name}' | grep -q '^claude' && exit
 # Window 1 is sesh's plain shell (no startup command, so no send-keys race to
 # wait out). Add the claude window and swap it to the front.
 # "; exec \$SHELL" returns to a shell instead of closing the window on exit.
+#
+# zsh -i, not the plain "zsh -c" tmux would use: tmux names a pane after its
+# foreground process group leader, and a non-interactive shell has no job
+# control, so it keeps claude inside its own process group and the status bar
+# renders a shell icon instead of the claude one. An interactive shell hands
+# claude its own process group and the terminal, so tmux sees claude.
+# -e (rather than an inline assignment) also leaves the account set for the
+# fallback shell, so a later `claude` in that window keeps the same config dir.
 tmux new-window -d -t "=$session" -n claude -c "$path" \
-  "CLAUDE_CONFIG_DIR=$claude_cfg claude; exec \$SHELL"
+  -e "CLAUDE_CONFIG_DIR=$claude_cfg" \
+  "zsh -ic 'claude; exec \$SHELL'"
 # Swap so the order is claude(1), shell(2), then land on claude.
 tmux swap-window -d -s "=$session:1" -t "=$session:2"
 tmux select-window -t "=$session:1"
