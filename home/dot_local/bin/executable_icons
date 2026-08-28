@@ -72,7 +72,10 @@ switch $argv[1]
         echo 
     case tmux
         echo 
-    case claude
+    # glob so wrappers and aliases (claude-work, claude-personal, ...) match;
+    # note plain aliases already exec the claude binary, so tmux usually
+    # reports just "claude" regardless
+    case '*claude*'
         echo " "
     case youtube-dl
         echo 
