@@ -523,13 +523,14 @@ TMUX_MEETING_CALENDARS="${TMUX_MEETING_CALENDARS:-you@example.com}"
 
 That file is listed in `.chezmoiignore`, so chezmoi never manages it and the address stays out of this public repo. Leaving `TMUX_MEETING_CALENDARS` unset watches every calendar, which mixes personal events into the bar.
 
-`prefix+M` opens the next meeting's video link — Meet, Zoom, Teams, Webex and friends, matched by host anywhere in the event's url, location, or description, since Google buries the Meet link in the HTML description while others use the location field. Five minutes ahead, a popup announces the meeting once (`j` joins, anything else dismisses); the marker file recording which meeting was announced is what stops a 2s refresh from re-firing it. Everything is tunable through the same file:
+`prefix+M` opens the next meeting's video link — Meet, Zoom, Teams, Webex and friends, matched by host anywhere in the event's url, location, or description, since Google buries the Meet link in the HTML description while others use the location field. Inside the imminent window the block flashes, alternating between a red block and red text: terminals ignore the blink attribute (SGR 5), and the bar can only animate as fast as it redraws, so `tmux-meeting` speeds `status-interval` up for those last minutes and restores it afterwards. A meeting already under way stays solid rather than strobing for its whole duration. Five minutes ahead, a popup announces the meeting once (`j` joins, anything else dismisses); the marker file recording which meeting was announced is what stops a 2s refresh from re-firing it. Everything is tunable through the same file:
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | `TMUX_MEETING_SOON_MINUTES` | `10` | Segment turns yellow |
-| `TMUX_MEETING_IMMINENT_MINUTES` | `2` | Segment becomes a red block |
+| `TMUX_MEETING_IMMINENT_MINUTES` | `2` | Segment becomes a flashing red block |
 | `TMUX_MEETING_ALERT_MINUTES` | `5` | Popup fires |
+| `TMUX_MEETING_FLASH_INTERVAL` | `1` | Seconds per flash phase |
 | `TMUX_MEETING_LOOKAHEAD_DAYS` | `2` | How far ahead to search |
 | `TMUX_MEETING_CACHE_TTL` | `60` | Seconds between calendar reads |
 | `TMUX_MEETING_TITLE_WIDTH` | `24` | Title truncation width |

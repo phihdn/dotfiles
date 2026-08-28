@@ -2,13 +2,12 @@
 #
 # tmux-meeting: the next meeting, for the tmux status line.
 #
-# Reads macOS Calendar.app through icalBuddy, so a Google Calendar reaches this
-# by being added under System Settings -> Internet Accounts. Nothing here talks
-# to Google directly; if a calendar is missing from Calendar.app it is invisible
-# here too.
+# Reads macOS Calendar.app through icalBuddy. A Google Calendar gets here by
+# being added under System Settings -> Internet Accounts; nothing talks to
+# Google directly, so a calendar missing from Calendar.app is invisible here.
 #
 # Wired up in tmux.conf via:
-#   set -ag status-right "#(tmux-meeting status 'fg=...' 'fg=...' 'fg=...,bg=...')"
+#   set -ag status-right "#(tmux-meeting status 'normal' 'soon' 'imminent' 'flash-off')"
 #   bind M run-shell "tmux-meeting join"
 #
 # Modes:
@@ -17,28 +16,22 @@
 #   join        open that link in the browser
 #   popup-body  internal — renders the alert popup
 #
-# Like tmux-uptime it emits its own #[...] styles, because which of the three
-# styles applies depends on how near the meeting is, and tmux's format language
-# cannot decide that against arbitrary text.
+# Styles are emitted here rather than in tmux.conf because which one applies
+# depends on how near the meeting is, and tmux formats cannot decide that.
 #
-# icalBuddy costs ~0.5s per call and the status line refreshes every 2s, so the
-# calendar is read at most once per cache_ttl. The countdown is recomputed from
-# the cached start time on every refresh, which costs nothing.
+# icalBuddy costs ~0.5s a call, so the calendar is read at most once per
+# cache_ttl; every refresh in between only recomputes the countdown.
 
 set -uo pipefail
 
-# Machine-local settings, sourced before anything is read below so the file can
-# set any of the variables here. It holds which calendars to watch, which are
-# account addresses — personal data that has no business in a public dotfiles
-# repo — so it is deliberately untracked and listed in .chezmoiignore. See the
-# tmux section of the README for the two lines it needs.
+# Machine-local settings, sourced first so it can set anything below. Holds the
+# calendar names — account addresses, so it is untracked and .chezmoiignore'd.
+# See the tmux section of the README for the two lines it needs.
 #
-# A file rather than an exported shell variable because status-line commands
-# inherit the tmux *server's* environment, which was fixed when the server
-# started; a later `export` in a shell would never reach this.
-#
-# Write its assignments as VAR="${VAR:-value}" so an explicit environment
-# variable still wins — handy for one-off testing without editing the file.
+# A file rather than an exported variable: status commands inherit the tmux
+# *server's* environment, fixed when the server started, so a later `export`
+# would never reach here. Write assignments as VAR="${VAR:-value}" so an
+# explicit environment variable still wins.
 config_file="${TMUX_MEETING_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/tmux/meeting.env}"
 # shellcheck source=/dev/null
 [[ -r $config_file ]] && . "$config_file"
@@ -47,42 +40,48 @@ mode="${1:-status}"
 normal_style="${2:-fg=blue}"
 soon_style="${3:-fg=yellow}"
 imminent_style="${4:-fg=black,bg=red}"
+# Off-phase of the imminent flash. Terminals ignore the blink attribute (SGR 5)
+# — Ghostty renders it solid — so the segment alternates two styles of its own.
+imminent_alt_style="${5:-fg=red}"
 
-# How far ahead to look for the next meeting. Two days so a Friday evening
-# still shows Monday morning rather than an empty bar.
+# Two days ahead, so a Friday evening still shows Monday morning.
 lookahead_days="${TMUX_MEETING_LOOKAHEAD_DAYS:-2}"
 # Seconds before the calendar is read again.
 cache_ttl="${TMUX_MEETING_CACHE_TTL:-60}"
-# Minutes out at which the segment turns yellow, then a red block.
+# Minutes out at which the segment turns yellow, then a flashing red block.
 soon_minutes="${TMUX_MEETING_SOON_MINUTES:-10}"
 imminent_minutes="${TMUX_MEETING_IMMINENT_MINUTES:-2}"
 # Minutes out at which the popup fires, once per meeting.
 alert_minutes="${TMUX_MEETING_ALERT_MINUTES:-5}"
-# Titles are truncated so one long event cannot push the bar around.
+# Refresh rate while flashing. tmux re-runs status commands once per
+# status-interval, so this is the flash rate too.
+flash_interval="${TMUX_MEETING_FLASH_INTERVAL:-1}"
+# Truncation width, so one long title cannot push the bar around.
 title_width="${TMUX_MEETING_TITLE_WIDTH:-24}"
-# Events pulled per read. The first one that has not ended yet wins, so this
-# only needs to exceed the number of events that can already be over today.
+# Events per read. The first one not yet ended wins, so this only has to exceed
+# the number already over today.
 max_events="${TMUX_MEETING_MAX_EVENTS:-24}"
-# Comma-separated calendar names to watch, exactly as icalBuddy prints them in
-# `icalBuddy calendars` (for a Google account that is the address itself).
-# Empty means every calendar, which mixes personal events into a work bar.
+# Calendars to watch, named as `icalBuddy calendars` prints them (for a Google
+# account, the address itself). Empty watches every calendar, which mixes
+# personal events into a work bar.
 calendars="${TMUX_MEETING_CALENDARS:-}"
 
 cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/tmux-meeting"
 cache_file="$cache_dir/next"
 alert_file="$cache_dir/alerted"
+# Remembers the bar's normal status-interval while the flash borrows a faster
+# one, so tmux.conf stays the only place that rate is written down.
+interval_file="$cache_dir/status-interval"
 
-# icalBuddy is macOS-only and reads a database that exists nowhere else, so on
-# Linux the segment disappears rather than erroring into the status line.
+# icalBuddy is macOS-only, so elsewhere the segment vanishes rather than
+# erroring into the status line.
 [[ $(uname -s) == Darwin ]] || exit 0
 command -v icalBuddy > /dev/null 2>&1 || exit 0
 
-# Splits icalBuddy's indented, multi-line output into one tab-separated record
-# per event: start date, start time, end date, end time, title, and every
-# remaining property flattened onto one line for the link search.
-#
-# A title sits at column 0 and everything belonging to it is indented, which is
-# what separates one event from the next.
+# Turns icalBuddy's indented output into one tab-separated record per event:
+# start date, start time, end date, end time, title, then every other property
+# flattened onto one line for the link search. A title sits at column 0 and its
+# properties are indented — that is what separates one event from the next.
 parse_events() {
   awk '
     function flush() {
@@ -113,9 +112,9 @@ parse_events() {
   '
 }
 
-# First video-call link found anywhere in the event. Google puts the Meet link
-# in the description, Zoom and Teams usually in the location or url, so search
-# the lot and filter by host rather than trusting one field.
+# First video-call link anywhere in the event. Google hides the Meet link in the
+# description and Zoom or Teams use the location or url field, so search the lot
+# and filter by host instead of trusting one field.
 extract_url() {
   printf '%s\n' "$1" |
     grep -oE 'https?://[^[:space:]"<>]+' |
@@ -124,9 +123,8 @@ extract_url() {
     sed 's/[.,;:)]*$//'
 }
 
-# Reads the calendar and caches the next meeting as "start_epoch<TAB>title<TAB>url".
-# An empty cache file means nothing is coming up, which is a real answer and is
-# cached like any other.
+# Caches the next meeting as "start_epoch<TAB>title<TAB>url". An empty file means
+# nothing is coming up — a real answer, cached like any other.
 refresh_cache() {
   local from to raw now sd st ed et title props start_epoch end_epoch url
   local -a cal_filter=()
@@ -137,8 +135,8 @@ refresh_cache() {
 
   [[ -n $calendars ]] && cal_filter=(--includeCals "$calendars")
 
-  # The ${a[@]+"${a[@]}"} form expands to nothing when the array is empty
-  # instead of tripping `set -u` under the bash 3.2 that ships with macOS.
+  # ${a[@]+"${a[@]}"} expands to nothing when the array is empty instead of
+  # tripping `set -u` under the bash 3.2 macOS ships.
   raw=$(icalBuddy \
     ${cal_filter[@]+"${cal_filter[@]}"} \
     --noCalendarNames \
@@ -153,9 +151,9 @@ refresh_cache() {
     eventsFrom:"$from" to:"$to" 2> /dev/null)
 
   : > "$cache_file.tmp"
-  # Deliberately not using icalBuddy's --includeOnlyEventsFromNowOn: it filters
-  # on start time, which drops a meeting the moment it begins. Selecting on the
-  # end time instead keeps an in-progress meeting on the bar until it is over.
+  # Not icalBuddy's --includeOnlyEventsFromNowOn: it filters on start time, which
+  # drops a meeting the moment it begins. Filtering on end time instead keeps an
+  # in-progress meeting on the bar until it is over.
   while IFS=$'\t' read -r sd st ed et title props; do
     [[ -n $ed && -n $et ]] || continue
     end_epoch=$(date -j -f "%Y-%m-%d %H:%M" "$ed $et" +%s 2> /dev/null) || continue
@@ -187,9 +185,27 @@ load_meeting() {
   [[ -n ${start:-} ]]
 }
 
-# Fires the popup once per meeting. The marker file holds the start time of the
-# meeting already announced, so a 2s refresh cannot re-trigger it; keying on a
-# time window alone would either fire repeatedly or be missed between polls.
+# Speeds the whole bar up while flashing, saving the rate it replaced. Saving to
+# a file means an interrupted run still restores the right rate next refresh.
+start_flashing() {
+  local current
+  current=$(tmux show -gv status-interval 2> /dev/null) || return 0
+  [[ $current == "$flash_interval" ]] && return 0
+  printf '%s' "$current" > "$interval_file"
+  tmux set -g status-interval "$flash_interval" 2> /dev/null
+}
+
+# Only a flash that actually borrowed the interval pays a tmux call; every other
+# refresh costs one file test.
+stop_flashing() {
+  [[ -s $interval_file ]] || return 0
+  tmux set -g status-interval "$(cat "$interval_file")" 2> /dev/null
+  rm -f "$interval_file"
+}
+
+# Fires the popup once per meeting. The marker holds the announced meeting's
+# start time, so a 2s refresh cannot re-trigger it; a time window alone would
+# either fire repeatedly or fall between polls.
 maybe_alert() {
   local diff="$1" start="$2" title="$3" url="$4" when
   ((diff > 0 && diff <= alert_minutes * 60)) || return 0
@@ -207,6 +223,7 @@ maybe_alert() {
 cmd_status() {
   local now diff style countdown when shown
   if ! load_meeting; then
+    stop_flashing
     printf '#[%s]󱁕 #[default]' "$normal_style"
     return 0
   fi
@@ -216,15 +233,25 @@ cmd_status() {
 
   if ((diff <= imminent_minutes * 60)); then
     style="$imminent_style"
+    # Flash only while the meeting is still ahead: it stays on the bar until the
+    # meeting ends, and a long one must not strobe for its whole duration.
+    # Wall-clock parity keeps the phase steady however often the script runs.
+    if ((diff > 0)); then
+      start_flashing
+      ((now % 2)) && style="$imminent_alt_style"
+    else
+      stop_flashing
+    fi
   elif ((diff <= soon_minutes * 60)); then
+    stop_flashing
     style="$soon_style"
   else
+    stop_flashing
     style="$normal_style"
   fi
 
-  # Right-aligned in a fixed 5-column field for the same reason tmux-sysinfo
-  # pads its percentages: an unpadded countdown changes width as it ticks and
-  # drags every neighbouring segment sideways.
+  # Fixed 5-column field, like tmux-sysinfo's percentages: an unpadded countdown
+  # changes width as it ticks and drags its neighbours sideways.
   if ((diff <= 0)); then
     countdown="now"
   elif ((diff < 3600)); then
