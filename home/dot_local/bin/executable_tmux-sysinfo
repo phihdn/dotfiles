@@ -144,5 +144,5 @@ mem=$(mem_percent)
 mem_style="$value_style"
 [[ $mem =~ ^[[:space:]]*[0-9]+$ ]] && ((mem >= mem_alert)) && mem_style="$alert_style"
 
-printf '#[%s] #[%s]%s%% ' "$accent_style" "$value_style" "$cpu"
-printf '#[%s] #[%s]%s%% #[default]' "$accent_style" "$mem_style" "$mem"
+printf '#[%s] #[%s]%s%% ' "$accent_style" "$value_style" "$cpu"
+printf '#[%s] #[%s]%s%% #[default]' "$accent_style" "$mem_style" "$mem"
