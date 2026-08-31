@@ -99,6 +99,19 @@ interval_file="$cache_dir/status-interval${interval_key//\//-}"
 [[ $(uname -s) == Darwin ]] || exit 0
 command -v icalBuddy > /dev/null 2>&1 || exit 0
 
+# BSD date and stat, by absolute path. This script depends on flags only they
+# have -- `date -v`, `date -j -f`, `date -r <epoch>`, `stat -f %m` -- and an
+# interactive PATH puts Homebrew's GNU coreutils (gnubin) ahead of /usr/bin,
+# where the same flags mean something else: GNU `date -r` takes a file, and GNU
+# `stat -f` reads the filesystem, so `stat -f %m` reports on a file literally
+# named "%m" and spills filesystem text into an arithmetic expansion.
+#
+# The status segment never hit this because a tmux status job inherits the
+# server's PATH, which reaches /usr/bin first. prefix+M runs in a popup with the
+# interactive PATH, so `pick` aborted under `set -u` before drawing anything.
+date=/bin/date
+stat=/usr/bin/stat
+
 # Turns icalBuddy's indented output into one tab-separated record per event:
 # start date, start time, end date, end time, title, then every other property
 # flattened onto one line for the link search. A title sits at column 0 and its
@@ -152,9 +165,9 @@ refresh_cache() {
   local from to raw now sd st ed et title props start_epoch end_epoch url
   local -a cal_filter=()
 
-  from=$(date +%Y-%m-%d)
-  to=$(date -v+"${lookahead_days}"d +%Y-%m-%d)
-  now=$(date +%s)
+  from=$("$date" +%Y-%m-%d)
+  to=$("$date" -v+"${lookahead_days}"d +%Y-%m-%d)
+  now=$("$date" +%s)
 
   [[ -n $calendars ]] && cal_filter=(--includeCals "$calendars")
 
@@ -179,9 +192,9 @@ refresh_cache() {
   # in-progress meeting on the bar until it is over.
   while IFS=$'\t' read -r sd st ed et title props; do
     [[ -n $ed && -n $et ]] || continue
-    end_epoch=$(date -j -f "%Y-%m-%d %H:%M" "$ed $et" +%s 2> /dev/null) || continue
+    end_epoch=$("$date" -j -f "%Y-%m-%d %H:%M" "$ed $et" +%s 2> /dev/null) || continue
     ((end_epoch > now)) || continue
-    start_epoch=$(date -j -f "%Y-%m-%d %H:%M" "$sd $st" +%s 2> /dev/null) || continue
+    start_epoch=$("$date" -j -f "%Y-%m-%d %H:%M" "$sd $st" +%s 2> /dev/null) || continue
     url=$(extract_url "$props")
     printf '%s\t%s\t%s\t%s\n' "$start_epoch" "$end_epoch" "$title" "$url" >> "$cache_file.tmp"
   done < <(printf '%s\n' "$raw" | parse_events)
@@ -196,7 +209,7 @@ ensure_cache() {
   local age
   mkdir -p "$cache_dir"
   if [[ -f $cache_file ]]; then
-    age=$(($(date +%s) - $(stat -f %m "$cache_file")))
+    age=$(($("$date" +%s) - $("$stat" -f %m "$cache_file")))
     ((age < cache_ttl)) && return 0
   fi
   refresh_cache
@@ -244,7 +257,7 @@ maybe_alert() {
   [[ -f $alert_file && $(cat "$alert_file" 2> /dev/null) == "$start" ]] && return 0
   printf '%s' "$start" > "$alert_file"
 
-  when=$(date -r "$start" "+%H:%M")
+  when=$("$date" -r "$start" "+%H:%M")
   msg="󰃭 $when  $title"
   [[ -n $url ]] && msg="$msg  ·  $url"
   # display-message reads its argument as a format, where # introduces a
@@ -260,7 +273,7 @@ cmd_status() {
     return 0
   fi
 
-  now=$(date +%s)
+  now=$("$date" +%s)
   diff=$((start - now))
 
   if ((diff <= imminent_minutes * 60)); then
@@ -303,7 +316,7 @@ cmd_status() {
   shown="$title"
   ((${#shown} > title_width)) && shown="${shown:0:title_width-1}…"
 
-  when=$(date -r "$start" "+%H:%M")
+  when=$("$date" -r "$start" "+%H:%M")
   printf '#[%s]󰃭 %s %s %s #[default]' "$style" "$when" "$shown" "$countdown"
 
   maybe_alert "$diff" "$start" "$title" "$url"
@@ -332,12 +345,12 @@ cmd_join() {
 # two rows, which is the whole point of the picker.
 pick_rows() {
   local now start end title url when mark note
-  now=$(date +%s)
+  now=$("$date" +%s)
   while IFS=$'\t' read -r start end title url; do
     [[ -n ${start:-} && -n ${end:-} ]] || continue
     ((end > now)) || continue
     ((start - now <= pick_minutes * 60)) || continue
-    when=$(date -r "$start" "+%H:%M")
+    when=$("$date" -r "$start" "+%H:%M")
     if ((start <= now)); then
       mark="now"
     else
