@@ -44,8 +44,11 @@ imminent_style="${4:-fg=black,bg=red}"
 # — Ghostty renders it solid — so the segment alternates two styles of its own.
 imminent_alt_style="${5:-fg=red}"
 
-# Two days ahead, so a Friday evening still shows Monday morning.
-lookahead_days="${TMUX_MEETING_LOOKAHEAD_DAYS:-2}"
+# Days beyond today to search; 0 keeps the segment to today only, so it answers
+# "what is left today" and goes quiet after the day's last meeting instead of
+# jumping to tomorrow morning. Raise it to look further ahead — a Friday evening
+# needs 3 to reach Monday.
+lookahead_days="${TMUX_MEETING_LOOKAHEAD_DAYS:-0}"
 # Seconds before the calendar is read again.
 cache_ttl="${TMUX_MEETING_CACHE_TTL:-60}"
 # Minutes out at which the segment turns yellow, then a flashing red block.

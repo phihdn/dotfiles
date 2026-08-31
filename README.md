@@ -543,7 +543,7 @@ That file is listed in `.chezmoiignore`, so chezmoi never manages it and the add
 | `TMUX_MEETING_ALERT_DISPLAY_MS` | `5000` | How long that announcement stays up |
 | `TMUX_MEETING_FLASH_INTERVAL` | `1` | Seconds per flash phase |
 | `TMUX_MEETING_PICK_MINUTES` | `60` | How far ahead `prefix+M` lists |
-| `TMUX_MEETING_LOOKAHEAD_DAYS` | `2` | How far ahead to search |
+| `TMUX_MEETING_LOOKAHEAD_DAYS` | `0` | Days beyond today to search; `0` is today only |
 | `TMUX_MEETING_CACHE_TTL` | `60` | Seconds between calendar reads |
 | `TMUX_MEETING_TITLE_WIDTH` | `24` | Title truncation width |
 
