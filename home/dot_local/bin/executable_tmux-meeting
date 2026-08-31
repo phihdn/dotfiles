@@ -15,7 +15,6 @@
 #   url         the next meeting's video-call link, if it has one
 #   join        open that link in the browser
 #   pick        choose among the meetings you could join now, then open it
-#   popup-body  internal — renders the alert popup
 #
 # Styles are emitted here rather than in tmux.conf because which one applies
 # depends on how near the meeting is, and tmux formats cannot decide that.
@@ -52,11 +51,19 @@ cache_ttl="${TMUX_MEETING_CACHE_TTL:-60}"
 # Minutes out at which the segment turns yellow, then a flashing red block.
 soon_minutes="${TMUX_MEETING_SOON_MINUTES:-10}"
 imminent_minutes="${TMUX_MEETING_IMMINENT_MINUTES:-2}"
-# Minutes out at which the popup fires, once per meeting.
+# Minutes out at which the announcement fires, once per meeting.
 alert_minutes="${TMUX_MEETING_ALERT_MINUTES:-5}"
-# Refresh rate while flashing. tmux re-runs status commands once per
-# status-interval, so this is the flash rate too.
+# How long that announcement stays on the message line.
+alert_display_ms="${TMUX_MEETING_ALERT_DISPLAY_MS:-5000}"
+# Status-interval the bar borrows while flashing, so a phase change lands
+# promptly instead of up to a whole normal refresh late. It is a nudge, not the
+# flash rate: tmux does not always re-arm its status timer when this changes,
+# so the phase below cannot assume the bar actually sped up.
 flash_interval="${TMUX_MEETING_FLASH_INTERVAL:-1}"
+# Seconds each phase of the imminent flash is held. Must be no shorter than the
+# slowest refresh the bar might still be running at, or the alternation aliases
+# against it — see cmd_status.
+flash_phase_seconds="${TMUX_MEETING_FLASH_PHASE_SECONDS:-2}"
 # How far ahead the picker looks: anything in progress or starting within this
 # many minutes is something you could plausibly join right now.
 pick_minutes="${TMUX_MEETING_PICK_MINUTES:-60}"
@@ -77,7 +84,15 @@ cache_file="$cache_dir/events"
 alert_file="$cache_dir/alerted"
 # Remembers the bar's normal status-interval while the flash borrows a faster
 # one, so tmux.conf stays the only place that rate is written down.
-interval_file="$cache_dir/status-interval"
+#
+# Keyed by socket, because the `tmux` calls below target whichever server
+# invoked us ($TMUX) while the cache directory is shared by all of them. With
+# one common file a second server -- a throwaway `tmux -L test`, or another
+# login -- saves its own interval over the real server's, and the restore then
+# sets the wrong rate. $TMUX is "socket,pid,session", and the substitution is
+# free where `tmux display -p` would cost another fork.
+interval_key=${TMUX%%,*}
+interval_file="$cache_dir/status-interval${interval_key//\//-}"
 
 # icalBuddy is macOS-only, so elsewhere the segment vanishes rather than
 # erroring into the status line.
@@ -214,21 +229,27 @@ stop_flashing() {
   rm -f "$interval_file"
 }
 
-# Fires the popup once per meeting. The marker holds the announced meeting's
-# start time, so a 2s refresh cannot re-trigger it; a time window alone would
-# either fire repeatedly or fall between polls.
+# Announces the meeting once. The marker holds the announced meeting's start
+# time, so a fast refresh cannot re-trigger it; a time window alone would either
+# fire repeatedly or fall between polls.
+#
+# display-message, not display-popup: a popup is modal and its body ended in a
+# `read`, so it captured the keyboard until dismissed -- an alert that fires
+# while you are mid-edit in nvim reads as tmux having frozen. This prints to the
+# message line and expires on its own. prefix+M still opens the picker when you
+# actually want to join.
 maybe_alert() {
-  local diff="$1" start="$2" title="$3" url="$4" when
+  local diff="$1" start="$2" title="$3" url="$4" when msg
   ((diff > 0 && diff <= alert_minutes * 60)) || return 0
   [[ -f $alert_file && $(cat "$alert_file" 2> /dev/null) == "$start" ]] && return 0
   printf '%s' "$start" > "$alert_file"
 
   when=$(date -r "$start" "+%H:%M")
-  tmux display-popup -E -w 60% -h 30% -T " next meeting " \
-    -e "MEETING_TITLE=$title" \
-    -e "MEETING_WHEN=$when" \
-    -e "MEETING_URL=$url" \
-    "$0" popup-body > /dev/null 2>&1 &
+  msg="󰃭 $when  $title"
+  [[ -n $url ]] && msg="$msg  ·  $url"
+  # display-message reads its argument as a format, where # introduces a
+  # substitution -- a title containing one would be mangled or, worse, expand.
+  tmux display-message -d "$alert_display_ms" "${msg//#/##}" > /dev/null 2>&1
 }
 
 cmd_status() {
@@ -246,10 +267,17 @@ cmd_status() {
     style="$imminent_style"
     # Flash only while the meeting is still ahead: it stays on the bar until the
     # meeting ends, and a long one must not strobe for its whole duration.
-    # Wall-clock parity keeps the phase steady however often the script runs.
+    #
+    # The phase comes off the wall clock, not a counter, so it stays steady
+    # however many times tmux expands the format — a redraw sometimes runs the
+    # command twice, which a counter would toggle straight back. The phase is
+    # held flash_phase_seconds rather than one second because the bar is only
+    # asked to refresh every second and is not guaranteed to obey: sampling a
+    # one-second alternation once every two seconds always lands on the same
+    # phase, and the segment sits frozen on one colour instead of flashing.
     if ((diff > 0)); then
       start_flashing
-      ((now % 2)) && style="$imminent_alt_style"
+      (((now / flash_phase_seconds) % 2)) && style="$imminent_alt_style"
     else
       stop_flashing
     fi
@@ -363,23 +391,11 @@ cmd_pick() {
   open "$url"
 }
 
-cmd_popup_body() {
-  printf '\n  %s\n\n  starts at %s\n' "${MEETING_TITLE:-}" "${MEETING_WHEN:-}"
-  [[ -n ${MEETING_URL:-} ]] && printf '  %s\n' "$MEETING_URL"
-  printf '\n  [enter] dismiss'
-  [[ -n ${MEETING_URL:-} ]] && printf '   [j] join'
-  printf '\n'
-  read -r -n 1 key
-  [[ ${key:-} == j && -n ${MEETING_URL:-} ]] && open "$MEETING_URL"
-  return 0
-}
-
 case "$mode" in
   status) cmd_status ;;
   url) cmd_url ;;
   join) cmd_join ;;
   pick) cmd_pick ;;
-  popup-body) cmd_popup_body ;;
   *)
     printf 'usage: %s [status|url|join|pick]\n' "${0##*/}" >&2
     exit 64
