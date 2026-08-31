@@ -1,4 +1,4 @@
-#!/usr/bin/env fish
+#!/usr/bin/env bash
 # Translates program names to icons, so we an use them in our tmux config.
 # Based on https://github.com/caarlos0/icons
 
@@ -8,91 +8,136 @@
 # command arrives as a bare version number instead of "claude". Map that back
 # before matching; the Homebrew cask install keeps the real name and is
 # unaffected either way.
-set -l cmd $argv[1]
-if string match -qr '^[0-9]+\.[0-9]+\.[0-9]+' -- $cmd
-    set cmd claude
-end
+#
+# Runs once per window on every status refresh, so it must stay a pure string
+# match with no subprocesses. This was a fish script until fish startup (~40ms,
+# versus ~1ms for bash) made it the most expensive thing on the status line:
+# three windows meant three fish interpreters every refresh.
 
-switch $cmd
-    case ack fd find fzf grep rg
-        echo 
-    case atop htop top
-        echo 
-    case bash fish zsh sh ash
-        echo 
-    case bat cat
-        echo 
-    case clx
-        echo 
-    case cp duplicate
-        echo 
-    case mv
-        echo 󰉒
-    case curl http pint lynx wget w3m
-        echo 
-    case docker docker-compose podman
-        echo 
-    case lf ls nnn ranger lsd
-        echo 
-    case elixir mix
-        echo 
-    case gh gh-dash
-        echo 
-    case git lazygit tig
-        echo 
-    case glow
-        echo 
-    case go goreleaser
-        echo 
-    case kubectl k9s
-        echo 
-    case java mvn
-        echo 
-    case less more
-        echo 
-    case lua
-        echo 
-    case man
-        echo 
-    case nano pico
-        echo 
-    case node npm yarn
-        echo 
-    case 'nix*'
-        echo 󱄅
-    case vim vi
-        echo 
-    case nvim
-        echo 
-    case python pip
-        echo 
-    case rm
-        echo 
-    case rsync
-        echo 
-    case ruby irb
-        echo 
-    case scp ssh
-        echo 󰣀
-    case sleep
-        echo 
-    case sudo
-        echo 
-    case tail
-        echo 
-    case task make
-        echo 
-    case tmux
-        echo 
-    # glob so wrappers and aliases (claude-work, claude-personal, ...) match;
-    # note plain aliases already exec the claude binary, so tmux usually
-    # reports just "claude" regardless
-    case '*claude*'
-        echo " "
-    case youtube-dl
-        echo 
-    # Fallback: the tmux status line shows the icon alone (no program name),
-    # so an unmatched command must still render something identifiable.
-    case '*'
-        echo 
-end
+cmd="${1:-}"
+
+if [[ $cmd =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+  cmd=claude
+fi
+
+case "$cmd" in
+  ack|fd|find|fzf|grep|rg)
+    echo 
+    ;;
+  atop|htop|top)
+    echo 
+    ;;
+  bash|fish|zsh|sh|ash)
+    echo 
+    ;;
+  bat|cat)
+    echo 
+    ;;
+  clx)
+    echo 
+    ;;
+  cp|duplicate)
+    echo 
+    ;;
+  mv)
+    echo 󰉒
+    ;;
+  curl|http|pint|lynx|wget|w3m)
+    echo 
+    ;;
+  docker|docker-compose|podman)
+    echo 
+    ;;
+  lf|ls|nnn|ranger|lsd)
+    echo 
+    ;;
+  elixir|mix)
+    echo 
+    ;;
+  gh|gh-dash)
+    echo 
+    ;;
+  git|lazygit|tig)
+    echo 
+    ;;
+  glow)
+    echo 
+    ;;
+  go|goreleaser)
+    echo 
+    ;;
+  kubectl|k9s)
+    echo 
+    ;;
+  java|mvn)
+    echo 
+    ;;
+  less|more)
+    echo 
+    ;;
+  lua)
+    echo 
+    ;;
+  man)
+    echo 
+    ;;
+  nano|pico)
+    echo 
+    ;;
+  node|npm|yarn)
+    echo 
+    ;;
+  nix*)
+    echo 󱄅
+    ;;
+  vim|vi)
+    echo 
+    ;;
+  nvim)
+    echo 
+    ;;
+  python|pip)
+    echo 
+    ;;
+  rm)
+    echo 
+    ;;
+  rsync)
+    echo 
+    ;;
+  ruby|irb)
+    echo 
+    ;;
+  scp|ssh)
+    echo 󰣀
+    ;;
+  sleep)
+    echo 
+    ;;
+  sudo)
+    echo 
+    ;;
+  tail)
+    echo 
+    ;;
+  task|make)
+    echo 
+    ;;
+  tmux)
+    echo 
+    ;;
+  # glob so wrappers and aliases (claude-work, claude-personal, ...) match;
+  # note plain aliases already exec the claude binary, so tmux usually
+  # reports just "claude" regardless
+  *claude*)
+    echo " "
+    ;;
+  youtube-dl)
+    echo 
+    ;;
+  # Fallback: the tmux status line shows the icon alone (no program name),
+  # so an unmatched command must still render something identifiable.
+  *)
+    echo 
+    ;;
+esac
