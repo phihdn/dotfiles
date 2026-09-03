@@ -8,7 +8,7 @@
 # tmux interprets #[...] sequences in #() output (the same trick gitmux uses),
 # so the segment emits its own style here — the threshold decides which of the
 # two to use, which tmux's format language can't do against arbitrary text.
-# Both styles are passed in so the gruvbox palette stays in tmux.conf.
+# Both styles are passed in so the color palette stays in tmux.conf.
 
 normal_style="${1:-default}"
 alert_style="${2:-fg=red}"

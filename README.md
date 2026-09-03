@@ -236,7 +236,7 @@ With the setup above, `node` resolves to nvm's version in **all** of those modes
 
 ### Neovim
 
-`~/.config/nvim` is a self-maintained config (custom Lua under `lua/phihdn/{core,plugins}`, one plugin per file), modernized for nvim 0.11+: native `vim.lsp.config()`/`vim.lsp.enable()` (mason installs the binaries; no mason-lspconfig), treesitter `main` branch, fzf-lua as the sole picker, blink.cmp completion, conform + nvim-lint, catppuccin with Gruvbox Material `color_overrides`, oil + mini.files for file management, and mini.ai/mini.surround textobjects. Languages: go, typescript, python (basedpyright), lua, bash, yaml, postgres, markdown.
+`~/.config/nvim` is a self-maintained config (custom Lua under `lua/phihdn/{core,plugins}`, one plugin per file), modernized for nvim 0.11+: native `vim.lsp.config()`/`vim.lsp.enable()` (mason installs the binaries; no mason-lspconfig), treesitter `main` branch, fzf-lua as the sole picker, blink.cmp completion, conform + nvim-lint, catppuccin (Mocha), oil + mini.files for file management, and mini.ai/mini.surround textobjects. Languages: go, typescript, python (basedpyright), lua, bash, yaml, postgres, markdown.
 
 `lazy-lock.json` **is committed** for this config — the applied target is the source of truth, so after `:Lazy update`, copy it back before committing: `cp ~/.config/nvim/lazy-lock.json home/dot_config/nvim/`.
 
@@ -496,7 +496,7 @@ nvim is never auto-started (each instance brings up TypeScript LSP node processe
 
 ### tmux status bar (cpu/ram, next meeting)
 
-The right-hand side of the status line reads, left to right: current directory + git state (via gitmux), next meeting, CPU/RAM, date and time, and uptime. Three helper scripts in `~/.local/bin` back the dynamic parts, and each prints its own `#[...]` style sequences rather than plain text — tmux's format language can't pick a color from a threshold, so the script decides while the gruvbox palette stays in `tmux.conf` and is passed in as arguments.
+The right-hand side of the status line reads, left to right: current directory + git state (via gitmux), next meeting, CPU/RAM, date and time, and uptime. Three helper scripts in `~/.local/bin` back the dynamic parts, and each prints its own `#[...]` style sequences rather than plain text — tmux's format language can't pick a color from a threshold, so the script decides while the color palette stays in `tmux.conf` and is passed in as arguments.
 
 | Script | Segment | Notes |
 | --- | --- | --- |

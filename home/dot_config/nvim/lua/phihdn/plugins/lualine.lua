@@ -68,56 +68,55 @@ return {
   },
   event = "VeryLazy",
   config = function()
-    -- local custom_gruvbox = require("lualine.themes.gruvbox")
     -- Change the background of lualine_c section for normal mode
-    -- custom_gruvbox.normal.c.bg = "#112233"
+    -- custom_theme.normal.c.bg = "#112233"
 
-    local custom_gruvbox = require("lualine.themes.gruvbox") -- start with gruvbox
+    local custom_theme = require("lualine.themes.catppuccin-mocha") -- start with mocha
 
-    -- Gruvbox Dark (Medium) palette — https://github.com/morhetz/gruvbox
+    -- Catppuccin Mocha palette — https://github.com/catppuccin/catppuccin
     local colors = {
-      bg = "#282828",
-      fg = "#ebdbb2",
-      yellow = "#fabd2f",
-      darkblue = "#3c3836",
-      green = "#b8bb26",
-      orange = "#fe8019",
-      magenta = "#d3869b",
-      blue = "#83a598",
-      red = "#fb4934",
+      bg = "#1e1e2e", -- base
+      fg = "#cdd6f4", -- text
+      yellow = "#f9e2af",
+      surface = "#313244", -- surface0 — mid-section background
+      green = "#a6e3a1",
+      orange = "#fab387", -- peach
+      magenta = "#cba6f7", -- mauve
+      blue = "#89b4fa",
+      red = "#f38ba8",
     }
 
-    custom_gruvbox.normal = {
+    custom_theme.normal = {
       a = { fg = colors.bg, bg = colors.blue, gui = "bold" },
-      b = { fg = colors.fg, bg = colors.darkblue },
+      b = { fg = colors.fg, bg = colors.surface },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_gruvbox.insert = {
+    custom_theme.insert = {
       a = { fg = colors.bg, bg = colors.green, gui = "bold" },
-      b = { fg = colors.fg, bg = colors.darkblue },
+      b = { fg = colors.fg, bg = colors.surface },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_gruvbox.visual = {
+    custom_theme.visual = {
       a = { fg = colors.bg, bg = colors.magenta, gui = "bold" },
-      b = { fg = colors.fg, bg = colors.darkblue },
+      b = { fg = colors.fg, bg = colors.surface },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_gruvbox.replace = {
+    custom_theme.replace = {
       a = { fg = colors.bg, bg = colors.red, gui = "bold" },
-      b = { fg = colors.fg, bg = colors.darkblue },
+      b = { fg = colors.fg, bg = colors.surface },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_gruvbox.command = {
+    custom_theme.command = {
       a = { fg = colors.bg, bg = colors.yellow, gui = "bold" },
-      b = { fg = colors.fg, bg = colors.darkblue },
+      b = { fg = colors.fg, bg = colors.surface },
       c = { fg = colors.fg, bg = colors.bg },
     }
 
-    custom_gruvbox.inactive = {
+    custom_theme.inactive = {
       a = { fg = colors.fg, bg = colors.bg, gui = "bold" },
       b = { fg = colors.fg, bg = colors.bg },
       c = { fg = colors.fg, bg = colors.bg },
@@ -127,8 +126,7 @@ return {
     require("lualine").setup({
       options = {
         -- theme = "auto",
-        -- theme = "gruvbox-material",
-        theme = custom_gruvbox,
+        theme = custom_theme,
         globalstatus = true,
         icons_enabled = true,
         component_separators = { left = "│", right = "│" },

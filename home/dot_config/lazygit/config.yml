@@ -61,7 +61,7 @@ git:
       # {{columnWidth}} placeholder is half-width, meant for ydiff — don't use it);
       # hunk-header box is replaced with a plain line-number header;
       # clickable lazygit-edit:// links need OSC8 terminal support + a URL handler
-      command: delta --dark --syntax-theme=gruvbox-dark --paging=never --line-numbers --side-by-side --hunk-header-decoration-style=omit --hunk-header-style='line-number syntax' --hyperlinks --hyperlinks-file-link-format='lazygit-edit://{path}:{line}'
+      command: delta --dark --syntax-theme=Catppuccin-mocha --paging=never --line-numbers --side-by-side --hunk-header-decoration-style=omit --hunk-header-style='line-number syntax' --hyperlinks --hyperlinks-file-link-format='lazygit-edit://{path}:{line}'
       colorArg: always
     - name: difftastic # structural, language-aware side-by-side diffs
       command: difft --color=always

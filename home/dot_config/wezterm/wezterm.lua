@@ -26,36 +26,37 @@ local config = {
 	font_size = 20,
 	line_height = 1.4,
 
-	-- colors — Gruvbox Dark, Medium (canonical morhetz/gruvbox hex, inline so it
-	-- matches exactly rather than relying on a bundled scheme's approximation)
-	-- https://github.com/morhetz/gruvbox
+	-- colors — Catppuccin Mocha (canonical hex, inline so it matches exactly
+	-- rather than relying on a bundled scheme's approximation)
+	-- https://github.com/catppuccin/wezterm
 	colors = {
-		foreground = "#ebdbb2",
-		background = "#282828",
-		cursor_bg = "#ebdbb2",
-		cursor_fg = "#282828",
-		cursor_border = "#ebdbb2",
-		selection_fg = "#ebdbb2",
-		selection_bg = "#665c54",
+		foreground = "#cdd6f4",
+		background = "#1e1e2e",
+		cursor_bg = "#f5e0dc",
+		cursor_fg = "#1e1e2e",
+		cursor_border = "#f5e0dc",
+		selection_fg = "#cdd6f4",
+		selection_bg = "#585b70",
+		-- Mocha defines one value per hue — ansi and brights share it, unlike gruvbox
 		ansi = {
-			"#282828",
-			"#cc241d",
-			"#98971a",
-			"#d79921",
-			"#458588",
-			"#b16286",
-			"#689d6a",
-			"#a89984",
+			"#45475a",
+			"#f38ba8",
+			"#a6e3a1",
+			"#f9e2af",
+			"#89b4fa",
+			"#f5c2e7",
+			"#94e2d5",
+			"#bac2de",
 		},
 		brights = {
-			"#928374",
-			"#fb4934",
-			"#b8bb26",
-			"#fabd2f",
-			"#83a598",
-			"#d3869b",
-			"#8ec07c",
-			"#ebdbb2",
+			"#585b70",
+			"#f38ba8",
+			"#a6e3a1",
+			"#f9e2af",
+			"#89b4fa",
+			"#f5c2e7",
+			"#94e2d5",
+			"#a6adc8",
 		},
 	},
 

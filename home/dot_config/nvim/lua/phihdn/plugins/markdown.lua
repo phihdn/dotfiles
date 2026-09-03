@@ -7,16 +7,15 @@ return {
   },
   ---@module 'render-markdown'
   init = function()
-    -- Gruvbox Dark Medium palette, matching the catppuccin color_overrides in
-    -- plugins/catppuccin-gruvbox.lua
+    -- Catppuccin Mocha palette, matching the colorscheme in plugins/catppuccin.lua
     local palette = {
-      bg = "#282828",
-      red = "#fb4934",
-      green = "#b8bb26",
-      yellow = "#fabd2f",
-      blue = "#83a598",
-      aqua = "#8ec07c",
-      orange = "#fe8019",
+      bg = "#1e1e2e", -- base
+      red = "#f38ba8",
+      green = "#a6e3a1",
+      yellow = "#f9e2af",
+      blue = "#89b4fa",
+      aqua = "#94e2d5", -- teal
+      orange = "#fab387", -- peach
     }
 
     -- Headline backgrounds (rotate through the accent colors)

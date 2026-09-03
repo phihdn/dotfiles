@@ -8,18 +8,18 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --strip-cwd-prefix'  # strip-cw
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # UI
-# Gruvbox Dark (Medium) — https://github.com/morhetz/gruvbox
+# Catppuccin Mocha — https://github.com/catppuccin/fzf
 export FZF_DEFAULT_OPTS='
   --height=60%
   --layout=reverse
   --border=rounded
   --prompt="  "
   --preview-window=right:65%:wrap:border-left
-  --color=fg:#ebdbb2,bg:#282828,hl:#fabd2f
-  --color=fg+:#ebdbb2,bg+:#3c3836,hl+:#fabd2f
-  --color=info:#83a598,prompt:#fb4934,pointer:#fb4934
-  --color=marker:#b8bb26,spinner:#8ec07c,header:#665c54
-  --color=border:#3c3836,gutter:#282828
+  --color=fg:#cdd6f4,bg:#1e1e2e,hl:#f9e2af
+  --color=fg+:#cdd6f4,bg+:#313244,hl+:#f9e2af
+  --color=info:#89b4fa,prompt:#f38ba8,pointer:#f38ba8
+  --color=marker:#a6e3a1,spinner:#94e2d5,header:#6c7086
+  --color=border:#313244,gutter:#1e1e2e
 '
 
 export _FZF_PREVIEW_CMD='bat --color=always --style=plain,numbers --line-range=:500 {}'
