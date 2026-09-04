@@ -494,19 +494,18 @@ Layouts come from **two mechanisms**, so changes go in different places dependin
 
 nvim is never auto-started (each instance brings up TypeScript LSP node processes, which piles up across parallel worktree sessions), and lazygit is on demand via the `prefix+g` popup instead of a standing window. The script exits early for everything else: non-git paths, umbrella folders like `~/ws/work` itself, bare-clone roots (they stay plain shell hubs for `git wt`), detached review worktrees (read-only — no agent window), and sessions that already have a `claude` window (so it doesn't fight the sesh-defined sessions above). To give another path pattern its own layout, add a `case` branch in `tmux-session-layout`.
 
-### tmux status bar (cpu/ram, next meeting)
+### tmux status bar (cpu/ram, uptime)
 
-The right-hand side of the status line reads, left to right: current directory + git state (via gitmux), next meeting, CPU/RAM, date and time, and uptime. Three helper scripts in `~/.local/bin` back the dynamic parts, and each prints its own `#[...]` style sequences rather than plain text — tmux's format language can't pick a color from a threshold, so the script decides while the color palette stays in `tmux.conf` and is passed in as arguments.
+The right-hand side of the status line reads, left to right: current directory + git state (via gitmux), CPU/RAM, date and time, and uptime. Two helper scripts in `~/.local/bin` back the dynamic parts, and each prints its own `#[...]` style sequences rather than plain text — tmux's format language can't pick a color from a threshold, so the script decides while the color palette stays in `tmux.conf` and is passed in as arguments.
 
 | Script | Segment | Notes |
 | --- | --- | --- |
 | `tmux-sysinfo` | CPU and RAM percentages | Cumulative-counter deltas both platforms; RAM turns a red block past `TMUX_SYSINFO_MEM_ALERT` (85%) |
-| `tmux-meeting` | Next meeting + countdown | macOS only (icalBuddy); hides itself on Linux |
 | `tmux-uptime` | Uptime | Flips to a red block past 7 days |
 
-The bar refreshes every 15s. Every refresh forks one process per `#()` on the bar *plus* one per window for the window-status icon, so the interval is a direct multiplier on process churn — at the old 2s with three windows that was seven processes every two seconds, all day, which on a machine already under load turned status redraws visibly laggy. Nothing on the bar needs finer granularity: the clock shows minutes, the meeting countdown is in minutes, and uptime is in days, so every segment is on the same 15s cadence with nothing special-cased.
+The bar refreshes every 15s. Every refresh forks one process per `#()` on the bar *plus* one per window for the window-status icon, so the interval is a direct multiplier on process churn — at the old 2s with three windows that was seven processes every two seconds, all day, which on a machine already under load turned status redraws visibly laggy. Nothing on the bar needs finer granularity: the clock shows minutes and uptime is in days, so every segment is on the same 15s cadence with nothing special-cased.
 
-Each segment is also built to be cheap in itself: nothing samples with a delay (`top -l 2` costs 1.4s and `iostat -c 2` a full second), `tmux-meeting` reads the calendar at most once a minute and recomputes its countdown from a cached start time, and `icons` is deliberately a plain `bash` `case` with no subprocesses — it was a fish script until fish's ~40ms startup, paid once per window per refresh, made it the single most expensive thing on the bar. Numeric fields are padded to a fixed width, so a value going from `9%` to `10%` doesn't shove every neighbouring segment sideways.
+Each segment is also built to be cheap in itself: nothing samples with a delay (`top -l 2` costs 1.4s and `iostat -c 2` a full second), and `icons` is deliberately a plain `bash` `case` with no subprocesses — it was a fish script until fish's ~40ms startup, paid once per window per refresh, made it the single most expensive thing on the bar. Numeric fields are padded to a fixed width, so a value going from `9%` to `10%` doesn't shove every neighbouring segment sideways.
 
 #### Making the cpu/ram numbers trustworthy
 
@@ -516,13 +515,15 @@ The CPU figure deliberately does **not** sum `ps -A -o %cpu=`. That column is a 
 
 The RAM figure counts **anonymous + wired + compressed** pages — what Activity Monitor calls "Memory Used", the pages that cannot be handed to another process without swapping. It used to count `active` instead of `anonymous`, which mixes in reclaimable file-backed pages while omitting inactive anonymous pages: that read 66.7% on a machine actually sitting at 74.4% with 0.08 GB free and 1.8 GB of swap in use, understating at precisely the moment the number matters. Past `TMUX_SYSINFO_MEM_ALERT` (85% by default) the value turns a red block, since beyond that the machine is about to start swapping.
 
-#### Next-meeting setup
+#### Meeting picker setup (`prefix+M`)
+
+`tmux-meeting` no longer has a status-bar segment — the calendar is off the bar, and the script now backs only the `prefix+M` join popup. Because the pre-meeting announcement fired from that segment's refresh, it is gone too: nothing runs `tmux-meeting status` on a schedule any more. Restoring the segment (the `set -ag status-right "#(tmux-meeting status ...)"` line in `tmux.conf`) brings both back.
 
 `tmux-meeting` reads macOS Calendar.app through [icalBuddy](https://hasseg.org/icalBuddy/). It never talks to Google directly, so a Google Calendar reaches it only by being added as an account in Calendar.app.
 
 1. `brew install ical-buddy` — already in the `Brewfile`, guarded to macOS.
 2. Add the Google account under **System Settings → Internet Accounts** with Calendars enabled, then confirm it shows up in `icalBuddy calendars`.
-3. Approve the macOS Calendar permission prompt. It attaches to whichever process runs the query, so if the segment stays stubbornly empty, run `icalBuddy eventsToday` once from a normal terminal and approve it there.
+3. Approve the macOS Calendar permission prompt. It attaches to whichever process runs the query, so if `prefix+M` stubbornly lists nothing, run `icalBuddy eventsToday` once from a normal terminal and approve it there.
 4. Create `~/.config/tmux/meeting.env` naming the calendars to watch — for a Google account the calendar name is the address itself.
 
 ```bash
@@ -531,20 +532,18 @@ The RAM figure counts **anonymous + wired + compressed** pages — what Activity
 TMUX_MEETING_CALENDARS="${TMUX_MEETING_CALENDARS:-you@example.com}"
 ```
 
-That file is listed in `.chezmoiignore`, so chezmoi never manages it and the address stays out of this public repo. Leaving `TMUX_MEETING_CALENDARS` unset watches every calendar, which mixes personal events into the bar.
+That file is listed in `.chezmoiignore`, so chezmoi never manages it and the address stays out of this public repo. Leaving `TMUX_MEETING_CALENDARS` unset watches every calendar, which mixes personal events into the picker.
 
-`prefix+M` opens an fzf popup listing every meeting in progress or starting within the hour, and joins the one you pick — Meet, Zoom, Teams, Webex and friends, matched by host anywhere in the event's url, location, or description, since Google buries the Meet link in the HTML description while others use the location field. A picker rather than a straight join because two meetings can start at the same time and there is no right answer to guess; both appear, and one without a video link is listed and marked rather than hidden, so a clash never disappears silently. Inside the imminent window the segment turns a solid red block. It used to flash, alternating two styles, which is the only way to animate text when the terminal will not: Ghostty does not render the blink attribute (SGR 5) — verified on 1.3.1, where a `#[blink]` segment sits perfectly still — so motion has to come from repainting, which meant holding the whole bar at a 1s refresh for the duration. The colour alone carries it, so the flash and the interval borrowing are both gone. Ahead of the meeting, an announcement naming it and its link appears once on the message line; the marker file recording which meeting was announced is what stops a fast refresh from re-firing it. It is a `display-message` rather than a `display-popup` on purpose: a popup is modal and waits on a keypress, so one firing while you are mid-edit in nvim captures the keyboard and reads as tmux having frozen. `prefix+M` is there for when you actually want to join. Everything is tunable through the same file:
+`prefix+M` opens an fzf popup listing every meeting in progress or starting within the hour, and joins the one you pick — Meet, Zoom, Teams, Webex and friends, matched by host anywhere in the event's url, location, or description, since Google buries the Meet link in the HTML description while others use the location field. A picker rather than a straight join because two meetings can start at the same time and there is no right answer to guess; both appear, and one without a video link is listed and marked rather than hidden, so a clash never disappears silently. Tunables live in the same file:
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `TMUX_MEETING_SOON_MINUTES` | `10` | Segment turns yellow |
-| `TMUX_MEETING_IMMINENT_MINUTES` | `2` | Segment becomes a red block |
-| `TMUX_MEETING_ALERT_MINUTES` | `5` | Announcement fires |
-| `TMUX_MEETING_ALERT_DISPLAY_MS` | `5000` | How long that announcement stays up |
 | `TMUX_MEETING_PICK_MINUTES` | `60` | How far ahead `prefix+M` lists |
 | `TMUX_MEETING_LOOKAHEAD_DAYS` | `0` | Days beyond today to search; `0` is today only |
 | `TMUX_MEETING_CACHE_TTL` | `60` | Seconds between calendar reads |
 | `TMUX_MEETING_TITLE_WIDTH` | `24` | Title truncation width |
+
+The remaining variables (`TMUX_MEETING_SOON_MINUTES` `10`, `TMUX_MEETING_IMMINENT_MINUTES` `2`, `TMUX_MEETING_ALERT_MINUTES` `5`, `TMUX_MEETING_ALERT_DISPLAY_MS` `5000`) only style the status segment and its announcement, so they do nothing until that segment is restored.
 
 ## 🐍🟢 Language Version Management
 
