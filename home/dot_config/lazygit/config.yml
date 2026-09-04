@@ -1,56 +1,56 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
 
-# Catppuccin Mocha
+# Gruvbox Dark, Medium — the previous theme
 #
 # gui:
 #   theme:
 #     activeBorderColor:
-#       - '#89b4fa'
+#       - '#83a598'
 #       - bold
 #     inactiveBorderColor:
-#       - '#a6adc8'
+#       - '#928374'
 #     optionsTextColor:
-#       - '#89b4fa'
+#       - '#83a598'
 #     selectedLineBgColor:
-#       - '#313244'
+#       - '#3c3836'
 #     cherryPickedCommitBgColor:
-#       - '#45475a'
+#       - '#504945'
 #     cherryPickedCommitFgColor:
-#       - '#89b4fa'
+#       - '#83a598'
 #     unstagedChangesColor:
-#       - '#f38ba8'
+#       - '#fb4934'
 #     defaultFgColor:
-#       - '#cdd6f4'
+#       - '#ebdbb2'
 #     searchingActiveBorderColor:
-#       - '#f9e2af'
+#       - '#fabd2f'
 #
 #   authorColors:
-#     '*': '#b4befe'
+#     '*': '#d3869b'
 
 gui:
   sidePanelWidth: 0.2 # narrow left panel so diffs get more horizontal room
   theme:
     activeBorderColor:
-      - '#83a598' # bright blue - for active borders
+      - '#89b4fa' # blue - for active borders
       - bold
     inactiveBorderColor:
-      - '#928374' # gray - for inactive borders
+      - '#a6adc8' # subtext0 - for inactive borders
     optionsTextColor:
-      - '#83a598' # bright blue - for option text highlights
+      - '#89b4fa' # blue - for option text highlights
     selectedLineBgColor:
-      - '#3c3836' # dark1 - for selected line backgrounds
+      - '#313244' # surface0 - for selected line backgrounds
     cherryPickedCommitBgColor:
-      - '#504945' # dark2 - for cherry-picked commit backgrounds
+      - '#45475a' # surface1 - for cherry-picked commit backgrounds
     cherryPickedCommitFgColor:
-      - '#83a598' # bright blue - for cherry-picked commit text
+      - '#89b4fa' # blue - for cherry-picked commit text
     unstagedChangesColor:
-      - '#fb4934' # bright red - for unstaged changes
+      - '#f38ba8' # red - for unstaged changes
     defaultFgColor:
-      - '#ebdbb2' # light1 - for default text
+      - '#cdd6f4' # text - for default text
     searchingActiveBorderColor:
-      - '#fabd2f' # bright yellow - for search highlights
+      - '#f9e2af' # yellow - for search highlights
   authorColors:
-    '*': '#d3869b' # bright purple - for author names
+    '*': '#b4befe' # lavender - for author names
 # Diff pagers — cycle between them inside lazygit with `|`
 # Note: staging individual lines always uses the builtin diff (pagers are bypassed there)
 git:
