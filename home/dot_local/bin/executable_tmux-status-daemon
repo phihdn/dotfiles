@@ -128,9 +128,17 @@ start_loop() {
   interval=$(tmux show-options -gv status-interval 2> /dev/null)
   interval=${interval:-15}
 
+  # A restart is `kill <pid>`; exit 0 on SIGTERM so tmux does not announce
+  # "terminated by signal 15" for a run-shell it started. The sleep runs as a
+  # child under `wait` because bash defers traps until a foreground command
+  # finishes — a plain `sleep` would hold the signal for up to a full tick.
+  local sleeper=""
+  trap '[[ -n $sleeper ]] && kill "$sleeper" 2> /dev/null; exit 0' TERM INT
   while :; do
     tick
-    sleep "$interval"
+    sleep "$interval" &
+    sleeper=$!
+    wait "$sleeper"
     tmux has-session 2> /dev/null || exit 0
     [[ $(tmux show-options -gqv @status_daemon_pid 2> /dev/null) == "$$" ]] || exit 0
   done
