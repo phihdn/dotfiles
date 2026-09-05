@@ -17,10 +17,11 @@
 #         @win_icon        window   `icons` glyph for the window's command
 #       Style strings are passed through to tmux-sysinfo/tmux-uptime so the
 #       color palette stays in tmux.conf; gitmux styles itself via its config.
-#   refresh-git <session-id> <pane-path>
-#       One-shot update of one session's @status_git; wired to the window/
-#       session selection hooks so the git segment follows focus immediately
-#       instead of waiting out the tick.
+#   refresh-focus <session-id> <pane-path>
+#       One-shot update of one session's @status_git plus a tmux-claude-status
+#       render; wired to the window/session selection hooks so the git segment
+#       follows focus immediately and a finished Claude turn is acknowledged
+#       the moment its window is looked at, instead of waiting out the tick.
 #
 # The loop exits when the tmux server goes away or when another daemon
 # instance has claimed @status_daemon_pid.
@@ -36,8 +37,16 @@ refresh_git() {
   [[ -n $session ]] || return 0
   if [[ -n $path ]] && command -v gitmux > /dev/null 2>&1; then
     seg=$(gitmux -cfg "$gitmux_cfg" "$path" 2> /dev/null) || seg=""
+    # gitmux closes with a color reset, which would paint the pill's trailing
+    # padding in the bar color; the pill format restores the style itself.
+    seg=$(printf '%s' "$seg" | sed -E 's/(#\[(fg=default,bg=default|none)\])+$//')
   fi
   tmux set-option -t "$session" @status_git "$seg" 2> /dev/null || true
+}
+
+refresh_focus() {
+  refresh_git "$@"
+  tmux-claude-status render
 }
 
 # One pass over the windows of attached sessions; `icons` is a pure-bash
@@ -73,6 +82,7 @@ tick() {
     "$(tmux-uptime "$uptime_normal" "$uptime_alert")" 2> /dev/null || true
   refresh_all_git
   refresh_icons
+  tmux-claude-status render
 }
 
 start_loop() {
@@ -107,9 +117,9 @@ mode="${1:-}"
 shift || true
 case "$mode" in
   start) start_loop "$@" ;;
-  refresh-git) refresh_git "$@" ;;
+  refresh-focus) refresh_focus "$@" ;;
   *)
-    echo "usage: tmux-status-daemon start <5 style args> | refresh-git <session> <path>" >&2
+    echo "usage: tmux-status-daemon start <5 style args> | refresh-focus <session-id> <path>" >&2
     exit 64
     ;;
 esac
