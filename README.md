@@ -515,36 +515,6 @@ The CPU figure deliberately does **not** sum `ps -A -o %cpu=`. That column is a 
 
 The RAM figure counts **anonymous + wired + compressed** pages — what Activity Monitor calls "Memory Used", the pages that cannot be handed to another process without swapping. It used to count `active` instead of `anonymous`, which mixes in reclaimable file-backed pages while omitting inactive anonymous pages: that read 66.7% on a machine actually sitting at 74.4% with 0.08 GB free and 1.8 GB of swap in use, understating at precisely the moment the number matters. Past `TMUX_SYSINFO_MEM_ALERT` (85% by default) the value turns a red block, since beyond that the machine is about to start swapping.
 
-#### Meeting picker setup (`prefix+M`)
-
-`tmux-meeting` no longer has a status-bar segment — the calendar is off the bar, and the script now backs only the `prefix+M` join popup. Because the pre-meeting announcement fired from that segment's refresh, it is gone too: nothing runs `tmux-meeting status` on a schedule any more. Restoring the segment (the `set -ag status-right "#(tmux-meeting status ...)"` line in `tmux.conf`) brings both back.
-
-`tmux-meeting` reads macOS Calendar.app through [icalBuddy](https://hasseg.org/icalBuddy/). It never talks to Google directly, so a Google Calendar reaches it only by being added as an account in Calendar.app.
-
-1. `brew install ical-buddy` — already in the `Brewfile`, guarded to macOS.
-2. Add the Google account under **System Settings → Internet Accounts** with Calendars enabled, then confirm it shows up in `icalBuddy calendars`.
-3. Approve the macOS Calendar permission prompt. It attaches to whichever process runs the query, so if `prefix+M` stubbornly lists nothing, run `icalBuddy eventsToday` once from a normal terminal and approve it there.
-4. Create `~/.config/tmux/meeting.env` naming the calendars to watch — for a Google account the calendar name is the address itself.
-
-```bash
-# Untracked on purpose: calendar names are account addresses.
-# The ${VAR:-...} form lets an explicit env var override this for testing.
-TMUX_MEETING_CALENDARS="${TMUX_MEETING_CALENDARS:-you@example.com}"
-```
-
-That file is listed in `.chezmoiignore`, so chezmoi never manages it and the address stays out of this public repo. Leaving `TMUX_MEETING_CALENDARS` unset watches every calendar, which mixes personal events into the picker.
-
-`prefix+M` opens an fzf popup listing every meeting in progress or starting within the hour, and joins the one you pick — Meet, Zoom, Teams, Webex and friends, matched by host anywhere in the event's url, location, or description, since Google buries the Meet link in the HTML description while others use the location field. A picker rather than a straight join because two meetings can start at the same time and there is no right answer to guess; both appear, and one without a video link is listed and marked rather than hidden, so a clash never disappears silently. Tunables live in the same file:
-
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `TMUX_MEETING_PICK_MINUTES` | `60` | How far ahead `prefix+M` lists |
-| `TMUX_MEETING_LOOKAHEAD_DAYS` | `0` | Days beyond today to search; `0` is today only |
-| `TMUX_MEETING_CACHE_TTL` | `60` | Seconds between calendar reads |
-| `TMUX_MEETING_TITLE_WIDTH` | `24` | Title truncation width |
-
-The remaining variables (`TMUX_MEETING_SOON_MINUTES` `10`, `TMUX_MEETING_IMMINENT_MINUTES` `2`, `TMUX_MEETING_ALERT_MINUTES` `5`, `TMUX_MEETING_ALERT_DISPLAY_MS` `5000`) only style the status segment and its announcement, so they do nothing until that segment is restored.
-
 ## 🐍🟢 Language Version Management
 
 This setup includes modern tools for managing Node.js and Python versions:

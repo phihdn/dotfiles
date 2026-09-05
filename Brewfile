@@ -51,7 +51,6 @@ brew "neovim", args: ["HEAD"]
 brew "tree-sitter-cli"  # required by nvim-treesitter (main branch) to install parsers
 brew "tmux"
 brew "gitmux"
-brew "ical-buddy" if OS.mac?  # Reads Calendar.app; powers the tmux next-meeting segment (no Linux equivalent, segment hides there)
 brew "git-lfs"
 brew "lazygit"
 brew "git-delta"   # Syntax-highlighting git pager (lazygit diff pager)
