@@ -141,8 +141,12 @@ mem=$(mem_percent)
 
 # Alert only on memory: it is the reading that tells you the machine is about to
 # start swapping, and a CPU spike is normal and self-correcting.
-mem_style="$value_style"
-[[ $mem =~ ^[[:space:]]*[0-9]+$ ]] && ((mem >= mem_alert)) && mem_style="$alert_style"
+# The icon flips with the value so the alert reads as one block, not a
+# highlighted number next to an unchanged glyph.
+mem_style="$value_style" mem_icon_style="$accent_style"
+if [[ $mem =~ ^[[:space:]]*[0-9]+$ ]] && ((mem >= mem_alert)); then
+  mem_style="$alert_style" mem_icon_style="$alert_style"
+fi
 
 printf '#[%s] #[%s]%s%% ' "$accent_style" "$value_style" "$cpu"
-printf '#[%s] #[%s]%s%% #[default]' "$accent_style" "$mem_style" "$mem"
+printf '#[%s] #[%s]%s%% #[default]' "$mem_icon_style" "$mem_style" "$mem"
