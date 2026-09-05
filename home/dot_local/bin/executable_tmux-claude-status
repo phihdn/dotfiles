@@ -6,7 +6,7 @@
 # `hook`; each event maps to a per-session state file, and `render` folds the
 # files into options the status formats read natively (no #() on the bar):
 #   @win_claude           window   working | attention | idle — styles the tab
-#   @status_claude        global   count of live sessions, empty when none
+#   @status_claude        global   count of live sessions as square digits, empty when none
 #   @status_claude_state  global   most urgent state across sessions
 # All colors live in tmux.conf.
 #
@@ -71,6 +71,17 @@ hook() {
   [[ -f $file && $(< "$file") == "$new" ]] && exit 0
   printf '%s\n' "$new" > "$file"
   render
+}
+
+# Digits as the Nerd Font filled squares the tabs use for the window index
+# (same table as win_num in tmux.conf), one glyph per digit: 20 -> 󰎧󰎡.
+square_digits() {
+  local glyphs="󰎡󰎤󰎧󰎪󰎭󰎱󰎳󰎶󰎹󰎼" n="$1" out="" d
+  while [[ -n $n ]]; do
+    d=${n:0:1}; n=${n:1}
+    out+=${glyphs:$d:1}
+  done
+  printf '%s' "$out"
 }
 
 # Highest state wins when a window holds several Claude panes.
@@ -161,7 +172,7 @@ render() {
   # @status_claude_state the most urgent state across sessions.
   local seg="" state=""
   if ((total > 0)); then
-    seg=$total
+    seg=$(square_digits "$total")
     if ((attention > 0)); then state=attention
     elif ((working > 0)); then state=working
     else state=idle
