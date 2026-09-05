@@ -198,10 +198,10 @@ Left to right:
 | Segment | What it shows |
 | --- | --- |
 | Session | Session name, bold dark text on a solid blue block with a dimmed 󰤂 icon. Holding the prefix turns the block red and the icon to 󰠠. |
-| Tabs | `glyph  index  name`: the program's Nerd Font glyph, the window index as a filled square (󰎤 󰎧 …), the window name, plus 󰊓 when a pane is zoomed. The active tab is bold on a surface0 block; the previously used window is flagged 󰁯 in yellow. The glyph turns **blue while that window's Claude Code is working and a red block while it waits on you**. |
+| Tabs | `glyph  index  name`: the program's Nerd Font glyph, the window index as a filled square (󰎤 󰎧 …), the window name, plus 󰊓 when a pane is zoomed. The active tab is bold on a surface0 block; the previously used window is flagged 󰁯 in yellow. While that window's Claude Code is working the glyph, index and name turn **blue**; while it waits on you the **whole tab becomes a red block**. |
 | Path | `░` + the current directory's basename (last 24 chars). |
 | Git | `▒` block + state icon, colored green (synced), peach (dirty), red (ahead — push), mauve (behind), followed by gitmux's counts and branch. Hidden outside a repo. |
-| Claude | `░` + number of live Claude Code sessions, a red block while any of them waits on you. Hidden when none run. |
+| Claude | `░` + number of live Claude Code sessions; the whole widget becomes a red block while any of them waits on you. Hidden when none run. |
 | CPU / RAM | `░` + both as percentages; RAM turns a red block past `TMUX_SYSINFO_MEM_ALERT` (85%). |
 | Uptime | `░ ⏻` + uptime; a red block once the machine has been up over 7 days. |
 | Clock | `YYYY-MM-DD ❬ HH:MM` on a surface0 block. |
@@ -228,7 +228,7 @@ tmux source-file ~/.config/tmux/tmux.conf
 
 #### Claude Code session status (`tmux-claude-status`)
 
-Claude Code hooks in `~/.claude/settings.json` (the private repo, see below) pipe their events into `tmux-claude-status hook` for `SessionStart`, `UserPromptSubmit`, `PreToolUse` (AskUserQuestion), `Notification` (permission_prompt), `PostToolUse`, `Stop` and `SessionEnd`. Each session's state — `working`, `attention`, `idle` — plus its tmux pane id is kept in `$TMPDIR/tmux-claude-status.<uid>/<session_id>`; `render` (called by every hook and by the daemon tick) folds those into `@win_claude` per window and the `@status_claude` count.
+Claude Code hooks in `~/.claude/settings.json` (the private repo, see below) pipe their events into `tmux-claude-status hook` for `SessionStart`, `UserPromptSubmit`, `PreToolUse` (AskUserQuestion), `Notification` (permission_prompt), `PostToolUse`, `Stop` and `SessionEnd`. Each session's state — `working`, `attention`, `idle` — plus its tmux pane id is kept in `$TMPDIR/tmux-claude-status.<uid>/<session_id>`; `render` (called by every hook and by the daemon tick) folds those into `@win_claude` per window plus the global `@status_claude` count and `@status_claude_state`; all styling lives in `tmux.conf`.
 
 Two rules make the red state meaningful: a permission prompt or question stays red until answered, while a finished turn (`Stop`) is acknowledged — dropped to idle — the moment its window is the active window of an attached session, i.e. once you have looked at it. Stale files are pruned when their pane is gone or no longer runs claude, so a crashed session never leaves a ghost. Because the hooks live in `settings.json`, new Claude sessions register without any restart; to exercise the bar by hand, feed a fake event: `printf '{"session_id":"sim","hook_event_name":"Stop"}' | TMUX_PANE=%N tmux-claude-status hook`.
 

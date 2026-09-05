@@ -79,12 +79,7 @@ rank() {
 }
 
 render() {
-  local normal alert
-  IFS='|' read -r normal alert <<< "$(tmux show-options -gqv @status_claude_styles 2> /dev/null)"
-  normal=${normal:-default}
-  alert=${alert:-fg=red}
-
-  local total=0 attention=0
+  local total=0 attention=0 working=0
   local wins="" # "window_id state" per line, later reduced by rank
   local f state reason pane info cmd wid active attached
   for f in "$state_dir"/*; do
@@ -104,6 +99,7 @@ render() {
     fi
     total=$((total + 1))
     [[ $state == attention ]] && attention=$((attention + 1))
+    [[ $state == working ]] && working=$((working + 1))
     wins+="$wid $state"$'\n'
   done
 
@@ -126,12 +122,21 @@ render() {
     fi
   done < <(tmux list-windows -a -F '#{session_attached} #{window_id} #{@win_claude}' 2> /dev/null)
 
-  local seg=""
+  # The widget is styled entirely in tmux.conf: @status_claude is the plain
+  # count (empty with no session, which hides the widget) and
+  # @status_claude_state the most urgent state across sessions.
+  local seg="" state=""
   if ((total > 0)); then
-    if ((attention > 0)); then seg="#[$alert]$total"; else seg="#[$normal]$total"; fi
+    seg=$total
+    if ((attention > 0)); then state=attention
+    elif ((working > 0)); then state=working
+    else state=idle
+    fi
   fi
   [[ $(tmux show-options -gqv @status_claude 2> /dev/null) == "$seg" ]] ||
     tmux set-option -g @status_claude "$seg" 2> /dev/null || true
+  [[ $(tmux show-options -gqv @status_claude_state 2> /dev/null) == "$state" ]] ||
+    tmux set-option -g @status_claude_state "$state" 2> /dev/null || true
 }
 
 case "${1:-}" in
