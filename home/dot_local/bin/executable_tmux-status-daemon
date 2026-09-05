@@ -37,9 +37,29 @@ refresh_git() {
   [[ -n $session ]] || return 0
   if [[ -n $path ]] && command -v gitmux > /dev/null 2>&1; then
     seg=$(gitmux -cfg "$gitmux_cfg" "$path" 2> /dev/null) || seg=""
-    # gitmux closes with a color reset, which would paint the pill's trailing
-    # padding in the bar color; the pill format restores the style itself.
+    # gitmux closes with a color reset that would bleed into the widget's
+    # trailing padding; the status format restores the style itself.
     seg=$(printf '%s' "$seg" | sed -E 's/(#\[(fg=default,bg=default|none)\])+$//')
+  fi
+  if [[ -n $seg ]]; then
+    # Lead with the theme's ▒ block + state icon, colored by repo state. The
+    # state is read off gitmux's own output rather than a second git run:
+    # ↑/↓ are its divergence arrows, and anything styled green/blue/gray/red
+    # is a staged/modified/untracked/conflict count (branch is white,
+    # divergence yellow). Styles come from @status_git_styles so the palette
+    # stays in tmux.conf: synced|dirty|ahead|behind.
+    local st_synced st_dirty st_ahead st_behind block icon
+    IFS='|' read -r st_synced st_dirty st_ahead st_behind <<< "$(tmux show-options -gqv @status_git_styles 2> /dev/null)"
+    if [[ $seg =~ \#\[fg=(green|blue|gray|red) ]]; then
+      block=${st_dirty:-fg=yellow} icon=󱓎
+    elif [[ $seg == *↑* ]]; then
+      block=${st_ahead:-fg=red} icon=󰛃
+    elif [[ $seg == *↓* ]]; then
+      block=${st_behind:-fg=magenta} icon=󰛀
+    else
+      block=${st_synced:-fg=green} icon=
+    fi
+    seg="#[$block]▒ $icon #[default]$seg"
   fi
   tmux set-option -t "$session" @status_git "$seg" 2> /dev/null || true
 }
@@ -57,10 +77,13 @@ refresh_focus() {
 # inline #() only ever ran for attached clients too). The selection hooks
 # repaint a session the moment it is attached or switched to.
 refresh_icons() {
-  local attached id cmd
+  local attached id cmd icon
   while read -r attached id cmd; do
     [[ ${attached:-0} -gt 0 && -n $id ]] || continue
-    tmux set-option -w -t "$id" @win_icon "$(icons "$cmd")" 2> /dev/null || true
+    # `icons` pads some wide glyphs with a trailing space; the tab format adds
+    # its own spacing, so every glyph is stored bare to keep the tabs aligned.
+    icon=$(icons "$cmd")
+    tmux set-option -w -t "$id" @win_icon "${icon% }" 2> /dev/null || true
   done < <(tmux list-windows -a -F '#{session_attached} #{window_id} #{pane_current_command}' 2> /dev/null)
 }
 
