@@ -131,7 +131,7 @@ case "$cmd" in
   # note plain aliases already exec the claude binary, so tmux usually
   # reports just "claude" regardless
   *claude*)
-    echo " "
+    echo 󰚩
     ;;
   youtube-dl)
     echo 

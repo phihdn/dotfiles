@@ -80,9 +80,8 @@ refresh_icons() {
   local attached id cmd
   while read -r attached id cmd; do
     [[ ${attached:-0} -gt 0 && -n $id ]] || continue
-    # Stored verbatim: `icons` pads double-width glyphs (claude's robot) with a
-    # trailing space so tmux reserves the second cell — strip it and the glyph
-    # gets clipped to one cell.
+    # Stored verbatim: if `icons` ever pads a double-width glyph with a trailing
+    # space (so tmux reserves the second cell), stripping it clips the glyph.
     tmux set-option -w -t "$id" @win_icon "$(icons "$cmd")" 2> /dev/null || true
   done < <(tmux list-windows -a -F '#{session_attached} #{window_id} #{pane_current_command}' 2> /dev/null)
 }
