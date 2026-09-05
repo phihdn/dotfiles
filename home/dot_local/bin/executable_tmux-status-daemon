@@ -77,13 +77,13 @@ refresh_focus() {
 # inline #() only ever ran for attached clients too). The selection hooks
 # repaint a session the moment it is attached or switched to.
 refresh_icons() {
-  local attached id cmd icon
+  local attached id cmd
   while read -r attached id cmd; do
     [[ ${attached:-0} -gt 0 && -n $id ]] || continue
-    # `icons` pads some wide glyphs with a trailing space; the tab format adds
-    # its own spacing, so every glyph is stored bare to keep the tabs aligned.
-    icon=$(icons "$cmd")
-    tmux set-option -w -t "$id" @win_icon "${icon% }" 2> /dev/null || true
+    # Stored verbatim: `icons` pads double-width glyphs (claude's robot) with a
+    # trailing space so tmux reserves the second cell — strip it and the glyph
+    # gets clipped to one cell.
+    tmux set-option -w -t "$id" @win_icon "$(icons "$cmd")" 2> /dev/null || true
   done < <(tmux list-windows -a -F '#{session_attached} #{window_id} #{pane_current_command}' 2> /dev/null)
 }
 
