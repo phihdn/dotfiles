@@ -2,8 +2,8 @@
 #
 # tmux-uptime: system uptime for the tmux status line, flipped to an alert
 # style once the machine has been up longer than a threshold (default 7 days).
-# Wired up in tmux.conf via:
-#   set -ag status-right "#(tmux-uptime 'fg=...,bg=...' 'fg=...,bg=...')"
+# Invoked by tmux-status-daemon each tick, which stores the output in the
+# @status_uptime option the status line renders (no #() on the bar itself).
 #
 # tmux interprets #[...] sequences in #() output (the same trick gitmux uses),
 # so the segment emits its own style here — the threshold decides which of the

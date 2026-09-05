@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
 # tmux-sysinfo: CPU and memory utilization segments for the tmux status line.
-# Wired up in tmux.conf via:
-#   set -ag status-right "#(tmux-sysinfo 'fg=...' 'fg=...' 'fg=...,bg=...')"
+# Invoked by tmux-status-daemon each tick, which stores the output in the
+# @status_sysinfo option the status line renders (no #() on the bar itself).
 #
 # Emits its own #[...] sequences (the same trick tmux-uptime and gitmux use) so
 # one invocation can paint both segments — icon in the accent style, value in the

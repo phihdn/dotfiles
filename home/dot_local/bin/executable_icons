@@ -9,7 +9,8 @@
 # before matching; the Homebrew cask install keeps the real name and is
 # unaffected either way.
 #
-# Runs once per window on every status refresh, so it must stay a pure string
+# Runs once per window on every tmux-status-daemon tick (which stores the
+# glyph in the window's @win_icon option), so it must stay a pure string
 # match with no subprocesses. This was a fish script until fish startup (~40ms,
 # versus ~1ms for bash) made it the most expensive thing on the status line:
 # three windows meant three fish interpreters every refresh.
