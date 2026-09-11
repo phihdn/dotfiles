@@ -32,7 +32,7 @@ require("lazy").setup({
   -- colorscheme that will be used when installing plugins.
   install = {
     missing = true,
-    colorscheme = { "catppuccin" },
+    colorscheme = { "kanagawa-dragon" },
   },
   ui = {
     -- border = "single",

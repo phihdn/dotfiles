@@ -11,7 +11,8 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 # Sets user-defined palette
-palette = "catppuccin_mocha"
+palette = "kanagawa_dragon"
+#palette = "catppuccin_mocha"
 #palette = "gruvbox_dark"
 
 command_timeout = 1000 # default is 500ms
@@ -201,6 +202,43 @@ renamed = "襁 "                                       #need to be updated
 deleted = " "
 
 # palette tables should be last in the config ⚓️
+
+# Kanagawa Dragon — https://github.com/rebelot/kanagawa.nvim
+# Keyed to the same names the modules above use, so switching palettes is a
+# one-line change. Dragon has no separate bright row for every hue, so the
+# brighter palette member is used wherever a name reads as an accent (red,
+# yellow, blue, teal) and the muted one wherever it reads as body text.
+[palettes.kanagawa_dragon]
+rosewater = "#c4b28a" # dragonYellow
+flamingo = "#b98d7b"  # dragonOrange2
+pink = "#a292a3"      # dragonPink
+mauve = "#938aa9"     # springViolet1
+red = "#e46876"       # waveRed
+maroon = "#c4746e"    # dragonRed
+peach = "#b6927b"     # dragonOrange
+yellow = "#e6c384"    # carpYellow
+green = "#87a987"     # dragonGreen
+teal = "#7aa89f"      # waveAqua2
+sky = "#8ea4a2"       # dragonAqua
+sapphire = "#8ba4b0"  # dragonBlue2
+blue = "#7fb4ca"      # springBlue
+lavender = "#8992a7"  # dragonViolet
+text = "#c5c9c5"      # dragonWhite
+subtext1 = "#c8c093"  # oldWhite
+subtext0 = "#a6a69c"  # dragonGray
+overlay2 = "#9e9b93"  # dragonGray2
+overlay1 = "#7a8382"  # dragonGray3
+overlay0 = "#737c73"  # dragonAsh
+surface2 = "#625e5a"  # dragonBlack6
+surface1 = "#393836"  # dragonBlack5
+surface0 = "#282727"  # dragonBlack4
+base = "#181616"      # dragonBlack3
+mantle = "#12120f"    # dragonBlack1
+crust = "#0d0c0c"     # dragonBlack0
+# gruvbox-era names still referenced by the modules above
+color_fg0 = "#c5c9c5" # dragonWhite
+color_aqua = "#7aa89f" # waveAqua2
+
 [palettes.catppuccin_macchiato]
 rosewater = "#f4dbd6"
 flamingo = "#f0c6c6"

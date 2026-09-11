@@ -12,8 +12,8 @@ shell-integration-features = "no-cursor,sudo,title"
 font-family = CommitMono Nerd Font
 font-size = 20
 
-theme = Catppuccin Mocha
-#theme = Kanagawa Dragon
+theme = Kanagawa Dragon
+#theme = Catppuccin Mocha
 #theme = Gruvbox Dark
 
 # extra leading for readability. This is safe to raise only because

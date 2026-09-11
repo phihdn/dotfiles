@@ -7,15 +7,15 @@ return {
   },
   ---@module 'render-markdown'
   init = function()
-    -- Catppuccin Mocha palette, matching the colorscheme in plugins/catppuccin.lua
+    -- Kanagawa Dragon palette, matching the colorscheme in plugins/kanagawa.lua
     local palette = {
-      bg = "#1e1e2e", -- base
-      red = "#f38ba8",
-      green = "#a6e3a1",
-      yellow = "#f9e2af",
-      blue = "#89b4fa",
-      aqua = "#94e2d5", -- teal
-      orange = "#fab387", -- peach
+      bg = "#181616", -- dragonBlack3
+      red = "#e46876", -- waveRed
+      green = "#87a987", -- dragonGreen
+      yellow = "#e6c384", -- carpYellow
+      blue = "#7fb4ca", -- springBlue
+      aqua = "#7aa89f", -- waveAqua2
+      orange = "#b6927b", -- dragonOrange
     }
 
     -- Headline backgrounds (rotate through the accent colors)

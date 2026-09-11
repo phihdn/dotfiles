@@ -71,19 +71,19 @@ return {
     -- Change the background of lualine_c section for normal mode
     -- custom_theme.normal.c.bg = "#112233"
 
-    local custom_theme = require("lualine.themes.catppuccin-mocha") -- start with mocha
+    local custom_theme = require("lualine.themes.kanagawa") -- start with the theme's own
 
-    -- Catppuccin Mocha palette — https://github.com/catppuccin/catppuccin
+    -- Kanagawa Dragon palette — https://github.com/rebelot/kanagawa.nvim
     local colors = {
-      bg = "#1e1e2e", -- base
-      fg = "#cdd6f4", -- text
-      yellow = "#f9e2af",
-      surface = "#313244", -- surface0 — mid-section background
-      green = "#a6e3a1",
-      orange = "#fab387", -- peach
-      magenta = "#cba6f7", -- mauve
-      blue = "#89b4fa",
-      red = "#f38ba8",
+      bg = "#181616", -- dragonBlack3
+      fg = "#c5c9c5", -- dragonWhite
+      yellow = "#e6c384", -- carpYellow
+      surface = "#282727", -- dragonBlack4 — mid-section background
+      green = "#87a987", -- dragonGreen
+      orange = "#b6927b", -- dragonOrange
+      magenta = "#938aa9", -- springViolet1
+      blue = "#7fb4ca", -- springBlue
+      red = "#e46876", -- waveRed
     }
 
     custom_theme.normal = {
