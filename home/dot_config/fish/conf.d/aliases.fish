@@ -3,6 +3,8 @@
 alias v nvim
 # LazyVim fallback profile (main config is self-maintained)
 alias nvl "env NVIM_APPNAME=nvim-lazyvim nvim"
+# NvChad test-drive profile
+alias nvc "env NVIM_APPNAME=nvim-nvchad nvim"
 alias grep "grep --color"
 alias please sudo
 

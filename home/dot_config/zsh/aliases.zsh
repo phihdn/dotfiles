@@ -31,6 +31,7 @@ alias diff='diff --color=auto'
 alias df='df -h'
 alias v='nvim'
 alias nvl='NVIM_APPNAME=nvim-lazyvim nvim'  # LazyVim fallback profile (main config is self-maintained)
+alias nvc='NVIM_APPNAME=nvim-nvchad nvim'   # NvChad test-drive profile
 alias -- -='cd -'  # `-- ` stops - being read as a flag; `cd -` jumps to previous dir
 
 # =========================================================
