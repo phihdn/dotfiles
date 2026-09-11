@@ -26,6 +26,10 @@ zplugin-update() {
   done
 }
 
+# Autosuggestions default to fg=8, the terminal's bright black. Under Kanagawa
+# Dragon that slot is a light gray (#a6a69c) and the suggestion competes with
+# what you actually typed, so pin it to the palette's comment color instead.
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#737c73' # dragonAsh
 _zplugin_load zsh-users zsh-autosuggestions
 _zplugin_load zsh-users zsh-history-substring-search
 

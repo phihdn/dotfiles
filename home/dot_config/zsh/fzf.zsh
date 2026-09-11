@@ -8,18 +8,18 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --strip-cwd-prefix'  # strip-cw
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # UI
-# Catppuccin Mocha — https://github.com/catppuccin/fzf
+# Kanagawa Dragon — https://github.com/rebelot/kanagawa.nvim
 export FZF_DEFAULT_OPTS='
   --height=60%
   --layout=reverse
   --border=rounded
   --prompt="  "
   --preview-window=right:65%:wrap:border-left
-  --color=fg:#cdd6f4,bg:#1e1e2e,hl:#f9e2af
-  --color=fg+:#cdd6f4,bg+:#313244,hl+:#f9e2af
-  --color=info:#89b4fa,prompt:#f38ba8,pointer:#f38ba8
-  --color=marker:#a6e3a1,spinner:#94e2d5,header:#6c7086
-  --color=border:#313244,gutter:#1e1e2e
+  --color=fg:#c5c9c5,bg:#181616,hl:#e6c384
+  --color=fg+:#c5c9c5,bg+:#282727,hl+:#e6c384
+  --color=info:#7fb4ca,prompt:#e46876,pointer:#e46876
+  --color=marker:#87a987,spinner:#7aa89f,header:#737c73
+  --color=border:#393836,gutter:#181616
 '
 
 export _FZF_PREVIEW_CMD='bat --color=always --style=plain,numbers --line-range=:500 {}'

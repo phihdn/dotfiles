@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
 
-# Catppuccin Mocha
+# Catppuccin Mocha — the previous theme
 #
 # gui:
 #   theme:
@@ -29,28 +29,29 @@
 
 gui:
   sidePanelWidth: 0.2 # narrow left panel so diffs get more horizontal room
+  # Kanagawa Dragon — https://github.com/rebelot/kanagawa.nvim
   theme:
     activeBorderColor:
-      - '#83a598' # bright blue - for active borders
+      - '#7fb4ca' # springBlue - for active borders
       - bold
     inactiveBorderColor:
-      - '#928374' # gray - for inactive borders
+      - '#737c73' # dragonAsh - for inactive borders
     optionsTextColor:
-      - '#83a598' # bright blue - for option text highlights
+      - '#7fb4ca' # springBlue - for option text highlights
     selectedLineBgColor:
-      - '#3c3836' # dark1 - for selected line backgrounds
+      - '#282727' # dragonBlack4 - for selected line backgrounds
     cherryPickedCommitBgColor:
-      - '#504945' # dark2 - for cherry-picked commit backgrounds
+      - '#393836' # dragonBlack5 - for cherry-picked commit backgrounds
     cherryPickedCommitFgColor:
-      - '#83a598' # bright blue - for cherry-picked commit text
+      - '#7fb4ca' # springBlue - for cherry-picked commit text
     unstagedChangesColor:
-      - '#fb4934' # bright red - for unstaged changes
+      - '#c4746e' # dragonRed - for unstaged changes
     defaultFgColor:
-      - '#ebdbb2' # light1 - for default text
+      - '#c5c9c5' # dragonWhite - for default text
     searchingActiveBorderColor:
-      - '#fabd2f' # bright yellow - for search highlights
+      - '#e6c384' # carpYellow - for search highlights
   authorColors:
-    '*': '#d3869b' # bright purple - for author names
+    '*': '#938aa9' # springViolet1 - for author names
 # Diff pagers — cycle between them inside lazygit with `|`
 # Note: staging individual lines always uses the builtin diff (pagers are bypassed there)
 git:
@@ -61,7 +62,7 @@ git:
       # {{columnWidth}} placeholder is half-width, meant for ydiff — don't use it);
       # hunk-header box is replaced with a plain line-number header;
       # clickable lazygit-edit:// links need OSC8 terminal support + a URL handler
-      command: delta --dark --syntax-theme=Catppuccin-mocha --paging=never --line-numbers --side-by-side --hunk-header-decoration-style=omit --hunk-header-style='line-number syntax' --hyperlinks --hyperlinks-file-link-format='lazygit-edit://{path}:{line}'
+      command: delta --dark --syntax-theme=Kanagawa-Dragon --paging=never --line-numbers --side-by-side --hunk-header-decoration-style=omit --hunk-header-style='line-number syntax' --hyperlinks --hyperlinks-file-link-format='lazygit-edit://{path}:{line}'
       colorArg: always
     - name: difftastic # structural, language-aware side-by-side diffs
       command: difft --color=always

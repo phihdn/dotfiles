@@ -29,6 +29,7 @@ compdef lsd=ls 2>/dev/null
 alias grep='rg --color=auto'
 alias diff='diff --color=auto'
 alias df='df -h'
+alias v='nvim'
 alias nvl='NVIM_APPNAME=nvim-lazyvim nvim'  # LazyVim fallback profile (main config is self-maintained)
 alias -- -='cd -'  # `-- ` stops - being read as a flag; `cd -` jumps to previous dir
 

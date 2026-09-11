@@ -26,37 +26,38 @@ local config = {
 	font_size = 20,
 	line_height = 1.4,
 
-	-- colors — Catppuccin Mocha (canonical hex, inline so it matches exactly
+	-- colors — Kanagawa Dragon (canonical hex, inline so it matches exactly
 	-- rather than relying on a bundled scheme's approximation)
-	-- https://github.com/catppuccin/wezterm
+	-- https://github.com/rebelot/kanagawa.nvim
 	colors = {
-		foreground = "#cdd6f4",
-		background = "#1e1e2e",
-		cursor_bg = "#f5e0dc",
-		cursor_fg = "#1e1e2e",
-		cursor_border = "#f5e0dc",
-		selection_fg = "#cdd6f4",
-		selection_bg = "#585b70",
-		-- Mocha defines one value per hue — ansi and brights share it, unlike gruvbox
+		foreground = "#c5c9c5",
+		background = "#181616",
+		cursor_bg = "#c8c093",
+		cursor_fg = "#181616",
+		cursor_border = "#c8c093",
+		selection_fg = "#c8c093",
+		selection_bg = "#2d4f67",
+		-- Dragon has a distinct bright row: the normal accents are the muted
+		-- ink-wash values, the brights are their saturated counterparts
 		ansi = {
-			"#45475a",
-			"#f38ba8",
-			"#a6e3a1",
-			"#f9e2af",
-			"#89b4fa",
-			"#f5c2e7",
-			"#94e2d5",
-			"#bac2de",
+			"#0d0c0c",
+			"#c4746e",
+			"#8a9a7b",
+			"#c4b28a",
+			"#8ba4b0",
+			"#a292a3",
+			"#8ea4a2",
+			"#c8c093",
 		},
 		brights = {
-			"#585b70",
-			"#f38ba8",
-			"#a6e3a1",
-			"#f9e2af",
-			"#89b4fa",
-			"#f5c2e7",
-			"#94e2d5",
-			"#a6adc8",
+			"#a6a69c",
+			"#e46876",
+			"#87a987",
+			"#e6c384",
+			"#7fb4ca",
+			"#938aa9",
+			"#7aa89f",
+			"#c5c9c5",
 		},
 	},
 

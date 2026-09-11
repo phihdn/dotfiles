@@ -1,181 +1,155 @@
-# 🛠️ MacAutoSetup
+# 🛠️ dotfiles
 
-A lean, modern development environment for macOS that brings the best terminal-first, keyboard-driven workflow to Mac — with minimal fuss.
+A terminal-first, keyboard-driven development environment for **macOS and Linux**, managed declaratively with [chezmoi](https://www.chezmoi.io) and themed [Catppuccin Mocha](https://github.com/catppuccin/catppuccin) end to end.
 
-_Inspired by [NLaundry/MacAutoSetup](https://github.com/NLaundry/MacAutoSetup)_
+_Started from [NLaundry/MacAutoSetup](https://github.com/NLaundry/MacAutoSetup); long since its own thing._
 
-## ✨ Core Features
+## ✨ Highlights
 
-- 🐟 **Fish shell** — user-friendly shell with great defaults (alternative)
-- 🧠 **Raycast** — fast launcher & automation
-- 🪟 **AeroSpace** — tiling window management (like i3, for Mac)
-- 🧑‍💻 **Neovim** — self-maintained config (nvim 0.11+ native LSP, fzf-lua, mini.nvim); LazyVim kept as a fallback profile (`nvl`)
-- 🖋️ **chezmoi** — declarative, template-aware dotfile management
-- 🧰 **Essential CLI tools** — ripgrep, fzf, bat, lsd, and more
-- 🚀 **Zsh** — default shell with a modular XDG config (`~/.config/zsh`) and a self-contained plugin manager
-- 🌟 **Starship** — beautiful, fast cross-shell prompt
-
-## 🎯 Philosophy
-
-- **Terminal-first, keyboard-driven workflow**
-- **Get up and running fast** — minimal configuration overhead
-- **Modular, understandable configuration** — no hidden magic
-- **Leverage community standards** — use well-maintained tools
-- **Dotfile hygiene** — organized, clean, and portable
+- 🖋️ **chezmoi** — one repo mirrors `$HOME`; templates pull secrets from 1Password at apply time, `git pull` auto-applies through tracked hooks.
+- 🚀 **Zsh** — default shell with a modular XDG config under `~/.config/zsh` and a self-contained git-clone plugin manager; **Fish** stays fully configured as an alternative.
+- 🧑‍💻 **Neovim** — self-maintained config on nvim 0.11+ native LSP, fzf-lua and mini.nvim; LazyVim kept as a fallback profile (`nvl`).
+- 🪟 **tmux** — [sesh](https://github.com/joshmedeski/sesh) sessions with path-aware layouts, and a status bar in the [tokyo-night-tmux](https://github.com/janoamaral/tokyo-night-tmux) layout that never forks a process to redraw — a background daemon feeds it, including live **Claude Code session state** per window.
+- 🌳 **Git worktrees** — `git bare-clone` + `git wt` for a one-directory-per-branch workflow (fixed `develop`/`prod` checkouts, ephemeral task and detached review worktrees).
+- 🤖 **Claude Code, two accounts** — `claude-work` / `claude-personal` keep logins and history apart while sharing one set of skills, hooks and settings.
+- 🪟 **AeroSpace** tiling, **Raycast**, **1Password** SSH agent + commit signing, **Starship** prompt, and the usual modern CLI (ripgrep, fzf, fd, bat, lsd, zoxide, lazygit, k9s …).
 
 ## 🚀 Installation
 
 ```bash
-git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
+git clone git@github.com:phihdn/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./bootstrap.sh
 ```
 
-This will:
+`bootstrap.sh` is idempotent and does, in order:
 
-1. Install Xcode CLI tools (if needed)
-2. Install Homebrew (if needed)
-3. Install packages from Brewfile (including chezmoi)
-4. Point chezmoi's `sourceDir` at this repo and run `chezmoi apply`
-5. Install nvm (zsh plugins self-install on first launch)
-6. Set zsh as the default shell (fish stays available via `fish`)
+1. Prerequisites — Xcode CLI tools on macOS; on Linux it checks for `curl`/`git`/`gcc` instead (install `build-essential` or equivalent first).
+2. Homebrew (macOS or Linuxbrew), then everything in the `Brewfile` — including chezmoi.
+3. Points chezmoi's `sourceDir` at this checkout, enables the auto-apply git hooks (`core.hooksPath .githooks`), and runs `chezmoi apply`.
+4. Shell environment — tpm (tmux plugin manager), nvm into `~/.config/nvm`, uv.
+5. Sets zsh as the default shell (fish stays available via `fish`) and generates kubectl completions for fish.
+6. Claude Code — clones the private `~/.claude` backup and seeds the `~/.claude-work` / `~/.claude-personal` account dirs (see [Claude Code — multiple accounts](#-claude-code--multiple-accounts)).
 
-Secrets (e.g. the WakaTime API key) are resolved from 1Password at apply time. Until the `op` CLI has an account configured, the secret-bearing files (`~/.wakatime.cfg`, `~/.gitconfig-work`) are skipped via `.chezmoiignore` so a fresh machine applies cleanly — set up `op`, then re-run `chezmoi apply` to create them.
+Secrets (the WakaTime API key, the work git identity) are rendered from 1Password at apply time. Until the `op` CLI has an account configured, `.chezmoiignore` skips the secret-bearing targets (`~/.wakatime.cfg`, `~/.gitconfig-work`) so a fresh machine applies cleanly — set up `op`, then re-run `chezmoi apply` to create them.
+
+Afterwards, open a new terminal (or `exec zsh -l`) and press `prefix+I` inside tmux once to install the tmux plugins.
 
 ### 🐧 Linux support
 
-The repo works on Linux too. `bootstrap.sh` detects the OS: on Linux it skips Xcode tools (checks for `curl`/`git`/`gcc` instead — install `build-essential` or equivalent first), installs Homebrew to `/home/linuxbrew/.linuxbrew`, and falls back to the system zsh for the default shell. OS-specific handling:
+Every change here must work on both OSes. `bootstrap.sh` detects the OS, installs Homebrew to `/home/linuxbrew/.linuxbrew` on Linux and falls back to the system zsh for the default shell. OS-specific handling:
 
 - **Brewfile** — casks and mac-only formulae are wrapped in `if OS.mac?`; on Linux install GUI apps and Nerd Fonts via your distro/Flatpak.
-- **chezmoi templates** — `~/.gitconfig*` pick the right 1Password `op-ssh-sign` path per OS (`/opt/1Password/op-ssh-sign` on Linux), and `home/.chezmoiignore` skips macOS-only app configs (AeroSpace) on Linux.
-- **Shells** — zsh and fish detect the Homebrew prefix at runtime (`HOMEBREW_PREFIX`), so PATH works with macOS arm64/Intel brew and Linuxbrew.
+- **chezmoi templates** — `~/.gitconfig*` pick the right 1Password `op-ssh-sign` path per OS (`/opt/1Password/op-ssh-sign` on Linux), and `home/.chezmoiignore` skips macOS-only app configs (AeroSpace, Karabiner) on Linux.
+- **Shells** — zsh and fish detect the Homebrew prefix at runtime (`HOMEBREW_PREFIX`), so PATH works with macOS arm64/Intel brew and Linuxbrew. Never hardcode `/opt/homebrew`.
+- **Scripts** — anything macOS-specific is guarded on `uname` (e.g. `tmux-sysinfo` reads `host_statistics64` on macOS and `/proc/stat` on Linux).
 
-## 📦 What Gets Installed
+## 📦 What the Brewfile installs
 
-### 🧰 Essential CLI Tools
+Plain `brew` formulae install on both OSes; casks and fonts are macOS-only.
 
-- **git**, **gh** — Version control and GitHub CLI
-- **fzf**, **ripgrep**, **bat** — Modern search and file tools
-- **fd**, **lsd** — Better ls and find alternatives
-- **htop**, **neofetch** — System monitoring and info
-- **tmux**, **sesh**, **starship** — Terminal multiplexer and prompt
-- **chezmoi** — Dotfile management
-- **jq** — JSON processor
-- **lf** — Terminal file manager
+| Group | Packages |
+| --- | --- |
+| Core CLI | git, curl, wget, chezmoi, fzf, ripgrep, bat, fd, jq, yq, gh, glab, htop, neofetch; GNU coreutils/sed/findutils/gawk on macOS |
+| Editor & git | neovim (HEAD), tree-sitter-cli, lazygit, git-delta, difftastic, tuicr, git-lfs, gitmux |
+| Terminal | tmux, sesh, zsh, fish, starship, zoxide, lf, lsd, gum |
+| Containers & cloud | lazydocker, lazysql, kubectl, k9s, k3sup, helm, ansible, awscli, gcloud-cli (cask), tailscale |
+| Languages | go, rust, bun, uv (Node comes from nvm, installed by `bootstrap.sh`) |
+| Utilities | mosh, nmap, cloc, tz, witr, speedtest, crush, libpq (psql without the server) |
+| GUI (macOS) | AeroSpace, Raycast, 1Password + CLI, Claude Desktop, Claude Code, Visual Studio Code, Rancher Desktop, Postman, Bruno, WezTerm, Ghostty, Kitty, Google Chrome, Discord, Zoom, OBS, Obsidian, Calibre, Audacity, NetNewsWire, Itsycal, KeyCastr, balenaEtcher |
+| Fonts (macOS) | JetBrains Mono, Fira Code and Hack Nerd Fonts |
 
-### 🛠️ Development Tools
+Ghostty's config asks for **CommitMono Nerd Font**, which is not in the Brewfile — install it separately or change `font-family` in `home/dot_config/ghostty/config`. Any Nerd Font works for the tmux bar; it only uses Nerd Font (MDI/FA) code points, never the "legacy computing" block.
 
-- **neovim** — Modern Vim-based editor with Lua config
-- **lazygit**, **lazydocker** — TUI for Git and Docker
-- **kubectl**, **k9s**, **helm** — Kubernetes tools
-- **uv**, **go**, **rust** — Language version managers and package installers
-- **wakatime** — Development time tracking
+`brew-sync` keeps the machine and the Brewfile in step:
 
-### 💻 GUI Applications
+```bash
+brew-sync            # install missing + prompt to remove packages not in Brewfile
+brew-sync preview    # show what cleanup would remove
+brew-sync install    # install only
+brew-sync cleanup    # cleanup only
+brew-sync force      # full sync, no prompts
+```
 
-- **AeroSpace** — Tiling window manager for macOS
-- **Raycast** — Spotlight replacement
-- **1Password** — Password manager with CLI
-- **Visual Studio Code** — Code editor
-- **WezTerm**, **Ghostty**, **Kitty** — Modern terminal emulators
-- **Docker** — Containerization
-- **Obsidian** — Note-taking
+## 📁 Repository layout
 
-### 🖥️ Fonts
-
-- **JetBrains Mono Nerd Font** — Coding font with icons
-- **Fira Code Nerd Font** — Alternative coding font with ligatures
-- **Hack Nerd Font** — Clean coding font option
-
-## 📁 Dotfiles Structure
-
-Dotfiles are managed using **chezmoi**. This repository is the chezmoi _source directory_. A `.chezmoiroot` file at the repo root contains `home`, so chezmoi treats the `home/` subdirectory as the source and applies it to `$HOME`.
+This repository is the chezmoi **source directory**. `.chezmoiroot` contains `home`, so chezmoi applies `home/` to `$HOME`; everything else at the root (`Brewfile`, `bootstrap.sh`, `CLAUDE.md`, `docs/`, `plans/`) is repo tooling, not applied.
 
 ```text
 .
 ├── .chezmoiroot        # contains "home" → chezmoi source is home/
-├── Brewfile            # Homebrew packages
+├── .githooks/          # post-merge + post-rewrite → chezmoi apply after git pull
+├── Brewfile            # Homebrew packages (macOS + Linux)
 ├── bootstrap.sh        # installer
-├── README.md
+├── docs/               # longer write-ups (git worktree workflow, journals)
 └── home/               # chezmoi source (mirrors $HOME)
-    ├── dot_zshenv                → ~/.zshenv (bootstraps ZDOTDIR)
-    ├── dot_gitconfig             → ~/.gitconfig
-    ├── private_dot_wakatime.cfg.tmpl → ~/.wakatime.cfg (0600, templated secret)
-    ├── dot_local/bin/executable_*    → ~/.local/bin/*  (executable)
-    └── dot_config/               → ~/.config/
-        ├── zsh/                  → ~/.config/zsh/ (modular: .zshrc, aliases.zsh, plugins.zsh, ...)
-        ├── nvim/ fish/ tmux/ aerospace/ starship.toml ...
+    ├── .chezmoiignore                  targets chezmoi must never manage (per-machine state, OS-conditional)
+    ├── .chezmoiremove                  targets chezmoi deletes if present (the old monolithic ~/.zshrc)
+    ├── dot_zshenv                    → ~/.zshenv                zsh bootstrap (points ZDOTDIR at ~/.config/zsh)
+    ├── dot_gitconfig.tmpl            → ~/.gitconfig             identity, 1Password SSH signing, conditional includes
+    ├── dot_gitconfig-personal.tmpl   → ~/.gitconfig-personal    included for repos under ~/ws/personal/
+    ├── private_dot_gitconfig-work.tmpl → ~/.gitconfig-work      included for repos under ~/ws/work/ (from 1Password, 0600)
+    ├── private_dot_wakatime.cfg.tmpl → ~/.wakatime.cfg          WakaTime (API key from 1Password, 0600)
+    ├── dot_markdownlint-cli2.jsonc   → ~/.markdownlint-cli2.jsonc  markdownlint defaults nvim uses
+    ├── dot_local/bin/executable_*    → ~/.local/bin/*           user scripts (see below)
+    └── dot_config/                   → ~/.config/
+        ├── zsh/            modular zsh config (see "zsh configuration")
+        ├── fish/           fish config (config.fish, conf.d/, functions/)
+        ├── nvim/           Neovim — self-maintained config
+        ├── nvim-lazyvim/   Neovim — LazyVim fallback profile (`nvl`)
+        ├── tmux/           tmux.conf + gitmux.conf
+        ├── sesh/           sesh sessions + reusable window definitions
+        ├── starship.toml   prompt (shared by zsh and fish)
+        ├── aerospace/      tiling window manager (macOS)
+        ├── private_karabiner/  Karabiner-Elements (macOS)
+        ├── ghostty/ kitty/ wezterm/   terminal emulators
+        ├── bat/ lsd/ lf/ lazygit/ k9s/ neofetch/   CLI tool configs + Catppuccin themes
+        └── 1Password/ssh/agent.toml   1Password SSH agent
 ```
 
-chezmoi's naming conventions encode file attributes:
+chezmoi's file-name prefixes encode attributes:
 
-| Source name      | Target           | Meaning                          |
-| ---------------- | ---------------- | -------------------------------- |
-| `dot_config/`    | `~/.config/`     | leading dot                      |
-| `executable_foo` | `~/foo` (`+x`)   | executable bit                   |
-| `private_foo`    | `~/foo` (`0600`) | restricted perms                 |
-| `foo.tmpl`       | `~/foo`          | Go template (secrets, host vars) |
+| Source name | Target | Meaning |
+| --- | --- | --- |
+| `dot_config/` | `~/.config/` | leading dot |
+| `executable_foo` | `~/foo` (`+x`) | executable bit |
+| `private_foo` | `~/foo` (`0600`) | restricted permissions |
+| `foo.tmpl` | `~/foo` | Go template (secrets, OS conditionals) |
 
-### Configuration reference
+### Scripts in `~/.local/bin`
 
-Annotated view of what each managed config is for:
+| Script | Purpose |
+| --- | --- |
+| `brew-sync` | Reconcile installed Homebrew packages with the Brewfile |
+| `git-bare-clone`, `git-wt` | Bare-clone + worktree workflow, reached as `git bare-clone` / `git wt` |
+| `lg` | lazygit, aware of the bare-repo worktree layout; behind `prefix+g` in tmux |
+| `sesh_start`, `sesh-dev-layout` | sesh session picker (`s` alias) and the nvim-over-shell pane layout for the `dev` window |
+| `tmux-session-layout` | `session-created` hook: two-window layout for worktree sessions under `~/ws/` |
+| `tmux-status-daemon` | Background feeder for the status bar (git, cpu/mem, uptime, window glyphs) |
+| `tmux-claude-status` | Claude Code hook receiver → per-window Claude state + session count on the bar |
+| `tmux-sysinfo`, `tmux-uptime`, `icons` | Segment producers the daemon calls |
+| `echo-path.sh`, `testfont.sh` | Print `PATH` one entry per line; print Nerd Font glyph ranges to check a font |
 
-```text
-home/
-├── dot_zshenv                    → ~/.zshenv               zsh bootstrap (points ZDOTDIR at ~/.config/zsh)
-├── dot_gitconfig                 → ~/.gitconfig            git identity + 1Password SSH signing
-├── dot_gitconfig-personal        → ~/.gitconfig-personal   included for repos under ~/ws/personal/
-├── private_dot_gitconfig-work.tmpl → ~/.gitconfig-work     included for repos under ~/ws/work/ (content pulled from 1Password, 0600)
-├── private_dot_wakatime.cfg.tmpl → ~/.wakatime.cfg         WakaTime (API key pulled from 1Password, 0600)
-├── dot_local/bin/executable_*    → ~/.local/bin/*          user scripts (brew-sync, sesh_start, git-bare-clone, ...)
-└── dot_config/                   → ~/.config/
-    ├── zsh/           zsh shell config — modular (see "zsh configuration" below)
-    ├── fish/          fish shell config (config.fish, conf.d/, functions/)
-    ├── nvim/          Neovim — self-maintained config (see "Neovim" below)
-    ├── nvim-lazyvim/  Neovim — LazyVim fallback profile (run with `nvl`)
-    ├── tmux/          tmux config + gitmux + catppuccin theme
-    ├── starship.toml  Starship prompt (shared by zsh and fish)
-    ├── aerospace/     AeroSpace tiling window manager
-    ├── ghostty/       terminal emulator
-    ├── kitty/         terminal emulator
-    ├── wezterm/       terminal emulator (Lua)
-    ├── bat/           bat config + Catppuccin/Kanagawa themes
-    ├── lazygit/       lazygit TUI config
-    ├── lf/            lf file manager (lfrc + executable previewer.sh)
-    ├── lsd/           lsd (ls replacement) config + colors
-    ├── k9s/           k9s config + skins (per-cluster state ignored)
-    ├── sesh/          sesh tmux session manager
-    ├── neofetch/      neofetch system info
-    └── 1Password/ssh/agent.toml   1Password SSH agent config
-```
-
-### zsh configuration (`~/.config/zsh`, `ZDOTDIR`)
+## 🐚 zsh configuration (`~/.config/zsh`, `ZDOTDIR`)
 
 The zsh config is split into small, single-purpose modules. `~/.zshenv` is the only zsh file kept in `$HOME`; it sets `ZDOTDIR` to `~/.config/zsh` so every other file lives there and `$HOME` stays clean.
 
-| File                       | Purpose                                                                                                                                                                                        |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `~/.zshenv` (`dot_zshenv`) | Minimal bootstrap. Sets `XDG_CONFIG_HOME` and `ZDOTDIR=~/.config/zsh`, then sources `$ZDOTDIR/.zshenv`. Read by **every** zsh invocation.                                                      |
-| `.zshenv`                  | Environment for all shells: XDG dirs, `EDITOR`/`VISUAL=nvim`, `MANPAGER=bat`, `GPG_TTY`, `KUBECONFIG`, `K9S_CONFIG_DIR`, and a deduplicated `PATH` (including nvm's default node — see below). |
-| `.zprofile`                | Login shells only. Re-prepends nvm's node to `PATH` after macOS `path_helper` reorders it (see [node / nvm on PATH](#node--nvm-on-path)).                                                      |
-| `.zshrc`                   | Interactive setup: history, shell options, completion (`compinit`), `zoxide`, fzf key-bindings, `kubectl` completion, lazy `nvm` + `uv` completion, then sources the modules below.            |
-| `fzf.zsh`                  | fzf defaults (`fd` source, `bat` preview, UI options) and the `Ctrl-F` file-picker widget.                                                                                                     |
-| `aliases.zsh`              | Aliases (git, kubernetes, `lsd`, `bat`, `rg`, sesh) and helper functions (`lf` dir-follow).                                                                                                    |
-| `bindings.zsh`             | Key-bindings and vi-mode cursor settings. Defines the `zvm_after_init` hook **before** plugins load so custom bindings survive zsh-vi-mode's reset.                                            |
-| `plugins.zsh`              | Self-contained plugin manager: clones plugins into `~/.config/zsh/plugins` on first launch and sources them. Run `zplugin-update` to update.                                                   |
-| `prompt.zsh`               | Initializes the Starship prompt (or a minimal `$` prompt inside Cursor Agent).                                                                                                                 |
-| `local.zsh`                | **Optional, per-machine, not managed by chezmoi.** Sourced last by `.zshrc` if it exists — put machine-specific exports and secrets here; it never lands in this repo.                         |
+| File | Purpose |
+| --- | --- |
+| `~/.zshenv` (`dot_zshenv`) | Minimal bootstrap. Sets `XDG_CONFIG_HOME` and `ZDOTDIR=~/.config/zsh`, then sources `$ZDOTDIR/.zshenv`. Read by **every** zsh invocation. |
+| `.zshenv` | Environment for all shells: XDG dirs, `EDITOR`/`VISUAL=nvim`, `MANPAGER=bat`, `GPG_TTY`, `KUBECONFIG`, `K9S_CONFIG_DIR`, and a deduplicated `PATH` (including nvm's default node — see below). |
+| `.zprofile` | Login shells only. Re-prepends nvm's node to `PATH` after macOS `path_helper` reorders it. |
+| `.zshrc` | Interactive setup: history, shell options, completion (`compinit`), `zoxide`, fzf key-bindings, `kubectl` completion, lazy `nvm` + `uv` completion, then sources the modules below. |
+| `fzf.zsh` | fzf defaults (`fd` source, `bat` preview, UI options) and the `Ctrl-F` file-picker widget. |
+| `aliases.zsh` | Aliases (git, kubernetes, `lsd`, `bat`, `rg`, `v`=nvim, `s`=sesh picker, `gwt`, `claude-work`/`claude-personal`) and helper functions (`lf` dir-follow). |
+| `bindings.zsh` | Key-bindings and vi-mode cursor settings. Defines the `zvm_after_init` hook **before** plugins load so custom bindings survive zsh-vi-mode's reset. |
+| `plugins.zsh` | Self-contained plugin manager: clones plugins into `~/.config/zsh/plugins` on first launch and sources them. Run `zplugin-update` to update. |
+| `prompt.zsh` | Initializes the Starship prompt (or a minimal `$` prompt inside Cursor Agent). |
+| `local.zsh` | **Optional, per-machine, not managed by chezmoi.** Sourced last by `.zshrc` if it exists — machine-specific exports and secrets go here; it never lands in this repo. |
 
-Plugins loaded by `plugins.zsh` (in order):
+Plugins loaded by `plugins.zsh`, in order: [`zsh-autosuggestions`](https://github.com/zsh-users/zsh-autosuggestions), [`zsh-history-substring-search`](https://github.com/zsh-users/zsh-history-substring-search), [`zsh-vi-mode`](https://github.com/jeffreytse/zsh-vi-mode), [`fast-syntax-highlighting`](https://github.com/zdharma-continuum/fast-syntax-highlighting).
 
-1. [`zsh-autosuggestions`](https://github.com/zsh-users/zsh-autosuggestions) — fish-style inline suggestions
-2. [`zsh-history-substring-search`](https://github.com/zsh-users/zsh-history-substring-search) — ↑/↓ substring history search
-3. [`zsh-vi-mode`](https://github.com/jeffreytse/zsh-vi-mode) — modal vi keybindings
-4. [`fast-syntax-highlighting`](https://github.com/zdharma-continuum/fast-syntax-highlighting) — command-line syntax highlighting
-
-#### Startup load order
-
-zsh reads its startup files in a fixed order. With `ZDOTDIR` set, ours load like this:
+### Startup load order
 
 ```text
 1. /etc/zshenv                    (system, if present)
@@ -189,190 +163,110 @@ zsh reads its startup files in a fixed order. With `ZDOTDIR` set, ours load like
      ├─ bindings.zsh   ← defines zvm_after_init BEFORE plugins load
      ├─ plugins.zsh    ← zsh-vi-mode resets keymaps, then runs zvm_after_init
      └─ prompt.zsh     ← starship (last, so it owns the prompt)
-   (login)  /etc/zlogin, ~/.config/zsh/.zlogin        — not used here
 ```
 
-Why the order matters:
+Why the order matters: `.zshenv` runs for every shell (including non-interactive scripts), so it holds only environment and `PATH`; `.zshrc` runs only for interactive shells; `bindings.zsh` comes before `plugins.zsh` because `zsh-vi-mode` clears keymaps on init and only re-applies bindings registered through `zvm_after_init`; `prompt.zsh` is last so Starship initializes after anything that could touch the prompt.
 
-- **`.zshenv` runs for every shell** (including non-interactive scripts), so it holds only environment/`PATH` — nothing interactive.
-- **`.zshrc` runs only for interactive shells** — aliases, keybindings, prompt.
-- **`bindings.zsh` is sourced before `plugins.zsh`** because `zsh-vi-mode` clears keymaps on init and only re-applies custom bindings registered via the `zvm_after_init` hook.
-- **`prompt.zsh` is sourced last** so Starship initializes after any plugin that could touch the prompt.
+### node / nvm on PATH
 
-#### node / nvm on PATH
+Node is managed by [nvm](https://github.com/nvm-sh/nvm) (`NVM_DIR=~/.config/nvm`), but nvm's `node`/`npm`/`npx` only land on `PATH` after `nvm.sh` is sourced — and `nvm.sh` is slow (100 ms+) and only sourced from `.zshrc`, i.e. interactive shells. That left non-interactive tools (scripts, editors, AI coding agents) with a _different_ node and none of the nvm-installed globals.
 
-Node is managed by [nvm](https://github.com/nvm-sh/nvm), but nvm's own `node`/`npm`/`npx` only land on `PATH` after `nvm.sh` is sourced — and `nvm.sh` is slow (100 ms+) and is only sourced from `.zshrc`, i.e. **interactive shells only**. That meant non-interactive tools (scripts, editors, AI coding agents like Claude Code) fell back to a _different_ node (e.g. `/usr/local/bin/node`) with none of your nvm-installed global packages.
+`.zshenv` therefore resolves nvm's **default** version and prepends its `bin` directory to `PATH` directly, without loading nvm. Because `.zshenv` is read by every zsh invocation, all shells — interactive, non-interactive, login, non-login — use the same node. The `nvm` command itself stays lazy-loaded in `.zshrc` (a one-line function that sources `nvm.sh` on first use). On macOS, `/etc/zprofile` runs `path_helper` after `.zshenv` and pushes `/usr/local/bin` back to the front, so `~/.config/zsh/.zprofile` re-prepends nvm's node for login shells too.
 
-To fix this without paying nvm's startup cost, `.zshenv` resolves nvm's **default** node version and prepends its `bin` directory to `PATH` directly:
+To confirm from inside any tool's shell: `command -v node` should print a path under `~/.config/nvm/versions/node/`.
 
-```bash
-export NVM_DIR="$HOME/.config/nvm"
-# ...resolve the default version, then add
-# "$NVM_DIR/versions/node/<ver>/bin" to PATH
-```
+Day-to-day: `nvm install --lts`, `nvm alias default <version>`, `.nvmrc` per project. Python is managed by [uv](https://docs.astral.sh/uv/) (`uv python install`, `uv init`, `uv add`, `uv run`, `uv tool install`) — a standalone binary already on `PATH`, so `.zshrc` only loads its completion.
 
-Because `.zshenv` is read by **every** zsh invocation, all shells — interactive, non-interactive, login, and non-login — now use the same node. The `nvm` _command_ itself stays lazy-loaded in `.zshrc` (a one-line function that sources `nvm.sh` on first use), since you only need it occasionally for `nvm use` / `nvm install`. `uv` is a fast standalone binary already on `PATH`, so `.zshrc` just loads its completion eagerly — no wrapper needed.
-
-**macOS login-shell caveat.** On macOS, `/etc/zprofile` runs `path_helper`, which rebuilds `PATH` _after_ `.zshenv` and pushes system dirs like `/usr/local/bin` back to the front. `~/.config/zsh/.zprofile` runs after that and re-prepends nvm's node, so login shells stay consistent too.
-
-**How do I know which shell type a tool (e.g. Claude Code) uses?** The pragmatic test is to just run this inside the tool's shell:
-
-```bash
-command -v node   # nvm path = good; /usr/local/bin/node = wrong node
-```
-
-To inspect the shell mode explicitly (works in zsh or bash):
-
-```bash
-# zsh
-[[ -o login ]] && echo login || echo non-login
-[[ -o interactive ]] && echo interactive || echo non-interactive
-# bash
-shopt -q login_shell && echo login || echo non-login
-case $- in *i*) echo interactive;; *) echo non-interactive;; esac
-```
-
-With the setup above, `node` resolves to nvm's version in **all** of those modes, so it shouldn't matter — but this is how you'd confirm.
-
-### Neovim
+## 🧑‍💻 Neovim
 
 `~/.config/nvim` is a self-maintained config (custom Lua under `lua/phihdn/{core,plugins}`, one plugin per file), modernized for nvim 0.11+: native `vim.lsp.config()`/`vim.lsp.enable()` (mason installs the binaries; no mason-lspconfig), treesitter `main` branch, fzf-lua as the sole picker, blink.cmp completion, conform + nvim-lint, catppuccin (Mocha), oil + mini.files for file management, and mini.ai/mini.surround textobjects. Languages: go, typescript, python (basedpyright), lua, bash, yaml, postgres, markdown.
 
 `lazy-lock.json` **is committed** for this config — the applied target is the source of truth, so after `:Lazy update`, copy it back before committing: `cp ~/.config/nvim/lazy-lock.json home/dot_config/nvim/`.
 
-**LazyVim fallback**: the LazyVim setup used during 2026-07 is kept fully working at `home/dot_config/nvim-lazyvim/` under an isolated `NVIM_APPNAME=nvim-lazyvim` profile — run it with the `nvl` alias (zsh + fish). Its lockfile stays unmanaged (see `.chezmoiignore`). History snapshots: [`20260710-nvim-pre-lazyvim`](https://github.com/phihdn/dotfiles/tree/20260710-nvim-pre-lazyvim/home/dot_config/nvim) (self config before the LazyVim experiment) and `20260730-nvim-pre-self` (LazyVim as main, right before this swap).
+**LazyVim fallback**: the LazyVim setup used during 2026-07 is kept fully working at `home/dot_config/nvim-lazyvim/` under an isolated `NVIM_APPNAME=nvim-lazyvim` profile — run it with the `nvl` alias (zsh + fish). Its lockfile stays unmanaged (see `.chezmoiignore`). History snapshots: [`20260710-nvim-pre-lazyvim`](https://github.com/phihdn/dotfiles/tree/20260710-nvim-pre-lazyvim/home/dot_config/nvim) (self config before the LazyVim experiment) and `20260730-nvim-pre-self` (LazyVim as main, right before the swap).
 
-## 🤖 Claude Code — multiple accounts
+## 🪟 tmux
 
-Run two Claude Code accounts (e.g. work + personal) on one machine without them colliding. Claude Code ties all of an account's state to a single config directory, selectable via the `CLAUDE_CONFIG_DIR` environment variable ([technique reference](https://frontendhire.com/learn/ai/courses/using-multiple-claude-accounts/overview)).
+Default `prefix+b` and default keybindings, plus a few additions (all listed by `prefix+?`): vim-style `Ctrl-h/j/k/l` pane movement that passes through to nvim splits, `prefix+h/j/k/l` and `prefix+C-h/C-l` for panes and windows, `prefix+N/P` to swap a window right/left, `prefix+Space` to toggle the last window, `prefix+u` to pick a URL from the pane with fzf, `prefix+g` for lazygit in a popup, `prefix+r` to reload the config, and `prefix+K` / `prefix+L` for the sesh picker and the last session.
 
-Two aliases (in both `zsh` and `fish`) point Claude at per-account dirs:
+### Status bar
+
+The layout follows [tokyo-night-tmux](https://github.com/janoamaral/tokyo-night-tmux), rebuilt in the Mocha palette rather than installed as a plugin — that plugin renders every widget through `#()` shell-outs (including one per window per refresh just to draw the stylised digits), which is exactly the cost this bar is built to avoid.
+
+Left to right:
+
+| Segment | What it shows |
+| --- | --- |
+| Session | Session name, bold dark text on a solid blue block with a dimmed 󰤂 icon. Holding the prefix turns the block red and the icon to 󰠠. |
+| Tabs | `glyph  index  name`: the program's Nerd Font glyph, the window index as a filled square (󰎤 󰎧 …), the window name, plus 󰊓 when a pane is zoomed. The active tab is bold on a surface0 block; the previously used window is flagged 󰁯 in yellow. While that window's Claude Code is working the glyph, index and name turn **blue**; while it waits on you the **whole tab becomes a red block**. |
+| Path | `░` + the current directory's basename (last 24 chars). |
+| Git | `▒` block + state icon, colored green (synced), peach (dirty), red (ahead — push), mauve (behind), followed by gitmux's counts and branch. Hidden outside a repo. |
+| Claude | `░` + number of live Claude Code sessions; the whole widget becomes a red block while any of them waits on you. Hidden when none run. |
+| CPU / RAM | `░` + both as percentages; RAM turns a red block past `TMUX_SYSINFO_MEM_ALERT` (85%). |
+| Uptime | `░ ⏻` + uptime; a red block once the machine has been up over 7 days. |
+| Clock | `YYYY-MM-DD ❬ HH:MM` on a surface0 block. |
+
+#### Fork-free rendering (`tmux-status-daemon`)
+
+The status formats contain **no `#()` subshells**. tmux forks a process per `#()` per refresh, for every window's format too, and any subshell in the status line also makes redraws slow down with scrollback size ([tmux/tmux#3352](https://github.com/tmux/tmux/issues/3352)) — on a loaded machine the bar visibly stalled. Instead `tmux-status-daemon` runs once per server (started from `tmux.conf` with `run-shell -b`, guarded by `@status_daemon_pid` so a config reload does not start a second one) and every 15s pushes each dynamic segment into a tmux user option that the formats read natively:
+
+| Option | Scope | Content |
+| --- | --- | --- |
+| `@status_sysinfo`, `@status_uptime` | global | pre-styled output of `tmux-sysinfo` / `tmux-uptime` |
+| `@status_git` | session | gitmux for the session's active pane, wrapped in the state block |
+| `@win_icon` | window | glyph from `icons <pane_current_command>` |
+| `@win_claude`, `@status_claude` | window / global | Claude state (see below) |
+
+Only **attached** sessions are refreshed — sesh keeps dozens open, and nothing renders the others. Three hooks (`after-select-window`, `client-session-changed`, `session-created`) call `tmux-status-daemon refresh-focus` so the git segment follows a window or session switch immediately instead of waiting out the tick. Machine load can now only delay the numbers, never the redraw. Window and pane indexes become glyphs through native `#{?#{==:#I,n},…}` conditionals rather than a script.
+
+After editing any of the daemon's scripts, restart it — `chezmoi apply` plus a config reload is not enough, because the running loop keeps ownership:
 
 ```bash
-claude-work       # CLAUDE_CONFIG_DIR=~/.claude-work claude
-claude-personal   # CLAUDE_CONFIG_DIR=~/.claude-personal claude
+kill "$(tmux show -gqv @status_daemon_pid)"; tmux set -gu @status_daemon_pid
+tmux source-file ~/.config/tmux/tmux.conf
 ```
 
-**What's isolated vs shared.** Each dir keeps its own login (on macOS the login lives in the Keychain, keyed per config dir), `history.jsonl`, `projects/`, and `sessions/`. Shared, read-mostly config is **symlinked** from `~/.claude` into each account dir so there's a single source of truth:
+#### Claude Code session status (`tmux-claude-status`)
+
+Claude Code hooks in `~/.claude/settings.json` (the private repo, see below) pipe their events into `tmux-claude-status hook` for `SessionStart`, `UserPromptSubmit`, `PreToolUse` (AskUserQuestion), `Notification` (permission_prompt), `PostToolUse`, `Stop` and `SessionEnd`. Each session's state — `working`, `attention`, `idle` — plus its tmux pane id is kept in `$TMPDIR/tmux-claude-status.<uid>/<session_id>`; `render` (called by every hook and by the daemon tick) folds those into `@win_claude` per window plus the global `@status_claude` count and `@status_claude_state`; all styling lives in `tmux.conf`.
+
+Two rules make the red state meaningful: a permission prompt or question stays red until answered, while a finished turn (`Stop`) is acknowledged — dropped to idle — the moment its window is the active window of an attached session, i.e. once you have looked at it. Live sessions are discovered from the process table (a `claude` process on the pane's tty), so Claude sessions started before the hooks existed still count — with a neutral state until they are restarted, since Claude Code reads hooks at startup — and a crashed session never leaves a ghost. New Claude sessions pick the hooks up from `settings.json` without any further setup; to exercise the bar by hand, feed a fake event: `printf '{"session_id":"sim","hook_event_name":"Stop"}' | TMUX_PANE=%N tmux-claude-status hook`.
+
+#### Making the cpu/ram numbers trustworthy
+
+Both readings are deltas between consecutive ticks of a cumulative counter, stored in a small per-user state file. On Linux that counter is `/proc/stat`; on macOS it is `host_statistics64(HOST_CPU_LOAD_INFO)` — the ticks `top` and Activity Monitor read — reached through a three-line `python3` ctypes call, because macOS exposes them through no sysctl and no shell tool that doesn't pay a sampling delay (`top -l 2` costs 1.4s, `iostat -c 2` a full second). A first run with no previous sample falls back to the since-boot average, which is what a single reading of those counters actually means.
+
+The CPU figure deliberately does **not** sum `ps -A -o %cpu=`. That column is a per-process decaying average over roughly the last minute, so it lags reality and badly overstates while a burst decays: measured at 267% against a true 53%, and 23% against a true 14.7%. Summing `ps -A -o time=` is closer but still undercounts by 3–5 points, because processes that exit between samples take their time with them and some kernel time is never attributed to a process at all.
+
+The RAM figure counts **anonymous + wired + compressed** pages — what Activity Monitor calls "Memory Used", the pages that cannot be handed to another process without swapping. Counting `active` instead mixes in reclaimable file-backed pages while omitting inactive anonymous pages: that read 66.7% on a machine actually sitting at 74.4% with 0.08 GB free and 1.8 GB of swap in use, understating at precisely the moment the number matters. Past `TMUX_SYSINFO_MEM_ALERT` (85% by default) the value turns a red block, since beyond that the machine is about to start swapping.
+
+`history-limit` is 100k lines per pane; the previous 1M made tmux itself a notable contributor to the memory pressure the bar is warning about.
+
+### Session layouts (sesh + hook script)
+
+Sessions are opened through [sesh](https://github.com/joshmedeski/sesh): the `s` alias in a plain shell (runs `~/.local/bin/sesh_start`, an fzf picker) or `prefix+K` inside tmux (same picker via `fzf-tmux`, defined in `tmux.conf`). `prefix+L` jumps back to the last session.
+
+Layouts come from **two mechanisms**, so changes go in different places depending on which kind of session you're editing:
+
+| Session kind | Layout source | Edit |
+| --- | --- | --- |
+| Pre-defined sessions (`home`, `dotfiles`, `tmux config`, `nvim config`, `work`, `personal`) | Declarative TOML | `~/.config/sesh/sesh.toml` + `~/.config/sesh/configs/windows.toml` |
+| Ad-hoc repo sessions under `~/ws/work/` or `~/ws/personal/` | tmux `session-created` hook script | `~/.local/bin/tmux-session-layout` |
+
+**Declarative (sesh TOML)** — `sesh.toml` defines named sessions (path, startup command) and references reusable windows from `configs/windows.toml` by name (`git`, `claude-work`, `claude-personal`, `dev`). sesh's TOML can't describe pane splits, so windows that need panes call a script instead: the `dev` window runs `~/.local/bin/sesh-dev-layout` (nvim on top, 25% shell pane below).
+
+**Dynamic (hook script)** — `tmux.conf` sets a global `session-created` hook that runs `~/.local/bin/tmux-session-layout` for _every_ new session (sesh-created or not). For git **worktrees** under `~/ws/work/` or `~/ws/personal/` it builds a two-window layout and lands on window 1:
 
 ```text
-~/.claude-work/skills   -> ~/.claude/skills
-~/.claude-work/agents   -> ~/.claude/agents
-~/.claude-work/commands -> ~/.claude/commands
-# ...also: settings.json, statusline.cjs, hooks, output-styles, rules,
-#          schemas, scripts, plugins, CLAUDE.md
+1: claude   # Claude Code, CLAUDE_CONFIG_DIR picked from the path (work → ~/.claude-work, personal → ~/.claude-personal)
+2: zsh      # plain shell — start nvim by hand when actually editing
 ```
 
-`bootstrap.sh` creates the dirs and symlinks automatically (guarded on `~/.claude` existing). To set it up manually or on another machine:
+nvim is never auto-started (each instance brings up TypeScript LSP node processes, which piles up across parallel worktree sessions), and lazygit is on demand via the `prefix+g` popup instead of a standing window. The script exits early for everything else: non-git paths, umbrella folders like `~/ws/work` itself, bare-clone roots (they stay plain shell hubs for `git wt`), detached review worktrees (read-only — no agent window), and sessions that already have a `claude` window (so it doesn't fight the sesh-defined sessions above). To give another path pattern its own layout, add a `case` branch in `tmux-session-layout`.
 
-```bash
-for dir in ~/.claude-work ~/.claude-personal; do
-  mkdir -p "$dir"
-  for item in CLAUDE.md settings.json statusline.cjs agents commands hooks \
-              output-styles rules schemas scripts skills plugins workflows; do
-    [ -e ~/.claude/"$item" ] && ln -sfn ~/.claude/"$item" "$dir/$item"
-  done
-done
-```
+## 🌳 Git worktree workflow (`git bare-clone`, `git wt`)
 
-### Installing skills with AgentKit (`ak`)
-
-[AgentKit](https://agentkit.best/docs) (`ak`, formerly `claudekit-cli`/`ck`) installs global skills/agents/hooks to `$CLAUDE_CONFIG_DIR` if set, otherwise to `~/.claude`. Since the `claude-work`/`claude-personal` aliases only export `CLAUDE_CONFIG_DIR` for the `claude` process, a plain terminal leaves it unset — so **`ak` installs to `~/.claude`, and the symlinks above propagate everything to both accounts automatically**. Install once, no per-account runs:
-
-```bash
-curl -fsSL https://agentkit.best/install.sh | sh   # one-time: installs the ak binary to ~/.local/bin
-ak kit init engineer   # writes to ~/.claude → both accounts see it via the symlinks
-```
-
-Cautions:
-
-- **Don't run `ak` from inside a `claude-work`/`claude-personal` session** — there `CLAUDE_CONFIG_DIR` is exported, so `ak` would target the account dir instead of `~/.claude`. Use a plain terminal.
-- **Don't run `ak uninstall` with `CLAUDE_CONFIG_DIR` pointed at an account dir** — that could recurse through the symlinks into your real `~/.claude`. Run it against `~/.claude`.
-- If `ak` ever adds a **new** top-level dir, re-run the seeding snippet above to symlink it into the account dirs.
-- Migrated from `ck` via `ak migrate --from=ck` — it archives the legacy kit under `~/.agentkit/archives/legacy-kit-migration/` before rewriting, and `ak migrate rollback` can undo it if needed.
-
-**First-time login** — run each alias once and sign in with the matching account:
-
-```bash
-claude-work       # then: /login  (work account)
-claude-personal   # then: /login  (personal account)
-```
-
-After that, each alias remembers its own login. Use the alias that matches the repo you're in.
-
-### Backing up `~/.claude` (separate private repo)
-
-`~/.claude` is **not** tracked by this (public) dotfiles repo — it holds the paid AgentKit kit, so it lives in its own **private** repo ([`phihdn/dotfiles-claude`](https://github.com/phihdn/dotfiles-claude)). That repo commits the restorable config (ak layer snapshot + custom `CLAUDE.md` + `rules/markdown-formatting.md` + `settings.json` + `agent-memory/`) and **gitignores every secret and machine-state path** (`.env`, `history.jsonl`, `projects/`, `sessions/`, `cache/`, `telemetry/`, `plugins/`, …). It is a standalone repo cloned by `bootstrap.sh`, not a git submodule.
-
-**Restore on a new machine** (handled automatically by `bootstrap.sh`, needs GitHub SSH/`gh` auth first):
-
-```bash
-git clone git@github.com:phihdn/dotfiles-claude.git ~/.claude
-ak kit refresh core --yes && ak kit refresh engineer --yes && ak kit refresh marketing --yes
-# then bootstrap seeds the ~/.claude-work / ~/.claude-personal symlinks
-```
-
-The cloned snapshot works immediately; `ak kit refresh` then overwrites the ak files with the latest release (your own edits are kept unless you pass `--force`).
-
-**Ongoing backup** — commit and push new config changes from `~/.claude`:
-
-```bash
-git -C ~/.claude add -A && git -C ~/.claude commit -m "chore: update claude config" && git -C ~/.claude push
-```
-
-Anything you author yourself should use a `phi-` prefix (e.g. `skills/phi-*`, `hooks/phi-*.cjs`) so it's easy to tell apart from ak content and survives `ak kit refresh` untouched.
-
-## 🚀 Usage
-
-### Install everything
-
-```bash
-./bootstrap.sh
-```
-
-### Preview / apply changes
-
-```bash
-chezmoi diff              # See what would change in $HOME
-chezmoi apply             # Apply changes
-chezmoi apply --dry-run -v
-```
-
-### Edit a managed file
-
-```bash
-chezmoi edit ~/.config/zsh/.zshrc   # edits the source under home/, then run chezmoi apply
-```
-
-### Start managing a new file
-
-```bash
-chezmoi add ~/.config/newapp/config
-chezmoi add --template ~/.config/app/secret.conf   # add as a template
-```
-
-### Homebrew Package Management
-
-```bash
-# Sync packages with Brewfile (install + cleanup)
-brew-sync
-
-# Preview what packages would be removed
-brew-sync preview
-
-# Only install packages from Brewfile
-brew-sync install
-
-# Only cleanup packages not in Brewfile
-brew-sync cleanup
-
-# Force sync without prompting
-brew-sync force
-```
-
-### Git worktree workflow (`git-bare-clone`)
-
-A custom script at `~/.local/bin/git-bare-clone` (source: `home/dot_local/bin/executable_git-bare-clone`) sets up a repo for working **exclusively from [git worktrees](https://git-scm.com/docs/git-worktree)** — one directory per branch, no stashing to switch context. Like plain `git clone`, it derives the project directory from the URL and creates it for you:
+`~/.local/bin/git-bare-clone` sets a repo up for working **exclusively from [git worktrees](https://git-scm.com/docs/git-worktree)** — one directory per branch, no stashing to switch context. Like plain `git clone`, it derives the project directory from the URL:
 
 ```bash
 git bare-clone git@gitlab.example.com:group/my-repo.git   # creates my-repo/
@@ -380,22 +274,13 @@ git bare-clone <url> custom-name                          # explicit directory
 git bare-clone <url> .                                    # set up in the current dir
 ```
 
-**How `git bare-clone` / `git wt` resolve to these scripts** — no links, no registration; three plain mechanisms chained:
+`git bare-clone` / `git wt` need no registration: chezmoi applies `home/dot_local/bin/executable_git-*` as real executables at `~/.local/bin/git-*`, `~/.local/bin` is on `PATH`, and git's external-subcommand convention turns `git foo` into a `PATH` lookup for `git-foo` — the same mechanism as `git lfs`.
 
-1. chezmoi applies `home/dot_local/bin/executable_git-*` as **real files** (not symlinks) at `~/.local/bin/git-*`; the `executable_` prefix sets `+x`.
-2. `~/.local/bin` is on `PATH` (zsh: `dot_zshenv`; fish: `conf.d/path.fish`).
-3. git's external-subcommand convention: an unknown subcommand `git foo` makes git search `PATH` for an executable named `git-foo` and exec it with the remaining args. The filename _is_ the integration — same mechanism as `git lfs` or `git flow`.
+What `bare-clone` does: creates the project directory, clones **bare** into `.bare/` (override with `-l`/`--location`), sets the origin fetch refspec to `+refs/heads/*:refs/remotes/origin/*` (bare clones don't track remote branches by default, so `git fetch` would otherwise never create `origin/<branch>`), and writes a `.git` _file_ containing `gitdir: ./.bare` so the project directory is the repo root without a checkout of its own.
 
-How it works (four steps):
+`~/.local/bin/git-wt` automates the day-to-day on top of it, with two classes of worktrees:
 
-1. Creates the project directory (URL basename minus `.git`, or the explicit second argument) and works inside it — skipped when the target is `.`.
-2. Clones the repo **bare** (no working tree) into a `.bare/` subdirectory (override the location with `-l`/`--location`).
-3. Sets the origin fetch refspec to `+refs/heads/*:refs/remotes/origin/*` — bare clones don't track remote branches by default, so without this `git fetch` would never create `origin/<branch>` refs.
-4. Writes a `.git` _file_ (not directory) in the project folder containing `gitdir: ./.bare`, which makes the project directory the repo root — git commands work there, but there's no checkout of its own.
-
-On top of it, `~/.local/bin/git-wt` (source: `home/dot_local/bin/executable_git-wt`) automates the day-to-day workflow. The model distinguishes two classes of worktrees:
-
-- **Fixed** — one per long-lived branch, dir name == branch name (`develop/`, `prod/`). Never deleted (created locked, so `git worktree remove` refuses). Treat as read-mostly: `git pull`, run, debug — branch off for changes.
+- **Fixed** — one per long-lived branch, dir name == branch name (`develop/`, `prod/`). Created locked so `git worktree remove` refuses; treat as read-mostly and branch off for changes.
 - **Ephemeral** — one per task (feature, hotfix, MR review). Created on demand, removed when merged.
 
 ```bash
@@ -406,23 +291,20 @@ git wt init <url> main            # explicit fixed branches; missing ones skippe
 
 # Task worktrees — dir = last branch segment (feature/BE-1234 → BE-1234/),
 # base defaults to origin/develop|main|master; copies .env* from a fixed worktree.
-# If origin/<branch> already exists (pushed by you or a teammate) and no
-# base-ref is given, tracks it instead of branching off.
-git wt new feature/BE-1234                # branch off default base, or track it if already pushed
-git wt new hotfix/BE-1300 origin/prod     # explicit base-ref always branches off, never auto-links
+# If origin/<branch> already exists and no base-ref is given, tracks it instead.
+git wt new feature/BE-1234
+git wt new hotfix/BE-1300 origin/prod     # explicit base-ref always branches off
 
 # MR review — detached HEAD, never blocks the author's branch
 git wt review feature/BE-1290             # creates review-BE-1290/
 
 # Finish — removes worktree + deletes the local branch (keeps it if unmerged)
 git wt done BE-1234
-git wt prune                              # bulk-remove all clean detached (review) worktrees, after confirmation
-git wt ls                                 # list all worktrees
+git wt prune                              # remove all clean detached (review) worktrees, after confirmation
+git wt ls
 ```
 
 Shell shortcuts: `gwt` → `git wt`, `gwtl` → `git wt ls` (zsh aliases + fish abbrs).
-
-Resulting layout — each subfolder is an independent checkout sharing one object store, so `develop`, a hotfix, and an MR review can all be open at once:
 
 ```text
 my-repo/
@@ -439,449 +321,97 @@ Gotchas the script handles or you should know:
 - `.env*` files are untracked, so new worktrees start without them — `git wt new` seeds them from the first fixed worktree that has any.
 - `node_modules` is per-worktree (gitignored ⇒ invisible to git). Each worktree needs its own install; `pnpm` makes this cheap via its global hard-linked store.
 - Git config, hooks, and signing live in `.bare/config` — shared by all worktrees automatically.
-- A branch can be checked out in only **one** worktree at a time; reviews use detached HEAD to sidestep this — see [Why review worktrees are detached](#why-review-worktrees-are-detached).
-- `git wt new`/`review` register the fresh worktree with zoxide (high seed score), so it shows up in the sesh session picker immediately — no `cd` needed first; `done`/`prune` deregister it again.
+- A branch can be checked out in only **one** worktree at a time; reviews use detached HEAD to sidestep this (below).
+- `git wt new`/`review` register the fresh worktree with zoxide (high seed score), so it shows up in the sesh picker immediately; `done`/`prune` deregister it again.
 - `git wt` refuses to run in a normal clone (worktrees would show up as untracked dirs there — the bare layout has no parent checkout).
-- `git clone --bare` mirrors every branch that existed on the remote at clone time straight into local `refs/heads/*`, with no upstream configured — both `git wt init` (fixed worktrees) and `git wt new <branch>` (reopening one of those branches) check for this and link to `origin/<branch>` via `git branch --set-upstream-to` whenever it's missing.
-- The project root (where `.bare/` lives) is plumbing, not a worktree — `cd` into `develop/`, `prod/`, or a task dir to actually work. Standing at the root shows `(bare)` in the Starship prompt (`home/dot_config/starship.toml`, `custom.git_branch` module) instead of a branch name, since the root has no branch of its own — see `docs/git-worktree-bare-clone-workflow.md` for why.
+- `git clone --bare` mirrors every remote branch straight into local `refs/heads/*` with no upstream configured — `git wt init` and `git wt new <branch>` detect this and link to `origin/<branch>` via `git branch --set-upstream-to`.
+- The project root (where `.bare/` lives) is plumbing, not a worktree — `cd` into `develop/`, `prod/`, or a task dir to work. Standing at the root shows `(bare)` in the Starship prompt (`custom.git_branch` module in `starship.toml`). Details in [`docs/git-worktree-bare-clone-workflow.md`](docs/git-worktree-bare-clone-workflow.md).
 
-#### Why review worktrees are detached
+### Why review worktrees are detached
 
-Every checkout has a `HEAD`. Normally it points at a **branch name** — commit something, and the branch moves forward with you; the checkout *owns* that branch:
+A normal checkout's `HEAD` points at a **branch**, so commits move that branch — the checkout _owns_ it. Detached HEAD points straight at a commit: same files on disk, fully buildable, but no branch claimed and nothing done there can move anyone's branch. `git wt review` insists on it because:
 
-```text
-HEAD → feature/BE-1234 → commit ab12cd3
-```
+1. **Git enforces one checkout per branch across all worktrees.** Detaching is what makes a second checkout of the same commit legal — `BE-1234/ [feature/BE-1234]` and `review-BE-1234/ (detached)` can coexist on the exact same commit.
+2. **A review is a read of a snapshot, not ownership of a branch.** Detaching at `origin/feature/BE-1290` gives exactly "what's in the MR right now"; a local branch could drift, get committed to by accident, or be pushed back over the author's work. Detached HEAD makes that path structurally impossible.
+3. **Mid-review updates are trivial** — `git fetch && git checkout --detach origin/feature/BE-1290`.
+4. **Cleanup is nothing** — removing a detached worktree removes everything, no leftover branch.
 
-Detached HEAD skips the middleman and points **straight at a commit**:
+Detachment is also the **marker for "disposable review checkout"** elsewhere: `git wt prune` sweeps only detached worktrees (dirty ones are still kept), and `tmux-session-layout` keys its lighter no-agent layout on detached HEAD rather than the `review-` name. One-line version: **a branch checkout is a claim; a detached checkout is a photograph.**
 
-```text
-HEAD → ab12cd3          (no branch involved)
-```
+## 🤖 Claude Code — multiple accounts
 
-Same files on disk, fully buildable and runnable. The only difference: no branch is claimed, and nothing done in that checkout can move anyone's branch.
-
-Why `git wt review` insists on it:
-
-1. **Git enforces one checkout per branch across all worktrees.** If `feature/BE-1234` is checked out in the `BE-1234/` worktree, `git worktree add review-BE-1234 feature/BE-1234` fails with `fatal: 'feature/BE-1234' is already used by worktree ...`. Detaching is what makes a second checkout of the same commit legal — `BE-1234/ [feature/BE-1234]` and `review-BE-1234/ (detached)` can coexist on the exact same commit.
-2. **A review is a read of a snapshot, not ownership of a branch.** What's being judged is "what's in the MR right now" = `origin/feature/BE-1290`. Detaching at that remote ref gives exactly that. A local branch instead would be a thing that can drift, get committed to by accident, and — worst case — get pushed back over the author's work. Detached HEAD makes the destructive path structurally impossible rather than just discouraged.
-3. **Mid-review updates are trivial.** The author pushes a fix mid-review? `git fetch && git checkout --detach origin/feature/BE-1290` — now on the new snapshot. A local branch would need pulls/resets on a branch that was never wanted.
-4. **Cleanup is nothing.** Removing a detached worktree removes everything — no leftover local branch to remember to delete. Compare `git wt done`, which has to delete the branch after removing a task worktree (and keeps it if unmerged).
-
-Detachment also acts as the **marker for "disposable review checkout"** elsewhere in this setup: `git wt prune` bulk-removes only detached worktrees (no branch → no owned work → safe to sweep; dirty ones are still kept), and `tmux-session-layout` keys its lighter no-agent session layout on detached HEAD rather than the `review-` name — the detachment is the invariant, the name is just convention.
-
-One-line version: **a branch checkout is a claim; a detached checkout is a photograph.** Reviews want the photograph — the same code, none of the ability to move what the author is standing on.
-
-### tmux session layouts (sesh + hook script)
-
-Sessions are opened through [sesh](https://github.com/joshmedeski/sesh): the `s` alias in a plain shell (runs `~/.local/bin/sesh_start`, an fzf picker) or `prefix+K` inside tmux (same picker via `fzf-tmux`, defined in `tmux.conf`). `prefix+L` jumps back to the last session.
-
-Layouts come from **two mechanisms**, so changes go in different places depending on which kind of session you're editing:
-
-| Session kind | Layout source | Edit |
-| --- | --- | --- |
-| Pre-defined sessions (`dotfiles`, `tmux config`, `nvim config`, ...) | Declarative TOML | `~/.config/sesh/sesh.toml` + `~/.config/sesh/configs/windows.toml` |
-| Ad-hoc repo sessions under `~/ws/work/` or `~/ws/personal/` | tmux `session-created` hook script | `~/.local/bin/tmux-session-layout` |
-
-**Declarative (sesh TOML)** — `sesh.toml` defines named sessions (path, startup command) and references reusable windows from `configs/windows.toml` by name (`git`, `claude-work`, `claude-personal`, `dev`). sesh's TOML can't describe pane splits, so windows that need panes call a script instead: the `dev` window runs `~/.local/bin/sesh-dev-layout` (nvim on top, 25% shell pane below).
-
-**Dynamic (hook script)** — `tmux.conf` sets a global `session-created` hook that runs `~/.local/bin/tmux-session-layout` for _every_ new session (sesh-created or not). For git **worktrees** under `~/ws/work/` or `~/ws/personal/` it builds a two-window layout and lands on window 1:
-
-```text
-1: claude   # Claude Code, CLAUDE_CONFIG_DIR picked from the path (work → ~/.claude-work, personal → ~/.claude-personal)
-2: zsh      # plain shell — start nvim by hand when actually editing
-```
-
-nvim is never auto-started (each instance brings up TypeScript LSP node processes, which piles up across parallel worktree sessions), and lazygit is on demand via the `prefix+g` popup instead of a standing window. The script exits early for everything else: non-git paths, umbrella folders like `~/ws/work` itself, bare-clone roots (they stay plain shell hubs for `git wt`), detached review worktrees (read-only — no agent window), and sessions that already have a `claude` window (so it doesn't fight the sesh-defined sessions above). To give another path pattern its own layout, add a `case` branch in `tmux-session-layout`.
-
-### tmux status bar (cpu/ram, next meeting)
-
-The right-hand side of the status line reads, left to right: current directory + git state (via gitmux), next meeting, CPU/RAM, date and time, and uptime. Three helper scripts in `~/.local/bin` back the dynamic parts, and each prints its own `#[...]` style sequences rather than plain text — tmux's format language can't pick a color from a threshold, so the script decides while the color palette stays in `tmux.conf` and is passed in as arguments.
-
-| Script | Segment | Notes |
-| --- | --- | --- |
-| `tmux-sysinfo` | CPU and RAM percentages | Cumulative-counter deltas both platforms; RAM turns a red block past `TMUX_SYSINFO_MEM_ALERT` (85%) |
-| `tmux-meeting` | Next meeting + countdown | macOS only (icalBuddy); hides itself on Linux |
-| `tmux-uptime` | Uptime | Flips to a red block past 7 days |
-
-The bar refreshes every 15s. Every refresh forks one process per `#()` on the bar *plus* one per window for the window-status icon, so the interval is a direct multiplier on process churn — at the old 2s with three windows that was seven processes every two seconds, all day, which on a machine already under load turned status redraws visibly laggy. Nothing on the bar needs finer granularity: the clock shows minutes, the meeting countdown is in minutes, and uptime is in days, so every segment is on the same 15s cadence with nothing special-cased.
-
-Each segment is also built to be cheap in itself: nothing samples with a delay (`top -l 2` costs 1.4s and `iostat -c 2` a full second), `tmux-meeting` reads the calendar at most once a minute and recomputes its countdown from a cached start time, and `icons` is deliberately a plain `bash` `case` with no subprocesses — it was a fish script until fish's ~40ms startup, paid once per window per refresh, made it the single most expensive thing on the bar. Numeric fields are padded to a fixed width, so a value going from `9%` to `10%` doesn't shove every neighbouring segment sideways.
-
-#### Making the cpu/ram numbers trustworthy
-
-Both readings are deltas between consecutive refreshes of a cumulative counter, stored in a small per-user state file. On Linux that counter is `/proc/stat`; on macOS it is `host_statistics64(HOST_CPU_LOAD_INFO)` — the ticks `top` and Activity Monitor read — reached through a three-line `python3` ctypes call, because macOS exposes them through no sysctl and no shell tool that doesn't pay a sampling delay. A first run with no previous sample falls back to the since-boot average, which is what a single reading of those counters actually means.
-
-The CPU figure deliberately does **not** sum `ps -A -o %cpu=`. That column is a per-process decaying average over roughly the last minute, so it lags reality and badly overstates while a burst decays: measured at 267% against a true 53%, and 23% against a true 14.7%. Summing `ps -A -o time=` instead is closer but still undercounts by 3–5 points, because processes that exit between samples take their time with them and some kernel time is never attributed to a process at all.
-
-The RAM figure counts **anonymous + wired + compressed** pages — what Activity Monitor calls "Memory Used", the pages that cannot be handed to another process without swapping. It used to count `active` instead of `anonymous`, which mixes in reclaimable file-backed pages while omitting inactive anonymous pages: that read 66.7% on a machine actually sitting at 74.4% with 0.08 GB free and 1.8 GB of swap in use, understating at precisely the moment the number matters. Past `TMUX_SYSINFO_MEM_ALERT` (85% by default) the value turns a red block, since beyond that the machine is about to start swapping.
-
-#### Next-meeting setup
-
-`tmux-meeting` reads macOS Calendar.app through [icalBuddy](https://hasseg.org/icalBuddy/). It never talks to Google directly, so a Google Calendar reaches it only by being added as an account in Calendar.app.
-
-1. `brew install ical-buddy` — already in the `Brewfile`, guarded to macOS.
-2. Add the Google account under **System Settings → Internet Accounts** with Calendars enabled, then confirm it shows up in `icalBuddy calendars`.
-3. Approve the macOS Calendar permission prompt. It attaches to whichever process runs the query, so if the segment stays stubbornly empty, run `icalBuddy eventsToday` once from a normal terminal and approve it there.
-4. Create `~/.config/tmux/meeting.env` naming the calendars to watch — for a Google account the calendar name is the address itself.
+Run two Claude Code accounts (work + personal) on one machine without them colliding. Claude Code ties all of an account's state to a single config directory, selectable via `CLAUDE_CONFIG_DIR` ([technique reference](https://frontendhire.com/learn/ai/courses/using-multiple-claude-accounts/overview)). Two aliases (zsh and fish) point Claude at per-account dirs:
 
 ```bash
-# Untracked on purpose: calendar names are account addresses.
-# The ${VAR:-...} form lets an explicit env var override this for testing.
-TMUX_MEETING_CALENDARS="${TMUX_MEETING_CALENDARS:-you@example.com}"
+claude-work       # CLAUDE_CONFIG_DIR=~/.claude-work claude
+claude-personal   # CLAUDE_CONFIG_DIR=~/.claude-personal claude
 ```
 
-That file is listed in `.chezmoiignore`, so chezmoi never manages it and the address stays out of this public repo. Leaving `TMUX_MEETING_CALENDARS` unset watches every calendar, which mixes personal events into the bar.
-
-`prefix+M` opens an fzf popup listing every meeting in progress or starting within the hour, and joins the one you pick — Meet, Zoom, Teams, Webex and friends, matched by host anywhere in the event's url, location, or description, since Google buries the Meet link in the HTML description while others use the location field. A picker rather than a straight join because two meetings can start at the same time and there is no right answer to guess; both appear, and one without a video link is listed and marked rather than hidden, so a clash never disappears silently. Inside the imminent window the segment turns a solid red block. It used to flash, alternating two styles, which is the only way to animate text when the terminal will not: Ghostty does not render the blink attribute (SGR 5) — verified on 1.3.1, where a `#[blink]` segment sits perfectly still — so motion has to come from repainting, which meant holding the whole bar at a 1s refresh for the duration. The colour alone carries it, so the flash and the interval borrowing are both gone. Ahead of the meeting, an announcement naming it and its link appears once on the message line; the marker file recording which meeting was announced is what stops a fast refresh from re-firing it. It is a `display-message` rather than a `display-popup` on purpose: a popup is modal and waits on a keypress, so one firing while you are mid-edit in nvim captures the keyboard and reads as tmux having frozen. `prefix+M` is there for when you actually want to join. Everything is tunable through the same file:
-
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `TMUX_MEETING_SOON_MINUTES` | `10` | Segment turns yellow |
-| `TMUX_MEETING_IMMINENT_MINUTES` | `2` | Segment becomes a red block |
-| `TMUX_MEETING_ALERT_MINUTES` | `5` | Announcement fires |
-| `TMUX_MEETING_ALERT_DISPLAY_MS` | `5000` | How long that announcement stays up |
-| `TMUX_MEETING_PICK_MINUTES` | `60` | How far ahead `prefix+M` lists |
-| `TMUX_MEETING_LOOKAHEAD_DAYS` | `0` | Days beyond today to search; `0` is today only |
-| `TMUX_MEETING_CACHE_TTL` | `60` | Seconds between calendar reads |
-| `TMUX_MEETING_TITLE_WIDTH` | `24` | Title truncation width |
-
-## 🐍🟢 Language Version Management
-
-This setup includes modern tools for managing Node.js and Python versions:
-
-### 📦 Node.js with nvm
-
-**nvm** (Node Version Manager) is automatically installed and configured for Node.js version management.
-
-#### nvm Basics
+**What's isolated vs shared.** Each dir keeps its own login (on macOS in the Keychain, keyed per config dir), `history.jsonl`, `projects/`, and `sessions/`. Shared, read-mostly config is **symlinked** from `~/.claude` into each account dir so there is a single source of truth: `CLAUDE.md`, `settings.json`, `statusline.cjs`, `agents`, `commands`, `hooks`, `output-styles`, `rules`, `schemas`, `scripts`, `skills`, `plugins`, `workflows`. `bootstrap.sh` creates the dirs and symlinks (guarded on `~/.claude` existing); to do it by hand:
 
 ```bash
-# List available Node.js versions
-nvm list-remote
-
-# Install latest LTS version
-nvm install --lts
-
-# Install specific version
-nvm install 18.19.0
-
-# Use specific version
-nvm use 18.19.0
-
-# Set default version
-nvm alias default 18.19.0
-
-# List installed versions
-nvm list
-
-# Install packages globally for current version
-npm install -g pnpm yarn typescript
+for dir in ~/.claude-work ~/.claude-personal; do
+  mkdir -p "$dir"
+  for item in CLAUDE.md settings.json statusline.cjs agents commands hooks \
+              output-styles rules schemas scripts skills plugins workflows; do
+    [ -e ~/.claude/"$item" ] && ln -sfn ~/.claude/"$item" "$dir/$item"
+  done
+done
 ```
 
-#### Project-specific Node versions
+**First-time login** — run each alias once and `/login` with the matching account. After that, use the alias that matches the repo you're in; `tmux-session-layout` picks the right one from the path automatically.
+
+### Installing skills with AgentKit (`ak`)
+
+[AgentKit](https://agentkit.best/docs) (`ak`, formerly `claudekit-cli`/`ck`) installs global skills/agents/hooks to `$CLAUDE_CONFIG_DIR` if set, otherwise to `~/.claude`. The aliases only export `CLAUDE_CONFIG_DIR` for the `claude` process, so from a plain terminal **`ak` installs to `~/.claude` and the symlinks propagate everything to both accounts**:
 
 ```bash
-# Create .nvmrc file in project root
-echo "18.19.0" > .nvmrc
-
-# Use version from .nvmrc
-nvm use
-
-# Auto-switch when entering directory (add to shell config)
-cd my-project  # Automatically switches to .nvmrc version
+curl -fsSL https://agentkit.best/install.sh | sh   # one-time: installs ak to ~/.local/bin
+ak kit init engineer                                 # writes to ~/.claude → both accounts see it
 ```
 
-### 🐍 Python with uv
+Cautions: don't run `ak` from inside a `claude-work`/`claude-personal` session (it would target the account dir); never run `ak uninstall` with `CLAUDE_CONFIG_DIR` pointed at an account dir (it could recurse through the symlinks into the real `~/.claude`); if `ak` adds a new top-level dir, re-run the seeding snippet above.
 
-**uv** is a fast Python package installer and resolver that replaces pip, pip-tools, and virtualenv.
+### Backing up `~/.claude` (separate private repo)
 
-#### uv Basics
+`~/.claude` is **not** tracked by this public repo — it holds the paid AgentKit kit — so it lives in its own private repo, [`phihdn/dotfiles-claude`](https://github.com/phihdn/dotfiles-claude), which commits the restorable config (ak layer snapshot, custom `CLAUDE.md`, `rules/`, `settings.json` — including the `tmux-claude-status` hooks — and `agent-memory/`) and gitignores every secret and machine-state path (`.env`, `history.jsonl`, `projects/`, `sessions/`, `cache/`, `telemetry/`, `plugins/`, …). It is a standalone clone, not a submodule.
+
+`bootstrap.sh` restores it (needs GitHub SSH/`gh` auth first) with the equivalent of:
 
 ```bash
-# Install Python versions
-uv python install 3.12
-uv python install 3.11
-
-# List installed Python versions
-uv python list
-
-# Create new project with virtual environment
-uv init my-python-project
-cd my-python-project
-
-# Add dependencies
-uv add requests pandas numpy
-uv add pytest --dev  # Development dependency
-
-# Install dependencies from pyproject.toml
-uv sync
-
-# Run Python with project environment
-uv run python script.py
-uv run pytest
-
-# Activate virtual environment manually
-source .venv/bin/activate  # or use uv shell
+git clone git@github.com:phihdn/dotfiles-claude.git ~/.claude
+ak kit refresh core --yes && ak kit refresh engineer --yes && ak kit refresh marketing --yes
 ```
 
-#### Advanced uv Usage
+Back it up by committing from `~/.claude` (`git -C ~/.claude add -A && git -C ~/.claude commit -m "chore: update claude config" && git -C ~/.claude push`). Anything you author yourself gets a `phi-` prefix (`skills/phi-*`, `hooks/phi-*.cjs`) so it stands apart from ak content and survives `ak kit refresh`.
+
+## 🔄 Day-to-day chezmoi
 
 ```bash
-# Create project with specific Python version
-uv init --python 3.11 my-project
-
-# Add dependency with version constraint
-uv add "django>=4.0,<5.0"
-
-# Update dependencies
-uv lock --upgrade
-
-# Export requirements.txt (for compatibility)
-uv export --format requirements-txt --output-file requirements.txt
-
-# Run commands in virtual environment
-uv run --python 3.12 python script.py
-
-# Install package globally
-uv tool install black
-uv tool install ruff
-
-# List global tools
-uv tool list
-```
-
-#### Project Structure with uv
-
-```text
-my-python-project/
-├── pyproject.toml     # Project metadata and dependencies
-├── uv.lock           # Lockfile with exact versions
-├── .venv/            # Virtual environment (auto-created)
-├── src/
-│   └── my_package/
-└── tests/
-```
-
-#### Migration from pip/pipenv/poetry
-
-```bash
-# From requirements.txt
-uv add -r requirements.txt
-
-# From Pipfile
-uv add $(cat Pipfile | grep -E '^[a-zA-Z]' | cut -d' ' -f1)
-
-# From poetry (copy dependencies from pyproject.toml)
-uv add package1 package2 package3
-```
-
-### 🔄 Switching Between Versions
-
-#### Node.js Version Switching
-
-```bash
-# Quick version switching
-nvm use 16    # Switch to Node 16
-nvm use 18    # Switch to Node 18
-nvm use node  # Switch to latest
-
-# Project-based switching (with .nvmrc)
-echo "18.19.0" > .nvmrc
-nvm use  # Uses version from .nvmrc
-```
-
-#### Python Version Switching
-
-```bash
-# Project-specific Python (via pyproject.toml)
-[tool.uv]
-python = "3.11"
-
-# Or specify when creating project
-uv init --python 3.11 my-project
-
-# Run with specific Python version
-uv run --python 3.12 python script.py
-```
-
-### 💡 Pro Tips
-
-#### Node.js Tips
-
-- Use `.nvmrc` files for consistent Node versions across team
-- Install global packages after switching Node versions
-- Use `nvm alias` to create shortcuts for frequently used versions
-
-#### Python Tips
-
-- Use `uv sync` to ensure dependencies match lockfile exactly
-- Leverage `uv run` to avoid manual virtual environment activation
-- Use `uv tool install` for global Python tools (black, ruff, etc.)
-- Pin Python versions in `pyproject.toml` for team consistency
-
-#### Performance
-
-- **uv is 10-100x faster** than pip for package installation
-- **nvm** provides instant Node.js version switching
-- Both tools cache downloads for faster subsequent installs
-
-## 📋 Managed Configurations
-
-**20 application configs** managed by chezmoi, organized by category:
-
-### 🖥️ Terminal Emulators
-
-- **ghostty**, **kitty**, **wezterm** - Modern GPU-accelerated terminals
-
-### 🐚 Shells & Prompts
-
-- **fish**, **zsh** - Modern shell configurations
-- **starship** - Beautiful cross-shell prompt
-
-### ⚡ CLI Tools & Utilities
-
-- **bat** - Enhanced cat with syntax highlighting
-- **lf** - Terminal file manager
-- **lsd** - Enhanced ls with colors and icons
-- **neofetch** - System information display
-- **scripts** - Custom utility scripts
-
-### 🧑‍💻 Development Tools
-
-- **git** - Version control configuration
-- **lazygit** - Git TUI interface
-- **nvim** - Modern Vim-based editor
-- **tmux** - Terminal multiplexer
-- **sesh** - tmux session manager
-
-### ☁️ Cloud & DevOps
-
-- **k9s** - Kubernetes cluster management
-
-### 🔐 Security & Productivity
-
-- **1password** - Password manager and SSH agent
-- **wakatime** - Development time tracking
-
-### 🪟 Window Management
-
-- **aerospace** - Tiling window manager for macOS
-
----
-
-| Config        | Description                                                                             |
-| ------------- | --------------------------------------------------------------------------------------- |
-| **1password** | 1Password CLI and SSH agent configuration                                               |
-| **aerospace** | AeroSpace tiling window manager configuration                                           |
-| **bat**       | bat (cat clone) with syntax highlighting themes                                         |
-| **fish**      | Fish shell configuration and plugins                                                    |
-| **git**       | Git configuration, aliases, and settings                                                |
-| **ghostty**   | Ghostty terminal emulator configuration                                                 |
-| **k9s**       | Kubernetes CLI (k9s) configuration and themes                                           |
-| **kitty**     | Kitty terminal emulator configuration                                                   |
-| **lazygit**   | Lazygit TUI configuration and themes                                                    |
-| **lf**        | lf file manager configuration and settings                                              |
-| **lsd**       | lsd (ls deluxe) configuration and colors                                                |
-| **neofetch**  | Neofetch system information display configuration                                       |
-| **nvim**      | Neovim — self-maintained config; LazyVim fallback profile via `nvl`                     |
-| **scripts**   | Custom utility scripts and tools                                                        |
-| **sesh**      | Sesh tmux session manager configuration                                                 |
-| **starship**  | Starship cross-shell prompt configuration                                               |
-| **tmux**      | tmux terminal multiplexer configuration and plugins                                     |
-| **wakatime**  | WakaTime time tracking configuration                                                    |
-| **wezterm**   | WezTerm terminal emulator configuration                                                 |
-| **zsh**       | Modular Zsh config under `~/.config/zsh` (ZDOTDIR) with a self-contained plugin manager |
-
-## ✅ Result
-
-After installation, you'll have:
-
-- **Modern terminal environment** with beautiful, fast tools
-- **Tiling window management** for efficient screen usage
-- **Powerful editor** ready for development
-- **Clean shell** with helpful aliases and functions
-- **Development tools** for Python, Node, Go, Rust, and Kubernetes
-- **Consistent experience** across different machines
-
-## 🔄 Updating
-
-To update your dotfiles:
-
-```bash
-cd ~/dotfiles
-git pull         # auto-applies via git hook (see below)
-# or, to also refresh tools/packages:
-./bootstrap.sh
-```
-
-### Auto-apply git hooks
-
-A `git pull` in this repo automatically runs `chezmoi apply`, so updates propagate to `$HOME` without a manual step. Tracked hooks live in `.githooks/`:
-
-- `post-merge` — fires after a merge-style pull.
-- `post-rewrite` — fires after a rebase-style pull (this repo sets `pull.rebase = true`, so pulls rebase and would otherwise skip `post-merge`). It only runs for rebases, not `git commit --amend`.
-
-Both are no-ops if `chezmoi` isn't installed. They're enabled by pointing git at the tracked hooks directory:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-`bootstrap.sh` runs this automatically, so a fresh clone is wired up after the first bootstrap. Because `core.hooksPath` lives in the local (uncommitted) `.git/config`, each new clone needs bootstrap (or the command above) once. If you ever want to apply manually instead, just run `chezmoi apply`.
-
-## 🛠️ Customization
-
-### Adding new config
-
-```bash
-chezmoi add ~/.config/newapp/config   # copies into home/ with correct naming
-```
-
-Then commit the new files under `home/` and push.
-
-### Modifying existing configs
-
-```bash
-chezmoi edit ~/.config/zsh/.zshrc   # edit the source under home/
-chezmoi apply                       # write changes to $HOME
-```
-
-Note: unlike stow, chezmoi does **not** use symlinks — it writes real files to `$HOME`. Always edit the source (via `chezmoi edit` or directly in `home/`) and run `chezmoi apply`, not the target files.
-
-### Ignoring files
-
-Add target-path patterns to `home/.chezmoiignore` (gitignore syntax) for per-machine state that should never be applied.
-
-## 🆘 Troubleshooting
-
-### Adopt existing $HOME files into the repo
-
-```bash
-chezmoi add ~/.config/nvim   # import current files as the new source of truth
-```
-
-### See exactly what will change
-
-```bash
-chezmoi diff
+chezmoi diff                        # what would change in $HOME
+chezmoi apply                       # write it
 chezmoi apply --dry-run -v
+chezmoi edit ~/.config/zsh/.zshrc   # edit the source under home/, then apply
+chezmoi add ~/.config/newapp/config # start managing a file (adds under home/ with the right name)
+chezmoi add --template ~/.some.secret
+chezmoi managed                     # everything chezmoi manages
+chezmoi doctor
 ```
 
-### Secret/template errors (e.g. WakaTime)
+chezmoi writes **real files** to `$HOME`, not symlinks — always edit the source (via `chezmoi edit` or directly under `home/`) and apply, never the target. Per-machine state that must never be applied goes in `home/.chezmoiignore` (gitignore syntax, templated so sections can be OS-conditional); targets that should be _deleted_ from `$HOME` go in `home/.chezmoiremove`.
+
+### Updating
 
 ```bash
-eval "$(op signin)"   # sign in to 1Password CLI
-chezmoi apply         # re-render templates
+cd ~/dotfiles && git pull   # auto-applies via git hook
+./bootstrap.sh              # also refreshes tools and packages
 ```
 
-### Verify chezmoi's state
+A `git pull` runs `chezmoi apply` through tracked hooks in `.githooks/`: `post-merge` for merge-style pulls and `post-rewrite` for rebase-style pulls (this repo sets `pull.rebase = true`, so pulls rebase and would otherwise skip `post-merge`; it runs only for rebases, not `git commit --amend`). Both no-op if `chezmoi` is absent. `bootstrap.sh` enables them with `git config core.hooksPath .githooks`; since that lives in the local `.git/config`, each fresh clone needs bootstrap (or that command) once.
 
-```bash
-chezmoi doctor        # diagnose configuration/tooling issues
-chezmoi managed       # list managed files
-```
+### Troubleshooting
 
----
-
-Enjoy your new development setup! 🚀
+- **Secret/template errors** (WakaTime, work gitconfig): `eval "$(op signin)"` then `chezmoi apply`.
+- **Adopt existing `$HOME` files** as the new source of truth: `chezmoi add ~/.config/nvim`.
+- **Status bar shows stale or empty segments**: check the daemon is alive with `tmux show -gv @status_daemon_pid`; restart it as described under [Fork-free rendering](#fork-free-rendering-tmux-status-daemon).
+- **Wrong `node`** inside a tool: `command -v node` — see [node / nvm on PATH](#node--nvm-on-path).

@@ -1,6 +1,6 @@
 k9s:
   ui:
-    skin: catppuccin-mocha-transparent # https://github.com/catppuccin/k9s
+    skin: kanagawa-dragon-transparent # Kanagawa Dragon — https://github.com/rebelot/kanagawa.nvim
   logger:
     tail: 500
     buffer: 5000

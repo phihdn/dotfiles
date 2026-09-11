@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+#
+# tmux-claude-status: Claude Code session state for the tmux status line.
+#
+# Claude Code hooks (~/.claude/settings.json) pipe their JSON event into
+# `hook`; each event maps to a per-session state file, and `render` folds the
+# files into options the status formats read natively (no #() on the bar):
+#   @win_claude           window   working | attention | idle — styles the tab
+#   @status_claude        global   count of live sessions, empty when none
+#   @status_claude_state  global   most urgent state across sessions
+# All colors live in tmux.conf.
+#
+# Live sessions are discovered from the process table (a claude process on the
+# pane's tty), so sessions started before the hooks existed — Claude Code reads
+# hooks at startup — still count, with a neutral `idle` state until restarted.
+#
+# tmux-status-daemon also calls `render` on every tick and focus hook. That is
+# where stale files are pruned (pane gone or no claude process left on it — a
+# crash never sends SessionEnd) and where a finished turn is acknowledged: a
+# session in `attention` because its turn ended drops to `idle` once its window
+# is the active window of an attached session, i.e. you have looked at it. A
+# permission prompt or AskUserQuestion stays `attention` until answered.
+#
+# State file: "<state> <reason> <pane_id>", reason is `done` (turn finished),
+# `input` (waiting on an answer) or `-`.
+
+set -u
+
+state_dir="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/tmux-claude-status.$(id -u)"
+
+json_field() { # $1 json, $2 key -> value of a simple string field, or ""
+  if [[ $1 =~ \"$2\":[[:space:]]*\"([^\"]+)\" ]]; then
+    printf '%s' "${BASH_REMATCH[1]}"
+  fi
+}
+
+hook() {
+  [[ -n ${TMUX_PANE:-} ]] || exit 0
+  local json sid ev tool ntype state="" reason="-"
+  json=$(cat)
+  sid=$(json_field "$json" session_id)
+  ev=$(json_field "$json" hook_event_name)
+  [[ -n $sid && -n $ev ]] || exit 0
+  local file="$state_dir/$sid"
+
+  case "$ev" in
+    SessionStart) state=idle ;;
+    UserPromptSubmit | PostToolUse) state=working ;;
+    PreToolUse)
+      tool=$(json_field "$json" tool_name)
+      [[ $tool == AskUserQuestion ]] || exit 0
+      state=attention reason=input
+      ;;
+    Notification)
+      ntype=$(json_field "$json" notification_type)
+      [[ $ntype == permission_prompt ]] || exit 0
+      state=attention reason=input
+      ;;
+    Stop) state=attention reason=done ;;
+    SessionEnd)
+      rm -f "$file"
+      render
+      exit 0
+      ;;
+    *) exit 0 ;;
+  esac
+
+  mkdir -p "$state_dir"
+  local new="$state $reason $TMUX_PANE"
+  # PostToolUse fires per tool call; skip the rewrite and render when nothing changed.
+  [[ -f $file && $(< "$file") == "$new" ]] && exit 0
+  printf '%s\n' "$new" > "$file"
+  render
+}
+
+# Highest state wins when a window holds several Claude panes.
+rank() {
+  case "$1" in
+    attention) echo 3 ;;
+    working) echo 2 ;;
+    idle) echo 1 ;;
+    *) echo 0 ;;
+  esac
+}
+
+# Panes with a live claude process, found through the process table rather than
+# #{pane_current_command}: that name flips to git/node/… whenever Claude runs a
+# tool, which would make a command-based check prune tracked sessions and
+# bounce the count. Native-installer binaries are named after the version, so
+# argv[0] is matched as claude or N.N.N. Output: "pane_id window_id
+# window_active session_attached" per line.
+claude_panes() {
+  local ttys tty pane wid active attached
+  ttys=$(ps -eo tty=,args= 2> /dev/null | awk '
+    { cmd = $2; sub(".*/", "", cmd) }
+    cmd == "claude" || cmd ~ /^[0-9]+\.[0-9]+\.[0-9]+$/ { print $1 }' | sort -u)
+  [[ -n $ttys ]] || return 0
+  ttys=$'\n'"$ttys"$'\n'
+  while read -r tty pane wid active attached; do
+    [[ $ttys == *$'\n'"${tty#/dev/}"$'\n'* ]] && echo "$pane $wid $active $attached"
+  done < <(tmux list-panes -a -F '#{pane_tty} #{pane_id} #{window_id} #{window_active} #{session_attached}' 2> /dev/null)
+}
+
+render() {
+  local total=0 attention=0 working=0
+  local wins="" # "window_id state" per line, later reduced by rank
+  local panes covered=$'\n'
+  panes=$(claude_panes)
+
+  # Sessions reporting through hooks: their file carries the live state.
+  local f state reason pane info wid active attached
+  for f in "$state_dir"/*; do
+    [[ -f $f ]] || continue
+    read -r state reason pane < "$f" || continue
+    [[ $'\n'"$panes" == *$'\n'"$pane "* ]] || { rm -f "$f"; continue; }
+    info=${panes#*$'\n'"$pane "}; info="$pane ${info%%$'\n'*}"
+    read -r pane wid active attached <<< "$info"
+    if [[ $state == attention && $reason == done && $active == 1 && ${attached:-0} -gt 0 ]]; then
+      state=idle reason=-
+      printf '%s\n' "$state $reason $pane" > "$f"
+    fi
+    total=$((total + 1))
+    [[ $state == attention ]] && attention=$((attention + 1))
+    [[ $state == working ]] && working=$((working + 1))
+    wins+="$wid $state"$'\n'
+    covered+="$pane"$'\n'
+  done
+
+  # Claude panes with no state file — sessions started before the hooks were
+  # configured (Claude Code reads hooks at startup), or run without them. They
+  # count as live sessions with a neutral state; the hooks take over the moment
+  # such a session is restarted.
+  while read -r pane wid active attached; do
+    [[ -n $pane ]] || continue
+    [[ $covered == *$'\n'"$pane"$'\n'* ]] && continue
+    total=$((total + 1))
+    wins+="$wid idle"$'\n'
+  done <<< "$panes"
+
+  # Reconcile every window of an attached session against the desired state,
+  # touching only the ones that differ so a render is a handful of tmux calls.
+  local line id current desired best r
+  while read -r attached id current; do
+    [[ ${attached:-0} -gt 0 && -n $id ]] || continue
+    desired="" best=0
+    while IFS=' ' read -r wid state; do
+      [[ $wid == "$id" ]] || continue
+      r=$(rank "$state")
+      ((r > best)) && best=$r desired=$state
+    done <<< "$wins"
+    [[ $desired == "$current" ]] && continue
+    if [[ -n $desired ]]; then
+      tmux set-option -w -t "$id" @win_claude "$desired" 2> /dev/null || true
+    else
+      tmux set-option -wu -t "$id" @win_claude 2> /dev/null || true
+    fi
+  done < <(tmux list-windows -a -F '#{session_attached} #{window_id} #{@win_claude}' 2> /dev/null)
+
+  # The widget is styled entirely in tmux.conf: @status_claude is the plain
+  # count (empty with no session, which hides the widget) and
+  # @status_claude_state the most urgent state across sessions.
+  local seg="" state=""
+  if ((total > 0)); then
+    seg=$total
+    if ((attention > 0)); then state=attention
+    elif ((working > 0)); then state=working
+    else state=idle
+    fi
+  fi
+  [[ $(tmux show-options -gqv @status_claude 2> /dev/null) == "$seg" ]] ||
+    tmux set-option -g @status_claude "$seg" 2> /dev/null || true
+  [[ $(tmux show-options -gqv @status_claude_state 2> /dev/null) == "$state" ]] ||
+    tmux set-option -g @status_claude_state "$state" 2> /dev/null || true
+}
+
+case "${1:-}" in
+  hook) hook ;;
+  render) render ;;
+  *)
+    echo "usage: tmux-claude-status hook  (JSON event on stdin) | render" >&2
+    exit 64
+    ;;
+esac

@@ -1,0 +1,102 @@
+# Kanagawa Dragon (transparent) — https://github.com/rebelot/kanagawa.nvim
+# bgColor stays `default` throughout so the terminal background shows through.
+k9s:
+  body:
+    fgColor: '#c5c9c5'
+    bgColor: default
+    logoColor: '#938aa9'
+  prompt:
+    fgColor: '#c5c9c5'
+    bgColor: default
+    suggestColor: '#7fb4ca'
+  help:
+    fgColor: '#c5c9c5'
+    bgColor: default
+    sectionColor: '#87a987'
+    keyColor: '#7fb4ca'
+    numKeyColor: '#c4746e'
+  frame:
+    title:
+      fgColor: '#7aa89f'
+      bgColor: default
+      highlightColor: '#a292a3'
+      counterColor: '#e6c384'
+      filterColor: '#87a987'
+    border:
+      fgColor: '#938aa9'
+      focusColor: '#8992a7'
+    menu:
+      fgColor: '#c5c9c5'
+      keyColor: '#7fb4ca'
+      numKeyColor: '#c4746e'
+    crumbs:
+      fgColor: '#181616'
+      bgColor: default
+      activeColor: '#c4b28a'
+    status:
+      newColor: '#7fb4ca'
+      modifyColor: '#8992a7'
+      addColor: '#87a987'
+      pendingColor: '#b6927b'
+      errorColor: '#e46876'
+      highlightColor: '#8ea4a2'
+      killColor: '#938aa9'
+      completedColor: '#737c73'
+  info:
+    fgColor: '#b6927b'
+    sectionColor: '#c5c9c5'
+  views:
+    table:
+      fgColor: '#c5c9c5'
+      bgColor: default
+      cursorFgColor: '#282727'
+      cursorBgColor: '#393836'
+      markColor: '#c4b28a'
+      header:
+        fgColor: '#e6c384'
+        bgColor: default
+        sorterColor: '#8ea4a2'
+    xray:
+      fgColor: '#c5c9c5'
+      bgColor: default
+      cursorColor: '#393836'
+      cursorTextColor: '#181616'
+      graphicColor: '#a292a3'
+    charts:
+      bgColor: default
+      chartBgColor: default
+      dialBgColor: default
+      defaultDialColors:
+        - '#87a987'
+        - '#e46876'
+      defaultChartColors:
+        - '#87a987'
+        - '#e46876'
+      resourceColors:
+        cpu:
+          - '#938aa9'
+          - '#7fb4ca'
+        mem:
+          - '#e6c384'
+          - '#b6927b'
+    yaml:
+      keyColor: '#7fb4ca'
+      valueColor: '#c5c9c5'
+      colonColor: '#a6a69c'
+    logs:
+      fgColor: '#c5c9c5'
+      bgColor: default
+      indicator:
+        fgColor: '#8992a7'
+        bgColor: default
+        toggleOnColor: '#87a987'
+        toggleOffColor: '#a6a69c'
+  dialog:
+    fgColor: '#e6c384'
+    bgColor: default
+    buttonFgColor: '#181616'
+    buttonBgColor: default
+    buttonFocusFgColor: '#181616'
+    buttonFocusBgColor: '#a292a3'
+    labelFgColor: '#c4b28a'
+    fieldFgColor: '#c5c9c5'

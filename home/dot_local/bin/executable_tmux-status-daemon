@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+#
+# tmux-status-daemon: pushes every dynamic status-line segment into tmux
+# @-options so the status line itself contains no #() subshells. tmux forks a
+# process per #() per refresh — and redraws slow down with scrollback size
+# while any subshell sits in the status format (tmux/tmux#3352) — so under
+# load the bar used to stall. With the push model a refresh renders stored
+# strings; load can only make the numbers arrive late, never block the bar.
+#
+# Modes:
+#   start <sysinfo-accent> <sysinfo-value> <sysinfo-alert> <uptime-normal> <uptime-alert>
+#       Singleton background loop (safe to re-run on config reload — a live
+#       daemon wins). Every status-interval it stores:
+#         @status_sysinfo  global   tmux-sysinfo output (cpu + mem segments)
+#         @status_uptime   global   tmux-uptime output
+#         @status_git      session  gitmux for the session's active pane path
+#         @win_icon        window   `icons` glyph for the window's command
+#       Style strings are passed through to tmux-sysinfo/tmux-uptime so the
+#       color palette stays in tmux.conf; gitmux styles itself via its config.
+#   refresh-focus <session-id> <pane-path>
+#       One-shot update of one session's @status_git plus a tmux-claude-status
+#       render; wired to the window/session selection hooks so the git segment
+#       follows focus immediately and a finished Claude turn is acknowledged
+#       the moment its window is looked at, instead of waiting out the tick.
+#
+# The loop exits when the tmux server goes away or when another daemon
+# instance has claimed @status_daemon_pid.
+
+set -u
+
+gitmux_cfg="$HOME/.config/tmux/gitmux.conf"
+
+# $1 is a session id ($n) rather than a name: ids are immune to rename races
+# and to names that look like target paths (sesh worktree sessions carry "/").
+refresh_git() {
+  local session="${1:-}" path="${2:-}" seg=""
+  [[ -n $session ]] || return 0
+  if [[ -n $path ]] && command -v gitmux > /dev/null 2>&1; then
+    seg=$(gitmux -cfg "$gitmux_cfg" "$path" 2> /dev/null) || seg=""
+    # gitmux closes with a color reset that would bleed into the widget's
+    # trailing padding; the status format restores the style itself.
+    seg=$(printf '%s' "$seg" | sed -E 's/(#\[(fg=default,bg=default|none)\])+$//')
+  fi
+  if [[ -n $seg ]]; then
+    # Lead with the theme's ▒ block + state icon, colored by repo state. The
+    # state is read off gitmux's own output rather than a second git run:
+    # ↑/↓ are its divergence arrows, and anything styled green/blue/gray/red
+    # is a staged/modified/untracked/conflict count (branch is white,
+    # divergence yellow). Styles come from @status_git_styles so the palette
+    # stays in tmux.conf: synced|dirty|ahead|behind.
+    local st_synced st_dirty st_ahead st_behind block icon
+    IFS='|' read -r st_synced st_dirty st_ahead st_behind <<< "$(tmux show-options -gqv @status_git_styles 2> /dev/null)"
+    if [[ $seg =~ \#\[fg=(green|blue|gray|red) ]]; then
+      block=${st_dirty:-fg=yellow} icon=󱓎
+    elif [[ $seg == *↑* ]]; then
+      block=${st_ahead:-fg=red} icon=󰛃
+    elif [[ $seg == *↓* ]]; then
+      block=${st_behind:-fg=magenta} icon=󰛀
+    else
+      block=${st_synced:-fg=green} icon=
+    fi
+    seg="#[$block]▒ $icon #[default]$seg"
+  fi
+  tmux set-option -t "$session" @status_git "$seg" 2> /dev/null || true
+}
+
+refresh_focus() {
+  refresh_git "$@"
+  tmux-claude-status render
+}
+
+# One pass over the windows of attached sessions; `icons` is a pure-bash
+# string match (~1ms) and this runs off the render path, so per-window
+# invocations are fine here. Unattached sessions are skipped — nothing renders
+# them, and with sesh holding dozens of sessions open the tick would otherwise
+# scale with the whole session list instead of what is on screen (the old
+# inline #() only ever ran for attached clients too). The selection hooks
+# repaint a session the moment it is attached or switched to.
+refresh_icons() {
+  local attached id cmd
+  while read -r attached id cmd; do
+    [[ ${attached:-0} -gt 0 && -n $id ]] || continue
+    # Stored verbatim: if `icons` ever pads a double-width glyph with a trailing
+    # space (so tmux reserves the second cell), stripping it clips the glyph.
+    tmux set-option -w -t "$id" @win_icon "$(icons "$cmd")" 2> /dev/null || true
+  done < <(tmux list-windows -a -F '#{session_attached} #{window_id} #{pane_current_command}' 2> /dev/null)
+}
+
+# gitmux for each attached session's active pane. Session-scoped so two
+# sessions on different repos never show each other's status; unattached
+# sessions are skipped for the same reason as refresh_icons.
+refresh_all_git() {
+  local attached sess path
+  while IFS=$'\t' read -r attached sess path; do
+    [[ ${attached:-0} -gt 0 ]] || continue
+    refresh_git "$sess" "$path"
+  done < <(tmux list-sessions -F $'#{session_attached}\t#{session_id}\t#{pane_current_path}' 2> /dev/null)
+}
+
+tick() {
+  tmux set-option -g @status_sysinfo \
+    "$(tmux-sysinfo "$sysinfo_accent" "$sysinfo_value" "$sysinfo_alert")" 2> /dev/null || true
+  tmux set-option -g @status_uptime \
+    "$(tmux-uptime "$uptime_normal" "$uptime_alert")" 2> /dev/null || true
+  refresh_all_git
+  refresh_icons
+  tmux-claude-status render
+}
+
+start_loop() {
+  sysinfo_accent="${1:-fg=blue}"
+  sysinfo_value="${2:-default}"
+  sysinfo_alert="${3:-fg=red}"
+  uptime_normal="${4:-default}"
+  uptime_alert="${5:-fg=red}"
+
+  # Singleton guard: a config reload re-runs this; the already-running loop
+  # keeps ownership and the newcomer exits.
+  local pid
+  pid=$(tmux show-options -gqv @status_daemon_pid 2> /dev/null)
+  if [[ -n $pid ]] && kill -0 "$pid" 2> /dev/null; then
+    exit 0
+  fi
+  tmux set-option -g @status_daemon_pid "$$" 2> /dev/null || exit 0
+
+  local interval
+  interval=$(tmux show-options -gv status-interval 2> /dev/null)
+  interval=${interval:-15}
+
+  # A restart is `kill <pid>`; exit 0 on SIGTERM so tmux does not announce
+  # "terminated by signal 15" for a run-shell it started. The sleep runs as a
+  # child under `wait` because bash defers traps until a foreground command
+  # finishes — a plain `sleep` would hold the signal for up to a full tick.
+  local sleeper=""
+  trap '[[ -n $sleeper ]] && kill "$sleeper" 2> /dev/null; exit 0' TERM INT
+  while :; do
+    tick
+    sleep "$interval" &
+    sleeper=$!
+    wait "$sleeper"
+    tmux has-session 2> /dev/null || exit 0
+    [[ $(tmux show-options -gqv @status_daemon_pid 2> /dev/null) == "$$" ]] || exit 0
+  done
+}
+
+mode="${1:-}"
+shift || true
+case "$mode" in
+  start) start_loop "$@" ;;
+  refresh-focus) refresh_focus "$@" ;;
+  *)
+    echo "usage: tmux-status-daemon start <5 style args> | refresh-focus <session-id> <path>" >&2
+    exit 64
+    ;;
+esac

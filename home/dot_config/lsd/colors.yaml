@@ -1,38 +1,39 @@
-user: "#cba6f7"         # Mocha mauve
-group: "#89b4fa"        # Mocha blue
+# Kanagawa Dragon — https://github.com/rebelot/kanagawa.nvim
+user: "#938aa9"          # springViolet1
+group: "#7fb4ca"         # springBlue
 permission:
-  read: "#a6e3a1"        # Mocha green
-  write: "#f9e2af"       # Mocha yellow
-  exec: "#f38ba8"        # Mocha red
-  exec-sticky: "#cba6f7" # Mocha mauve
-  no-access: "#6c7086"   # Mocha overlay0
-  octal: "#94e2d5"       # Mocha teal
-  acl: "#94e2d5"         # Mocha teal
-  context: "#89b4fa"     # Mocha blue
+  read: "#87a987"        # dragonGreen
+  write: "#e6c384"       # carpYellow
+  exec: "#e46876"        # waveRed
+  exec-sticky: "#938aa9" # springViolet1
+  no-access: "#737c73"   # dragonAsh
+  octal: "#7aa89f"       # waveAqua2
+  acl: "#7aa89f"         # waveAqua2
+  context: "#7fb4ca"     # springBlue
 date:
-  hour-old: "#94e2d5"    # Mocha teal
-  day-old: "#89b4fa"     # Mocha blue
-  older: "#74c7ec"       # Mocha sapphire — deeper blue, reads as receding
+  hour-old: "#7aa89f"    # waveAqua2
+  day-old: "#7fb4ca"     # springBlue
+  older: "#8ba4b0"       # dragonBlue2 — deeper blue, reads as receding
 size:
-  none: "#6c7086"        # Mocha overlay0
-  small: "#a6e3a1"       # Mocha green
-  medium: "#f9e2af"      # Mocha yellow
-  large: "#fab387"       # Mocha peach
+  none: "#737c73"        # dragonAsh
+  small: "#87a987"       # dragonGreen
+  medium: "#e6c384"      # carpYellow
+  large: "#b6927b"       # dragonOrange
 inode:
-  valid: "#cba6f7"       # Mocha mauve
-  invalid: "#6c7086"     # Mocha overlay0
+  valid: "#938aa9"       # springViolet1
+  invalid: "#737c73"     # dragonAsh
 links:
-  valid: "#cba6f7"       # Mocha mauve
-  invalid: "#6c7086"     # Mocha overlay0
-tree-edge: "#7f849c"     # Mocha overlay1
+  valid: "#938aa9"       # springViolet1
+  invalid: "#737c73"     # dragonAsh
+tree-edge: "#7a8382"     # dragonGray3
 git-status:
-  default: "#cdd6f4"           # Mocha text
-  unmodified: "#6c7086"        # Mocha overlay0
-  ignored: "#6c7086"           # Mocha overlay0
-  new-in-index: "#a6e3a1"      # Mocha green
-  new-in-workdir: "#a6e3a1"    # Mocha green
-  typechange: "#f9e2af"        # Mocha yellow
-  deleted: "#f38ba8"           # Mocha red
-  renamed: "#a6e3a1"           # Mocha green
-  modified: "#f9e2af"          # Mocha yellow
-  conflicted: "#f38ba8"        # Mocha red
+  default: "#c5c9c5"           # dragonWhite
+  unmodified: "#737c73"        # dragonAsh
+  ignored: "#737c73"           # dragonAsh
+  new-in-index: "#87a987"      # dragonGreen
+  new-in-workdir: "#87a987"    # dragonGreen
+  typechange: "#e6c384"        # carpYellow
+  deleted: "#e46876"           # waveRed
+  renamed: "#87a987"           # dragonGreen
+  modified: "#e6c384"          # carpYellow
+  conflicted: "#e46876"        # waveRed
