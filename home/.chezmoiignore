@@ -41,5 +41,3 @@
 # The main nvim config commits its lockfile (target is the source of truth:
 # copy it back to the repo after updating plugins). Since 2026-09-15 that is
 # nvim-pack-lock.json — vim.pack's lockfile — not lazy.nvim's lazy-lock.json.
-# The LazyVim fallback profile's lockfile stays per-machine state, as always.
-.config/nvim-lazyvim/lazy-lock.json

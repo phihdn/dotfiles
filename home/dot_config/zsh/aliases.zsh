@@ -30,9 +30,6 @@ alias grep='rg --color=auto'
 alias diff='diff --color=auto'
 alias df='df -h'
 alias v='nvim'
-alias nvl='NVIM_APPNAME=nvim-lazyvim nvim'  # LazyVim fallback profile (main config is self-maintained)
-alias nvc='NVIM_APPNAME=nvim-nvchad nvim'   # NvChad test-drive profile
-alias nvs='NVIM_APPNAME=nvim-smnatale nvim' # smnatale/dotfiles nvim_nightly test-drive (vim.pack)
 alias -- -='cd -'  # `-- ` stops - being read as a flag; `cd -` jumps to previous dir
 
 # =========================================================

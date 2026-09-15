@@ -1,12 +1,6 @@
 # Aliases - for commands that need arguments or complex behavior
 
 alias v nvim
-# LazyVim fallback profile (main config is self-maintained)
-alias nvl "env NVIM_APPNAME=nvim-lazyvim nvim"
-# NvChad test-drive profile
-alias nvc "env NVIM_APPNAME=nvim-nvchad nvim"
-# smnatale/dotfiles nvim_nightly test-drive (vim.pack)
-alias nvs "env NVIM_APPNAME=nvim-smnatale nvim"
 alias grep "grep --color"
 alias please sudo
 
