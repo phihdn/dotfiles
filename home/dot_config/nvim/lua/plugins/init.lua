@@ -41,6 +41,7 @@ vim.pack.add({
 	"https://github.com/rachartier/tiny-cmdline.nvim",
 	"https://github.com/stevearc/quicker.nvim",
 	"https://github.com/j-hui/fidget.nvim",
+	"https://github.com/folke/which-key.nvim",
 	"https://github.com/artemave/workspace-diagnostics.nvim",
 
 	-- Git
@@ -76,4 +77,5 @@ require("plugins.treesitter")
 require("plugins.misc")
 require("plugins.golang")
 require("plugins.quicker")
+require("plugins.whichkey")
 require("plugins.testing")

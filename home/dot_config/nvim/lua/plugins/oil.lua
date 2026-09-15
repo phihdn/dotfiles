@@ -16,4 +16,4 @@ oil_git_status.setup({
 	show_ignored = false,
 })
 
-vim.keymap.set("n", "<leader>e", ":Oil<cr>", { silent = true })
+vim.keymap.set("n", "<leader>e", ":Oil<cr>", { silent = true, desc = "File explorer (Oil)" })
