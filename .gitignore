@@ -39,7 +39,11 @@ private/
 # Local planning artifacts (not part of the dotfiles)
 plans/
 
-home/dot_config/nvim/*lock.json
+# The main nvim config's plugin lockfile IS committed — it pins plugin
+# revisions so a fresh machine rebuilds the same versions. (It used to be
+# listed here and force-added past the rule, which silently dropped tracking
+# the moment the config was replaced.)
+!home/dot_config/nvim/nvim-pack-lock.json
 
 # k9s runtime state
 home/dot_config/k9s/benchmarks/*
