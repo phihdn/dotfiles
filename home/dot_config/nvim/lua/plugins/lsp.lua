@@ -1,17 +1,23 @@
 require("mason").setup()
 require("mason-lspconfig").setup({})
 require("mason-tool-installer").setup({
+	-- mason registry package names, not nvim-lspconfig server names. The
+	-- lspconfig spellings (eslint, lua_ls, ts_ls, jsonls, yamlls) only resolve
+	-- through mason-lspconfig's translation table, which is not guaranteed to
+	-- be loaded when run_on_start fires at VimEnter. On a cold start the
+	-- lookup raises `Cannot find package "eslint"` and that error aborts the
+	-- whole list, so every entry after it silently never installs.
 	ensure_installed = {
 		"stylua",
 		"prettierd",
-		"eslint",
-		"lua_ls",
+		"eslint-lsp",
+		"lua-language-server",
 		"tailwindcss-language-server",
-		"ts_ls",
+		"typescript-language-server",
 		"gopls",
 		"sqls",
-		"jsonls",
-		"yamlls",
+		"json-lsp",
+		"yaml-language-server",
 		"biome",
 	},
 	auto_update = false,
