@@ -13,22 +13,10 @@ require("mason-tool-installer").setup({
 		"jsonls",
 		"yamlls",
 		"biome",
-		-- added to match the day-to-day languages of the main config in
-		-- ~/.config/nvim; upstream is a Go/TS setup and ships neither
-		"bashls",
-		"marksman",
 	},
 	auto_update = false,
 	run_on_start = true,
 })
-
--- basedpyright is installed with `uv tool install basedpyright`, not mason:
--- mason builds pypi venvs from `python3`, which is a symlink into uv's CPython,
--- and a venv made through that symlink cannot find its stdlib (ensurepip fails
--- with "No module named 'encodings'"). The uv-installed binary is on PATH, so
--- lspconfig's default cmd finds it -- it just needs enabling by hand, since
--- mason-lspconfig only auto-enables what mason itself installed.
-vim.lsp.enable("basedpyright")
 
 require("workspace-diagnostics").setup()
 

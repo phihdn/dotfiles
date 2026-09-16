@@ -9,7 +9,6 @@ vim.pack.add({
 
 	-- Appearance
 	"https://github.com/rose-pine/neovim",
-	"https://github.com/rebelot/kanagawa.nvim",
 	"https://github.com/kevinhwang91/nvim-hlslens",
 	"https://github.com/m4xshen/smartcolumn.nvim",
 	"https://github.com/nvim-lualine/lualine.nvim",
@@ -61,6 +60,7 @@ vim.pack.add({
 
 	-- Developer utilities
 	"https://github.com/chrisgrieser/nvim-chainsaw",
+	"https://github.com/alker0/chezmoi.vim",
 })
 
 require("plugins.blink")

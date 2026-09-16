@@ -1,17 +1,12 @@
--- Popup showing what keys are available after a prefix. Added while learning
--- this config's mappings; `<leader>sk` (Telescope keymaps) is the searchable
--- counterpart when you want to grep rather than browse.
+-- Only addition to Sam's upstream config: a popup listing what keys follow a
+-- prefix, for learning the mappings. Group labels below cover the leader
+-- prefixes upstream actually uses; without them which-key shows a bare "+prefix".
 require("which-key").setup({
 	preset = "helix",
-	-- how long to hold the prefix before the popup appears
 	delay = 300,
-	icons = {
-		mappings = false, -- no per-mapping icons; the descriptions carry the meaning
-	},
+	icons = { mappings = false },
 })
 
--- Group labels for the leader prefixes this config actually uses. Without
--- these, which-key shows a bare "+prefix" and you have to guess.
 require("which-key").add({
 	{ "<leader>c", group = "quickfix / copy" },
 	{ "<leader>g", group = "git / goto" },
