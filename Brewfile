@@ -104,6 +104,7 @@ brew "teamookla/speedtest/speedtest", trusted: true  # Speedtest CLI
 
 # Specialized tools
 brew "joshmedeski/sesh/sesh", trusted: true
+brew "raine/workmux/workmux", trusted: true  # git worktree + tmux sessions for parallel agents
 
 # GUI Applications (macOS only — casks don't exist on Linux;
 # install equivalents with the distro package manager / Flatpak)

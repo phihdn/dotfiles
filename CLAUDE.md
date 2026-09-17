@@ -41,6 +41,7 @@ brew-sync force              # Full sync, no prompts
 ### Key Integrations
 - **Shell**: Zsh (default) — modular XDG config under `~/.config/zsh` (`ZDOTDIR`), bootstrapped by a minimal `~/.zshenv`, with a self-contained git-clone plugin manager (no zinit) + Starship prompt
 - **Alt Shell**: Fish + Fisher plugin manager (still fully configured; launch with `fish`)
+- **Parallel agents**: [workmux](https://workmux.raine.dev) — `workmux add <branch>` makes a git worktree + tmux session (`mode: session`) with a Claude agent already running. Config at `home/dot_config/workmux/config.yaml`. Coexists with `git wt` (same sibling-directory layout); `git wt` keeps the bare-clone/fixed/review worktrees. Sessions are prefixed `<repo>/wm-` and `tmux-session-layout` skips `wm-*|*/wm-*` so it doesn't add a duplicate claude window — keep that infix in any per-repo `window_prefix`. Bare-clone repos need a `.workmux.yaml` (`worktree_dir: ".."`, explicit `window_prefix`) because `{project}` resolves to `.bare` there.
 - **Window Management**: AeroSpace
 - **Git**: 1Password SSH signing, conditional includes for `~/ws/work/` vs `~/ws/personal/`
 - **Node.js**: nvm (`~/.config/nvm`). `.zshenv` prepends nvm's default node `bin` to `PATH` so `node`/`npm`/`npx` work in **all** shells (interactive, non-interactive, login, non-login) — important for tools/agents that shell out non-interactively. `~/.config/zsh/.zprofile` re-prepends it after macOS `path_helper` in login shells. The `nvm` command itself is lazy-loaded in `.zshrc`.

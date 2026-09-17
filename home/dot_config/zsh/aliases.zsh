@@ -46,6 +46,9 @@ alias ld="lazydocker"
 alias s="sesh_start"
 alias s.="sesh connect ."
 
+# workmux — worktree + tmux session per parallel agent (`wm add`, `wm merge`).
+alias wm="workmux"
+
 # =========================================================
 # Claude Code — multiple accounts
 # =========================================================

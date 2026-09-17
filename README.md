@@ -11,6 +11,7 @@ _Started from [NLaundry/MacAutoSetup](https://github.com/NLaundry/MacAutoSetup);
 - 🧑‍💻 **Neovim** — self-maintained config on nvim 0.11+ native LSP, fzf-lua and mini.nvim; LazyVim kept as a fallback profile (`nvl`).
 - 🪟 **tmux** — [sesh](https://github.com/joshmedeski/sesh) sessions with path-aware layouts, and a status bar in the [tokyo-night-tmux](https://github.com/janoamaral/tokyo-night-tmux) layout that never forks a process to redraw — a background daemon feeds it, including live **Claude Code session state** per window.
 - 🌳 **Git worktrees** — `git bare-clone` + `git wt` for a one-directory-per-branch workflow (fixed `develop`/`prod` checkouts, ephemeral task and detached review worktrees).
+- 🤹 **Parallel agents** — [workmux](https://workmux.raine.dev) turns a branch into a worktree + tmux session with an agent already running, sharing the same directory layout as `git wt`.
 - 🤖 **Claude Code, two accounts** — `claude-work` / `claude-personal` keep logins and history apart while sharing one set of skills, hooks and settings.
 - 🪟 **AeroSpace** tiling, **Raycast**, **1Password** SSH agent + commit signing, **Starship** prompt, and the usual modern CLI (ripgrep, fzf, fd, bat, lsd, zoxide, lazygit, k9s …).
 
@@ -52,7 +53,7 @@ Plain `brew` formulae install on both OSes; casks and fonts are macOS-only.
 | --- | --- |
 | Core CLI | git, curl, wget, chezmoi, fzf, ripgrep, bat, fd, jq, yq, gh, glab, htop, neofetch; GNU coreutils/sed/findutils/gawk on macOS |
 | Editor & git | neovim (HEAD), tree-sitter-cli, lazygit, git-delta, difftastic, tuicr, git-lfs, gitmux |
-| Terminal | tmux, sesh, zsh, fish, starship, zoxide, lf, lsd, gum |
+| Terminal | tmux, sesh, workmux, zsh, fish, starship, zoxide, lf, lsd, gum |
 | Containers & cloud | lazydocker, lazysql, kubectl, k9s, k3sup, helm, ansible, awscli, gcloud-cli (cask), tailscale |
 | Languages | go, rust, bun, uv (Node comes from nvm, installed by `bootstrap.sh`) |
 | Utilities | mosh, nmap, cloc, tz, witr, speedtest, crush, libpq (psql without the server) |
@@ -99,6 +100,7 @@ This repository is the chezmoi **source directory**. `.chezmoiroot` contains `ho
         ├── nvim-lazyvim/   Neovim — LazyVim fallback profile (`nvl`)
         ├── tmux/           tmux.conf + gitmux.conf
         ├── sesh/           sesh sessions + reusable window definitions
+        ├── workmux/        worktree + tmux session per parallel agent
         ├── starship.toml   prompt (shared by zsh and fish)
         ├── aerospace/      tiling window manager (macOS)
         ├── private_karabiner/  Karabiner-Elements (macOS)
@@ -262,7 +264,7 @@ Layouts come from **two mechanisms**, so changes go in different places dependin
 2: zsh      # plain shell — start nvim by hand when actually editing
 ```
 
-nvim is never auto-started (each instance brings up TypeScript LSP node processes, which piles up across parallel worktree sessions), and lazygit is on demand via the `prefix+g` popup instead of a standing window. The script exits early for everything else: non-git paths, umbrella folders like `~/ws/work` itself, bare-clone roots (they stay plain shell hubs for `git wt`), detached review worktrees (read-only — no agent window), and sessions that already have a `claude` window (so it doesn't fight the sesh-defined sessions above). To give another path pattern its own layout, add a `case` branch in `tmux-session-layout`.
+nvim is never auto-started (each instance brings up TypeScript LSP node processes, which piles up across parallel worktree sessions), and lazygit is on demand via the `prefix+g` popup instead of a standing window. The script exits early for everything else: non-git paths, umbrella folders like `~/ws/work` itself, bare-clone roots (they stay plain shell hubs for `git wt`), detached review worktrees (read-only — no agent window), workmux sessions (they arrive with an agent already running — see [Parallel agents](#-parallel-agents-workmux)), and sessions that already have a `claude` window (so it doesn't fight the sesh-defined sessions above). To give another path pattern its own layout, add a `case` branch in `tmux-session-layout`.
 
 ## 🌳 Git worktree workflow (`git bare-clone`, `git wt`)
 
@@ -337,6 +339,88 @@ A normal checkout's `HEAD` points at a **branch**, so commits move that branch �
 4. **Cleanup is nothing** — removing a detached worktree removes everything, no leftover branch.
 
 Detachment is also the **marker for "disposable review checkout"** elsewhere: `git wt prune` sweeps only detached worktrees (dirty ones are still kept), and `tmux-session-layout` keys its lighter no-agent layout on detached HEAD rather than the `review-` name. One-line version: **a branch checkout is a claim; a detached checkout is a photograph.**
+
+## 🤹 Parallel agents (`workmux`)
+
+[workmux](https://workmux.raine.dev) pairs a git worktree with a tmux session and starts a coding agent in it, so several agents can work on different branches at once without sharing a checkout. It **coexists with `git wt` rather than replacing it**: `git wt` still owns the bare-clone layout, the fixed `develop`/`prod` worktrees, and detached review checkouts; workmux is the entry point when the point of the worktree is to hand it to an agent.
+
+Both produce siblings in the same directory, so one repo has one layout no matter which tool made the worktree:
+
+```text
+~/ws/work/user-service/
+├── .bare/          # git wt init
+├── develop/        # git wt init  (fixed, locked)
+├── prod/           # git wt init  (fixed, locked)
+├── PORTAL-8750/    # git wt new
+├── review-8801/    # git wt review (detached)
+└── fix-login/      # workmux add
+```
+
+The global config is `~/.config/workmux/config.yaml` (source: `home/dot_config/workmux/config.yaml`). `workmux config reference` prints the fully documented default file. The choices it encodes:
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| `mode` | `session` | One tmux session per worktree — the same unit sesh uses, so worktrees show up in the `prefix+K` picker alongside everything else. |
+| `window_prefix` | `{project}/wm-` | Sessions read `user-service/wm-fix-login`: repo-qualified like sesh's own worktree sessions, and the `wm-` infix is what `tmux-session-layout` matches to stay out of the way (below). |
+| `agent` / `agents` | `cc-work`, `cc-personal` | Named profiles setting `CLAUDE_CONFIG_DIR`, mirroring the `claude-work` / `claude-personal` aliases. `cc-work` is the default; override per run with `-a cc-personal` or per repo with `agent:` in its `.workmux.yaml`. |
+| `panes` | agent + 15-row shell | Agent on top, shell below for git and tests. No nvim, for the same reason sesh sessions start as plain shells — one TypeScript LSP per worktree adds up fast. |
+| `files.copy` | `.env`, `.env.*` | Untracked, so a fresh worktree starts without them — the same seeding `git wt new` does. |
+| `post_create` | `zoxide add --score 100` | Registers the worktree with zoxide at the score `git wt` uses, so the sesh picker offers it immediately instead of burying it. |
+| `status_format` | left at `true` | workmux writes its agent icons (🤖 working, 💬 waiting, ✅ done) into `window-status-format`. It does this once, at runtime, **for the workmux session only** — `tmux.conf` is never edited, so sesh sessions keep the Kanagawa tabs and the daemon's Claude state. |
+
+### Bare-clone repos need a per-repo `.workmux.yaml`
+
+workmux derives its defaults from the main worktree, and in a `git wt` bare clone that resolves to `.bare` — worktrees would land in `.bare__worktrees/` and sessions would be named `.bare/wm-…`. Drop a `.workmux.yaml` in the repo (committed or not, as the project prefers) to correct both:
+
+```yaml
+worktree_dir: ".."              # sibling of develop/ and prod/, not nested under .bare
+window_prefix: "user-service/wm-"   # {project} would expand to ".bare" here
+main_branch: develop
+```
+
+Normal (non-bare) clones need none of this — the defaults already give `<repo>__worktrees/` and `<repo>/wm-<branch>`.
+
+One naming quirk to expect: workmux slugifies the handle, so `wm add PORTAL-9001` creates the branch `PORTAL-9001` but the directory `portal-9001/` and the session `user-service/wm-portal-9001`. `git wt new` preserves the case (`PORTAL-9001/`), so the two tools' directories for a Jira-key branch differ in case only.
+
+### How it stays out of the session hook's way
+
+`tmux-session-layout` runs on **every** `session-created` and would otherwise bolt a second `claude` window onto the layout workmux just built. It short-circuits on the session name instead:
+
+```bash
+case "$session" in
+  wm-* | */wm-*) exit 0 ;;
+esac
+```
+
+Name matching is free; `workmux list --json` would be authoritative but costs ~0.8 s, and this hook blocks session creation. Keep the `wm-` infix in any per-repo `window_prefix` override or the guard stops matching.
+
+### Status tracking is a separate, interactive step
+
+The agent-status icons need hooks installed into the agent's own config. Run this once **from a plain terminal, not inside a `claude-*` session**, so `CLAUDE_CONFIG_DIR` is unset and the hooks land in `~/.claude/settings.json` — shared by both accounts through the symlinks:
+
+```bash
+workmux setup
+```
+
+Two things to know before answering its prompts:
+
+- It also writes to **other** agents it detects, without asking per-agent: `~/.gemini/settings.json`, `~/.gemini/config/hooks.json`, and `~/.config/opencode/plugins/workmux-status.ts`. None of those are managed by this repo; delete them to undo.
+- Its bundled skills (`merge`, `rebase`, `worktree`, `coordinator`, `open-pr`, `workmux`) install into `~/.claude/skills/` without a `phi-` prefix, so `ak kit refresh` may remove them. Re-run `workmux setup --skills` if they disappear.
+
+### Daily commands
+
+```bash
+wm add fix-login              # worktree + session + agent, branched off the current branch
+wm add fix-login -a cc-personal   # same, on the personal Claude account
+wm add -A -p "fix the login redirect loop"   # LLM-named branch from a prompt
+wm add --pr 1234              # check out a PR/MR into its own worktree
+wm list                       # worktrees + agent status
+wm dashboard                  # TUI: monitor agents, diffs, send commands
+wm merge                      # merge, then delete worktree + session + branch
+wm remove                     # drop a worktree without merging
+```
+
+`wm` is aliased in zsh and abbreviated in fish; shell completions load in both.
 
 ## 🤖 Claude Code — multiple accounts
 

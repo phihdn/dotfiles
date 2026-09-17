@@ -36,6 +36,7 @@ abbr -a ld lazydocker
 # Session management
 abbr -a s sesh_start
 abbr -a s. "sesh connect ."
+abbr -a wm workmux
 
 # Kubernetes
 abbr -a k kubectl

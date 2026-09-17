@@ -19,6 +19,16 @@ session="$1"
 path="$2"
 { [ -n "$session" ] && [ -d "$path" ]; } || exit 0
 
+# workmux (mode: session) builds its own pane layout and starts the agent
+# itself, so this hook must not add a second claude window on top of it. Its
+# sessions are identified by workmux's window_prefix — "wm-" by default and
+# "<repo>/wm-" via the {project} form set in ~/.config/workmux/config.yaml.
+# Matching the name costs nothing; `workmux list --json` would be authoritative
+# but takes ~0.8s, and this hook blocks session creation.
+case "$session" in
+  wm-* | */wm-*) exit 0 ;;
+esac
+
 # Only lay out real working trees — not umbrella folders like ~/ws/work, and
 # not bare-clone roots (git-wt layout), where rev-parse prints "false" but
 # still exits 0. Bare roots stay plain shell hubs for git wt / lg.

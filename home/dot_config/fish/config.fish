@@ -38,6 +38,11 @@ if status is-interactive; and type -q zoxide
     zoxide init fish | source
 end
 
+# workmux (git worktree + tmux session per parallel agent)
+if status is-interactive; and type -q workmux
+    workmux completions fish | source
+end
+
 # Vi key bindings
 set -g fish_key_bindings fish_vi_key_bindings
 

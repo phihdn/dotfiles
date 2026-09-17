@@ -1,0 +1,84 @@
+# workmux — global configuration. https://workmux.raine.dev
+# `workmux config reference` prints the fully documented default file.
+# Per-repo overrides live in that repo's own .workmux.yaml (`workmux init`);
+# arrays there can splice this file back in with the literal string "<global>".
+
+# Nerd Font glyphs are available everywhere here (tmux bar, lsd, starship),
+# so declare it instead of letting workmux prompt on first run.
+nerdfont: true
+
+#------------------------------------------------------------------------------
+# tmux
+#------------------------------------------------------------------------------
+
+# One tmux session per worktree, the same unit sesh uses for worktree sessions.
+mode: session
+
+# `{project}` is the main worktree's directory name, so sessions read
+# "<repo>/wm-<branch>" — the shape sesh already gives bare-clone worktrees
+# (agents-service/AIML-296), so equally named branches in different repos never
+# collide in the picker. The "wm-" infix is load-bearing, not decoration:
+# ~/.local/bin/tmux-session-layout skips sessions matching wm-*|*/wm-* so the
+# session-created hook does not bolt a second `claude` window onto the pane
+# layout workmux just built. Keep it in any per-repo override.
+# NOTE: inside a `git wt` bare clone `{project}` resolves to ".bare"; those
+# repos set an explicit window_prefix in their own .workmux.yaml (see README).
+window_prefix: "{project}/wm-"
+
+# status_format is left at its default (true): workmux rewrites
+# window-status-format to carry its agent icons. It does that at runtime, once,
+# and only for the workmux session — ~/.config/tmux/tmux.conf is untouched, so
+# sesh sessions keep the Kanagawa tab format and tmux-status-daemon's Claude
+# state. To opt out instead, set `status_format: false` and place
+# #{?@workmux_status, #{@workmux_status},} in the window-status formats by hand.
+
+#------------------------------------------------------------------------------
+# Agents
+#------------------------------------------------------------------------------
+
+# The two Claude Code accounts, mirroring the claude-work / claude-personal
+# shell aliases. Override per run with `-a cc-personal`, or per repo with
+# `agent: cc-personal` in that repo's .workmux.yaml.
+agents:
+  cc-work:
+    type: claude
+    command: claude
+    env:
+      CLAUDE_CONFIG_DIR: ~/.claude-work
+  cc-personal:
+    type: claude
+    command: claude
+    env:
+      CLAUDE_CONFIG_DIR: ~/.claude-personal
+
+agent: cc-work
+
+#------------------------------------------------------------------------------
+# Panes
+#------------------------------------------------------------------------------
+
+# Agent above, a shell below for git/tests. Deliberately no nvim: auto-starting
+# it per worktree piles up typescript-language-server processes across parallel
+# sessions — the same reason sesh sessions open as plain shells.
+panes:
+  - command: <agent>
+    focus: true
+  - split: vertical
+    size: 15
+
+#------------------------------------------------------------------------------
+# Files and hooks
+#------------------------------------------------------------------------------
+
+# .env* is untracked, so a fresh worktree starts without it — the same seeding
+# `git wt new` does from a fixed worktree.
+files:
+  copy:
+    - .env
+    - .env.*
+
+# Register the worktree with zoxide at the score `git wt` uses, so the sesh
+# picker offers it immediately instead of burying it. pre_remove is left at its
+# default (fast node_modules deletion); zoxide prunes dead paths on its own.
+post_create:
+  - 'zoxide add --score 100 "$WM_WORKTREE_PATH" 2>/dev/null || true'
