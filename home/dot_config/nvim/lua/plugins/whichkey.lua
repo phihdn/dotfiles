@@ -8,10 +8,16 @@ require("which-key").setup({
 })
 
 require("which-key").add({
-	{ "<leader>c", group = "quickfix / copy" },
+	{ "<leader>b", group = "buffer" },
+	{ "<leader>c", group = "code / quickfix" },
+	{ "<leader>e", group = "explorer" },
+	{ "<leader>f", group = "find" },
 	{ "<leader>g", group = "git / goto" },
-	{ "<leader>r", group = "restart / rotate" },
-	{ "<leader>s", group = "search (telescope)" },
+	{ "<leader>r", group = "restart / rename / rotate" },
+	{ "<leader>s", group = "split" },
 	{ "<leader>t", group = "test" },
+	{ "<leader>u", group = "ui / toggles" },
+	{ "<leader>x", group = "diagnostics" },
 	{ "<leader>z", group = "zdiff" },
+	{ "gs", group = "surround" },
 })

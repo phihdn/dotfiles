@@ -46,7 +46,6 @@ vim.api.nvim_create_autocmd(
 				return { buffer = ev.buf, silent = true, desc = desc }
 			end
 			vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, opts("Go to definition"))
-			vim.keymap.set("n", "<leader><space>", vim.lsp.buf.hover, opts("Hover documentation"))
 			vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, opts("Go to implementation"))
 			vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, opts("Go to type definition"))
 			vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts("Rename symbol"))
@@ -59,7 +58,23 @@ vim.api.nvim_create_autocmd(
 					end,
 				})
 			end, opts("Code action"))
-			vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, opts("Format buffer"))
+
+
+			-- Personal scheme: gd/gD plus the nvim 0.11 builtin gr*/gO lhs,
+			-- rebound to telescope pickers for a better UI than the default
+			-- quickfix. grn (rename) and gra (code action) stay on the builtins.
+			local tel = function(picker)
+				return function()
+					require("telescope.builtin")[picker]()
+				end
+			end
+			vim.keymap.set("n", "gd", tel("lsp_definitions"), opts("[G]oto [D]efinition"))
+			vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts("[G]oto [D]eclaration"))
+			vim.keymap.set("n", "grr", tel("lsp_references"), opts("[G]oto [R]eferences"))
+			vim.keymap.set("n", "gri", tel("lsp_implementations"), opts("[G]oto [I]mplementation"))
+			vim.keymap.set("n", "grt", tel("lsp_type_definitions"), opts("[G]oto [T]ype definition"))
+			vim.keymap.set("n", "gO", tel("lsp_document_symbols"), opts("Document Symbols"))
+			vim.keymap.set("n", "gW", tel("lsp_dynamic_workspace_symbols"), opts("Workspace Symbols"))
 
 			vim.keymap.set("n", "<leader>d", function()
 				vim.diagnostic.open_float({
