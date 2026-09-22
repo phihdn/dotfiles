@@ -34,6 +34,11 @@ vim.pack.add({
 	"https://github.com/nvim-mini/mini.nvim",
 	"https://github.com/wansmer/treesj",
 	"https://github.com/abecodes/tabout.nvim",
+	"https://github.com/folke/flash.nvim",
+	"https://github.com/folke/todo-comments.nvim",
+
+	-- Markdown
+	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
 
 	-- Diagnostics and command line
 	"https://github.com/rachartier/tiny-inline-diagnostic.nvim",
@@ -74,6 +79,9 @@ require("plugins.mini")
 require("plugins.oil")
 require("plugins.telescope")
 require("plugins.treesitter")
+require("plugins.markdown")
+require("plugins.flash")
+require("plugins.todo")
 require("plugins.misc")
 require("plugins.golang")
 require("plugins.quicker")
