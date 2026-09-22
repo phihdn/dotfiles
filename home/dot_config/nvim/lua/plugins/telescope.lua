@@ -6,6 +6,25 @@ local code_action = require("tiny-code-action")
 telescope.setup({
 	defaults = {
 		path_display = { "truncate", "filename_first" },
+
+		-- Match the look of the fzf-lua setup this config replaced: one
+		-- centered rounded float, prompt on top, preview filling the right
+		-- half. Telescope numbers results from the top only when
+		-- sorting_strategy is "ascending", so that has to move with the prompt.
+		-- fzf's selection pointer: a solid block, painted red by the
+		-- TelescopeSelectionCaret group in plugins/colorscheme.lua
+		selection_caret = "▌ ",
+		sorting_strategy = "ascending",
+		layout_strategy = "horizontal",
+		layout_config = {
+			prompt_position = "top",
+			width = 0.85,
+			height = 0.85,
+			preview_width = 0.5,
+		},
+		borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+		winblend = 0,
+
 		mappings = {
 			i = {
 				["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,

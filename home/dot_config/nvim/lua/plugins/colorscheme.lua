@@ -9,6 +9,7 @@ require("rose-pine").setup({
 		NotificationInfo = { bg = "none", fg = "text" },
 		NotificationWarning = { bg = "none", fg = "subtle" },
 		NotificationError = { bg = "none", fg = "love" },
+		TelescopeSelectionCaret = { fg = "love" },
 	},
 })
 
