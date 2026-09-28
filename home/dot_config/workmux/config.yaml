@@ -32,6 +32,14 @@ window_prefix: "{project}/wm-"
 # state. To opt out instead, set `status_format: false` and place
 # #{?@workmux_status, #{@workmux_status},} in the window-status formats by hand.
 
+# A static Nerd Font spinner (nf-fa-spinner) instead of the default robot.
+# It can't animate: workmux takes a fixed string, and a frame-pushing loop
+# would break the fork-free status bar. waiting/done keep workmux's defaults.
+status_icons:
+  working: ""
+  waiting: "💬"
+  done: "✅"
+
 #------------------------------------------------------------------------------
 # Agents
 #------------------------------------------------------------------------------
