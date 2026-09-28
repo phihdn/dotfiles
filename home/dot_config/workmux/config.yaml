@@ -25,12 +25,10 @@ mode: session
 # repos set an explicit window_prefix in their own .workmux.yaml (see README).
 window_prefix: "{project}/wm-"
 
-# status_format is left at its default (true): workmux rewrites
-# window-status-format to carry its agent icons. It does that at runtime, once,
-# and only for the workmux session — ~/.config/tmux/tmux.conf is untouched, so
-# sesh sessions keep the Kanagawa tab format and tmux-status-daemon's Claude
-# state. To opt out instead, set `status_format: false` and place
-# #{?@workmux_status, #{@workmux_status},} in the window-status formats by hand.
+# status_format: false — workmux would append its agent icon after the tab
+# format's closing reset, so the icon sat outside the tab in plain bar colours.
+# ~/.config/tmux/tmux.conf places #{@workmux_status} inside the tab instead.
+status_format: false
 
 # A static Nerd Font spinner (nf-fa-spinner) instead of the default robot.
 # It can't animate: workmux takes a fixed string, and a frame-pushing loop
