@@ -12,7 +12,7 @@ Cheat sheet for `home/dot_config/nvim`. Leader is `<Space>`. Press `<Space>` and
 | `<leader>f` | find (fzf-lua) | `ff` files, `fg` grep, `fo` recent, `fr` resume, `fk` keymaps |
 | `<leader>g` | git | `ga` stage hunk, `gr` reset hunk, `gp` preview, `gb` blame, `gv` diffview |
 | `<leader>s` | split | `sv` vertical, `sh` horizontal, `se` equalize, `sx` close |
-| `<leader>u` | ui toggles | `uw` wrap, `us` spell, `ud` diagnostics, `uh` inlay hints, `uB` inline blame |
+| `<leader>u` | ui toggles | `uw` wrap, `us` spell, `ud` diagnostics, `uh` inlay hints, `um` markdown rendering, `uB` inline blame |
 | `<leader>x` | diagnostics lists (trouble) | `xw` workspace, `xd` buffer, `xq` quickfix, `xt` todos |
 | `<leader>y` | yank to clipboard | `y{motion}`, `Y` line, `yp` file path, `ym` messages |
 

@@ -63,3 +63,5 @@ require("render-markdown").setup({
     enabled = true,
   },
 })
+
+vim.keymap.set("n", "<leader>um", "<cmd>RenderMarkdown toggle<CR>", { desc = "Toggle markdown rendering" })
