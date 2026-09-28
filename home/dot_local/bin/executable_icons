@@ -129,9 +129,10 @@ case "$cmd" in
     ;;
   # glob so wrappers and aliases (claude-work, claude-personal, ...) match;
   # note plain aliases already exec the claude binary, so tmux usually
-  # reports just "claude" regardless
+  # reports just "claude" regardless. No glyph: the tab shows only the name
+  # (tmux.conf drops the icon slot when @win_icon is empty)
   *claude*)
-    echo 
+    echo ""
     ;;
   youtube-dl)
     echo 
