@@ -1,6 +1,8 @@
 vim.pack.add({
   "https://github.com/stevearc/oil.nvim",
   "https://github.com/nvim-tree/nvim-web-devicons",
+  -- git status of each entry in the sign column
+  "https://github.com/refractalize/oil-git-status.nvim",
 })
 
 CustomOilBar = function()
@@ -24,6 +26,7 @@ require("oil").setup({
   },
   win_options = {
     winbar = "%{v:lua.CustomOilBar()}",
+    signcolumn = "yes:2", -- oil-git-status: staged + unstaged columns
   },
   view_options = {
     show_hidden = true,
@@ -33,6 +36,8 @@ require("oil").setup({
     end,
   },
 })
+
+require("oil-git-status").setup({ show_ignored = false })
 
 -- Open parent directory in current window
 vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })

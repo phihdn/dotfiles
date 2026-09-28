@@ -180,7 +180,7 @@ Day-to-day: `nvm install --lts`, `nvm alias default <version>`, `.nvmrc` per pro
 
 ## 🧑‍💻 Neovim
 
-`~/.config/nvim` is a self-maintained config (custom Lua under `lua/phihdn/{core,plugins}`, one plugin per file), on nvim 0.13 nightly: plugins managed by the built-in `vim.pack` (no lazy.nvim), native `vim.lsp.config()`/`vim.lsp.enable()` (mason installs the binaries; no mason-lspconfig), treesitter `main` branch, fzf-lua as the sole picker, blink.cmp completion, conform + nvim-lint, Kanagawa Dragon, oil + mini.files for file management, and mini.ai/mini.surround textobjects. Languages: go, typescript, python (basedpyright), lua, bash, yaml, postgres, markdown.
+`~/.config/nvim` is a self-maintained config (custom Lua under `lua/phihdn/{core,plugins}`, one plugin per file), on nvim 0.13 nightly: plugins managed by the built-in `vim.pack` (no lazy.nvim), native `vim.lsp.config()`/`vim.lsp.enable()` (mason installs the binaries; no mason-lspconfig), treesitter `main` branch, fzf-lua as the sole picker, blink.cmp completion, conform + nvim-lint, Kanagawa Dragon, oil (with oil-git-status) + mini.files for file management, and mini.ai/mini.surround textobjects. Languages: go, typescript, python (basedpyright), lua, bash, yaml, postgres, markdown.
 
 Each plugin module in `lua/phihdn/plugins/` calls `vim.pack.add()` and configures the plugin right after; `lua/phihdn/plugins/init.lua` sets the load order. Plugins needed for the first screen (or that must see the file nvim was started with) load at startup; the rest load on the first event-loop tick after startup, like lazy.nvim's `VeryLazy`, which keeps startup around 50ms. Plugins live in `~/.local/share/nvim/site/pack/core/opt`.
 
