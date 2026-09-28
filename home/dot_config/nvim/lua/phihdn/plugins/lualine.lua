@@ -77,6 +77,7 @@ local colors = {
   yellow = "#e6c384", -- carpYellow
   surface = "#282727", -- dragonBlack4 — mid-section background
   green = "#87a987", -- dragonGreen
+  orange = "#b6927b", -- dragonOrange
   magenta = "#938aa9", -- springViolet1
   blue = "#7fb4ca", -- springBlue
   red = "#e46876", -- waveRed
@@ -119,6 +120,7 @@ custom_theme.inactive = {
 }
 
 local icons = require("phihdn.core.icons")
+local pack_updates = require("phihdn.pack-updates")
 require("lualine").setup({
   options = {
     -- theme = "auto",
@@ -159,6 +161,17 @@ require("lualine").setup({
     },
     lualine_x = {
       { "fancy_macro" },
+      {
+        -- plugins with a pending update (checked in the background at startup);
+        -- apply them with :packupdate
+        function()
+          return "󰚰 " .. pack_updates.count
+        end,
+        cond = function()
+          return pack_updates.count > 0
+        end,
+        color = { fg = colors.orange },
+      },
       { markdownWordcount },
       { autoformatOff, color = { fg = colors.red, gui = "bold" } },
       {
@@ -194,3 +207,6 @@ require("lualine").setup({
   tabline = {},
   extensions = { "oil", "trouble", "quickfix", "mason" },
 })
+
+-- a few seconds in, so the fetches don't compete with startup work
+vim.defer_fn(pack_updates.check, 3000)
