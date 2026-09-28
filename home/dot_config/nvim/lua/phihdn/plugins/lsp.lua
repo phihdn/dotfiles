@@ -1,8 +1,7 @@
--- nvim 0.11+ native LSP: nvim-lspconfig is data-only here — it ships the
--- lsp/<server>.lua defaults (cmd, filetypes, root markers) that
--- vim.lsp.config() reads from the runtimepath. No require("lspconfig").
+-- Built-in LSP client only: each server's defaults (cmd, filetypes, root
+-- markers, settings) live in this config's lsp/<server>.lua, which
+-- vim.lsp.config() reads from the runtimepath — no nvim-lspconfig.
 vim.pack.add({
-  "https://github.com/neovim/nvim-lspconfig",
   -- installs the binaries listed below into mason's bin dir (mason itself: plugins/mason.lua)
   "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim",
   -- LSP progress messages in the corner
@@ -87,16 +86,7 @@ vim.diagnostic.config({
 -- broadcast blink.cmp's extra completion capabilities to every server
 vim.lsp.config("*", { capabilities = require("blink.cmp").get_lsp_capabilities() })
 
-vim.lsp.config("yamlls", {
-  settings = {
-    yaml = {
-      keyOrdering = false,
-      format = { enable = true },
-    },
-  },
-})
-
--- servers by nvim-lspconfig name; mason package names differ (list below)
+-- server names match the files in lsp/; mason package names differ (list below)
 vim.lsp.enable({
   "bashls",
   "basedpyright",
