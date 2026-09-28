@@ -1,4 +1,2 @@
-return {
-  "tpope/vim-sleuth",
-  -- No further initialization needed, as this is a real "vim" not a lua plugin.
-}
+-- indent detection; a vimscript plugin, nothing to configure
+vim.pack.add({ "https://github.com/tpope/vim-sleuth" })

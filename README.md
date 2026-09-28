@@ -8,7 +8,7 @@ _Started from [NLaundry/MacAutoSetup](https://github.com/NLaundry/MacAutoSetup);
 
 - 🖋️ **chezmoi** — one repo mirrors `$HOME`; templates pull secrets from 1Password at apply time, `git pull` auto-applies through tracked hooks.
 - 🚀 **Zsh** — default shell with a modular XDG config under `~/.config/zsh` and a self-contained git-clone plugin manager; **Fish** stays fully configured as an alternative.
-- 🧑‍💻 **Neovim** — self-maintained config on nvim 0.11+ native LSP, fzf-lua and mini.nvim; LazyVim kept as a fallback profile (`nvl`).
+- 🧑‍💻 **Neovim** — self-maintained config on nvim's built-in plugin manager (`vim.pack`) and native LSP, with fzf-lua and mini.nvim.
 - 🪟 **tmux** — [sesh](https://github.com/joshmedeski/sesh) sessions with path-aware layouts, and a status bar in the [tokyo-night-tmux](https://github.com/janoamaral/tokyo-night-tmux) layout that never forks a process to redraw — a background daemon feeds it, including live **Claude Code session state** per window.
 - 🌳 **Git worktrees** — `git bare-clone` + `git wt` for a one-directory-per-branch workflow (fixed `develop`/`prod` checkouts, ephemeral task and detached review worktrees).
 - 🤹 **Parallel agents** — [workmux](https://workmux.raine.dev) turns a branch into a worktree + tmux session with an agent already running, sharing the same directory layout as `git wt`.
@@ -97,7 +97,6 @@ This repository is the chezmoi **source directory**. `.chezmoiroot` contains `ho
         ├── zsh/            modular zsh config (see "zsh configuration")
         ├── fish/           fish config (config.fish, conf.d/, functions/)
         ├── nvim/           Neovim — self-maintained config
-        ├── nvim-lazyvim/   Neovim — LazyVim fallback profile (`nvl`)
         ├── tmux/           tmux.conf + gitmux.conf
         ├── sesh/           sesh sessions + reusable window definitions
         ├── workmux/        worktree + tmux session per parallel agent
@@ -181,11 +180,17 @@ Day-to-day: `nvm install --lts`, `nvm alias default <version>`, `.nvmrc` per pro
 
 ## 🧑‍💻 Neovim
 
-`~/.config/nvim` is a self-maintained config (custom Lua under `lua/phihdn/{core,plugins}`, one plugin per file), modernized for nvim 0.11+: native `vim.lsp.config()`/`vim.lsp.enable()` (mason installs the binaries; no mason-lspconfig), treesitter `main` branch, fzf-lua as the sole picker, blink.cmp completion, conform + nvim-lint, catppuccin (Mocha), oil + mini.files for file management, and mini.ai/mini.surround textobjects. Languages: go, typescript, python (basedpyright), lua, bash, yaml, postgres, markdown.
+`~/.config/nvim` is a self-maintained config (custom Lua under `lua/phihdn/{core,plugins}`, one plugin per file), on nvim 0.13 nightly: plugins managed by the built-in `vim.pack` (no lazy.nvim), native `vim.lsp.config()`/`vim.lsp.enable()` (mason installs the binaries; no mason-lspconfig), treesitter `main` branch, fzf-lua as the sole picker, blink.cmp completion, conform + nvim-lint, Kanagawa Dragon, oil + mini.files for file management, and mini.ai/mini.surround textobjects. Languages: go, typescript, python (basedpyright), lua, bash, yaml, postgres, markdown.
 
-`lazy-lock.json` **is committed** for this config — the applied target is the source of truth, so after `:Lazy update`, copy it back before committing: `cp ~/.config/nvim/lazy-lock.json home/dot_config/nvim/`.
+Each plugin module in `lua/phihdn/plugins/` calls `vim.pack.add()` and configures the plugin right after; `lua/phihdn/plugins/init.lua` sets the load order. Plugins needed for the first screen (or that must see the file nvim was started with) load at startup; the rest load on the first event-loop tick after startup, like lazy.nvim's `VeryLazy`, which keeps startup around 50ms. Plugins live in `~/.local/share/nvim/site/pack/core/opt`.
 
-**LazyVim fallback**: the LazyVim setup used during 2026-07 is kept fully working at `home/dot_config/nvim-lazyvim/` under an isolated `NVIM_APPNAME=nvim-lazyvim` profile — run it with the `nvl` alias (zsh + fish). Its lockfile stays unmanaged (see `.chezmoiignore`). History snapshots: [`20260710-nvim-pre-lazyvim`](https://github.com/phihdn/dotfiles/tree/20260710-nvim-pre-lazyvim/home/dot_config/nvim) (self config before the LazyVim experiment) and `20260730-nvim-pre-self` (LazyVim as main, right before the swap).
+- Update: `:packupdate`, review the changes, `:write` to apply, then `:restart`.
+- Remove: delete the plugin's `vim.pack.add()` entry, `:restart`, then `:packdel <name>`.
+- New machine: the committed lockfile makes the first start install every plugin at the pinned revision.
+
+`nvim-pack-lock.json` **is committed** — the applied target is the source of truth, so after `:packupdate`, copy it back before committing: `cp ~/.config/nvim/nvim-pack-lock.json home/dot_config/nvim/`.
+
+History snapshots: [`20260710-nvim-pre-lazyvim`](https://github.com/phihdn/dotfiles/tree/20260710-nvim-pre-lazyvim/home/dot_config/nvim) (self config before the LazyVim experiment) and `20260730-nvim-pre-self` (LazyVim as main, right before the swap).
 
 ## 🪟 tmux
 

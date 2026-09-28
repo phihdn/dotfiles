@@ -38,5 +38,5 @@
 # tmux plugins are cloned at runtime by tpm
 .config/tmux/plugins
 
-# The main nvim config commits its lazy-lock.json (target is the source of
-# truth: copy it back to the repo after :Lazy update).
+# The main nvim config commits its vim.pack lockfile, nvim-pack-lock.json
+# (target is the source of truth: copy it back to the repo after :packupdate).

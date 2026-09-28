@@ -1,28 +1,21 @@
-return {
-  "folke/which-key.nvim",
-  event = "VeryLazy",
-  opts = {
-    preset = "helix",
-    -- v3 spec: group labels for the leader prefixes used across this config
-    spec = {
-      { "<leader>b", group = "buffer" },
-      { "<leader>c", group = "code" },
-      { "<leader>e", group = "explorer" },
-      { "<leader>f", group = "find" },
-      { "<leader>g", group = "git" },
-      { "<leader>s", group = "split" },
-      { "<leader>u", group = "ui/toggles" },
-      { "<leader>x", group = "diagnostics" },
-      { "gs", group = "surround" },
-    },
+vim.pack.add({ "https://github.com/folke/which-key.nvim" })
+
+require("which-key").setup({
+  preset = "helix",
+  -- v3 spec: group labels for the leader prefixes used across this config
+  spec = {
+    { "<leader>b", group = "buffer" },
+    { "<leader>c", group = "code" },
+    { "<leader>e", group = "explorer" },
+    { "<leader>f", group = "find" },
+    { "<leader>g", group = "git" },
+    { "<leader>s", group = "split" },
+    { "<leader>u", group = "ui/toggles" },
+    { "<leader>x", group = "diagnostics" },
+    { "gs", group = "surround" },
   },
-  keys = {
-    {
-      "<leader>?",
-      function()
-        require("which-key").show({ global = false })
-      end,
-      desc = "Buffer Local Keymaps (which-key)",
-    },
-  },
-}
+})
+
+vim.keymap.set("n", "<leader>?", function()
+  require("which-key").show({ global = false })
+end, { desc = "Buffer Local Keymaps (which-key)" })
