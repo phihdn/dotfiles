@@ -21,11 +21,11 @@ vim.opt.clipboard = "" -- don't use system clipboard
 -- default position
 vim.opt.scrolloff = 10
 
--- ex line
--- vim.o.ls = 0 -- laststatus 0: Never show, 1: Only show if there are at least two windows, 2: Always show, 3: (Neovim-only) Always show one global status line for the whole tabpage
--- vim.o.ch = 0 -- cmdheight: 0: hide command line, 1: alwasy shows 1 line, 2+: Useful if you want more space for command feedback/errors
--- views can only be fully collapsed with the global statusline
---vim.opt.laststatus = 3
+-- command line: hidden until you type : / ?, so the statusline sits on the
+-- last row. ui2 (experimental core message UI) shows messages in a floating
+-- window instead of popping the command line open; `g<` opens the history.
+vim.o.cmdheight = 0
+require("vim._core.ui2").enable({ msg = { targets = "msg" } })
 
 -- search
 vim.opt.hlsearch = true
