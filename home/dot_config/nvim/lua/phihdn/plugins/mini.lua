@@ -1,9 +1,6 @@
 vim.pack.add({ "https://github.com/nvim-mini/mini.nvim" })
 
 local nmap = function(keys, func, desc)
-  if desc then
-    desc = desc .. " [Mini]"
-  end
   vim.keymap.set("n", keys, func, { desc = desc })
 end
 
@@ -16,10 +13,7 @@ indentscope.setup({
     -- indent_at_cursor = false,
     try_as_border = true,
   },
-  mappings = {
-    goto_top = "[s",
-    goto_bottom = "]s",
-  },
+  -- default [i / ]i jump to the scope's edges (keeps [s / ]s for spelling)
 })
 
 require("mini.cursorword").setup()
@@ -86,11 +80,11 @@ nmap("<leader>ee", function()
   if not MiniFiles.close() then
     MiniFiles.open()
   end
-end, "Toggle file explorer")
+end, "Toggle explorer (mini.files)")
 nmap("<leader>ef", function()
   MiniFiles.open(vim.api.nvim_buf_get_name(0), false)
   MiniFiles.reveal_cwd()
-end, "Explore current file's directory")
+end, "Reveal current file (mini.files)")
 
 -- local miniclue = require("mini.clue")
 -- miniclue.setup({

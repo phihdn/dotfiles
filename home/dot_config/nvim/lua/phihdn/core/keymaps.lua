@@ -1,72 +1,75 @@
-local opts = { noremap = true, silent = true }
+-- Core keymaps (no plugins). Plugin keymaps live next to their plugin in
+-- lua/phihdn/plugins/; which-key (<leader>) and <leader>fk list them all.
+-- Leader prefixes: b buffer · c code · e explorer · f find · g git
+--                  s split · u ui toggles · x diagnostics lists · y/p clipboard
+local map = vim.keymap.set
 
-vim.keymap.set("n", "\\", "<cmd>Oil --float<CR>", { desc = "Open Parent Directory in Oil" })
-vim.keymap.set("n", "gl", function()
-  vim.diagnostic.open_float()
-end, { desc = "Open Diagnostics in Float" })
+-- Editing --------------------------------------------------------------------
+map("i", "jk", "<Esc>", { desc = "Exit insert mode" })
+map("n", "x", '"_x', { desc = "Delete char (keep registers)" })
+map("x", "p", "P", { desc = "Paste over selection (keep register)" })
+map("n", "J", "mzJ`z", { desc = "Join lines (keep cursor)" })
+-- shadows builtin X (delete char before cursor)
+map(
+  "n",
+  "X",
+  ":keeppatterns substitute/\\s*\\%#\\s*/\\r/e <bar> normal! ==^<CR>",
+  { silent = true, desc = "Split line at cursor" }
+)
+map("x", "J", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move selection down" })
+map("x", "K", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move selection up" })
+map("x", "<", "<gv", { desc = "Indent left (keep selection)" })
+map("x", ">", ">gv", { desc = "Indent right (keep selection)" })
 
--- Keep cursor centered when scrolling
-vim.keymap.set("n", "<C-d>", "<C-d>zz", opts)
-vim.keymap.set("n", "<C-u>", "<C-u>zz", opts)
+-- Motion ---------------------------------------------------------------------
+-- move by screen line when wrapping, but keep real-line motion for counts (5j)
+map("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, desc = "Down (screen line)" })
+map("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, desc = "Up (screen line)" })
+-- keep the cursor centered (and open folds) on big jumps and search hits
+map("n", "<C-d>", "<C-d>zz", { desc = "Half page down (centered)" })
+map("n", "<C-u>", "<C-u>zz", { desc = "Half page up (centered)" })
+for _, key in ipairs({ "n", "N", "*", "#", "g*", "g#" }) do
+  map("n", key, key .. "zzzv", { desc = "Search " .. key .. " (centered)" })
+end
+map("n", "<Esc>", "<cmd>nohlsearch<CR><Esc>", { desc = "Clear search highlight" })
 
--- Move selected line / block of text in visual mode
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "moves lines down in visual selection" })
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "moves lines up in visual selection" })
-
-vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines and keep cursor in the middle" })
-
--- Move by screen line when wrapping, but keep real-line motion for counts (5j)
-vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
-vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true })
-
--- better indenting without reselecting
-vim.keymap.set("v", "<", "<gv")
-vim.keymap.set("v", ">", ">gv")
-
-vim.keymap.set({ "n", "x" }, "<leader>y", [["+y]], { desc = "Copy to clipboard" })
-vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Copy line to clipboard" })
-vim.keymap.set("n", "<leader>ym", function()
+-- Clipboard: <leader>y / <leader>p mirror y / p against the system clipboard;
+-- plain y / p stay on nvim's registers ('clipboard' is empty on purpose)
+map({ "n", "x" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
+map("n", "<leader>Y", '"+Y', { desc = "Yank line to clipboard" })
+map({ "n", "x" }, "<leader>p", '"+p', { desc = "Paste from clipboard" })
+map("n", "<leader>P", '"+P', { desc = "Paste from clipboard (before)" })
+map("n", "<leader>yp", function()
+  local path = vim.fn.expand("%:~")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied " .. path)
+end, { desc = "Yank file path to clipboard" })
+map("n", "<leader>ym", function()
   vim.fn.setreg("+", vim.fn.execute("messages"))
-  vim.notify("Messages copied to clipboard")
+  vim.notify("Copied :messages")
 end, { desc = "Yank :messages to clipboard" })
 
--- paste over selection without clobbering the unnamed register
--- (builtin visual P has done this natively since nvim 0.10)
-vim.keymap.set("x", "p", "P")
+-- Buffers & splits -----------------------------------------------------------
+map("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Next buffer" })
+map("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
+map("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
+map("n", "<leader>sv", "<C-w>v", { desc = "Split vertically" })
+map("n", "<leader>sh", "<C-w>s", { desc = "Split horizontally" })
+map("n", "<leader>se", "<C-w>=", { desc = "Equalize splits" })
+map("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close split" })
 
--- Exit insert mode with jk
-vim.keymap.set("i", "jk", "<ESC>", opts)
+-- Diagnostics (nvim's defaults add [d ]d to jump and <C-w>d for this float)
+map("n", "gl", vim.diagnostic.open_float, { desc = "Line diagnostics" })
 
--- Navigate buffers
-vim.keymap.set("n", "<S-l>", ":bnext<CR>", opts)
-vim.keymap.set("n", "<S-h>", ":bprevious<CR>", opts)
-vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
-
--- Center screen (and reopen folds) when jumping between matches
-vim.keymap.set("n", "n", "nzzzv", opts)
-vim.keymap.set("n", "N", "Nzzzv", opts)
-vim.keymap.set("n", "*", "*zzzv", opts)
-vim.keymap.set("n", "#", "#zzzv", opts)
-vim.keymap.set("n", "g*", "g*zzzv", opts)
-vim.keymap.set("n", "g#", "g#zzzv", opts)
-
--- Split line at cursor (shadows builtin X = delete char before cursor)
-vim.keymap.set("n", "X", ":keeppatterns substitute/\\s*\\%#\\s*/\\r/e <bar> normal! ==^<cr>", { silent = true })
-
-vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR><Esc>", opts)
-
--- delete single character without copying into register
-vim.keymap.set("n", "x", '"_x', opts)
-
---split management
-vim.keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
-vim.keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" })
-vim.keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" })
-vim.keymap.set("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close current split" })
-
--- Copy filepath to the clipboard
-vim.keymap.set("n", "<leader>fp", function()
-  local filePath = vim.fn.expand("%:~")
-  vim.fn.setreg("+", filePath)
-  print("File path copied to clipboard: " .. filePath)
-end, { desc = "Copy file path to clipboard" })
+-- UI toggles -----------------------------------------------------------------
+local toggle = function(lhs, option, desc)
+  map("n", lhs, function()
+    vim.wo[option] = not vim.wo[option]
+    vim.notify(("%s %s"):format(option, vim.wo[option] and "on" or "off"))
+  end, { desc = desc })
+end
+toggle("<leader>uw", "wrap", "Toggle wrap")
+toggle("<leader>us", "spell", "Toggle spell")
+map("n", "<leader>ud", function()
+  vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end, { desc = "Toggle diagnostics" })

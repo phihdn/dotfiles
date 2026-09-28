@@ -11,5 +11,5 @@ vim.keymap.set("n", "<leader>gv", function()
   else
     vim.cmd("DiffviewOpen")
   end
-end, { desc = "Diffview (toggle working-tree diff)" })
-vim.keymap.set("n", "<leader>gV", "<cmd>DiffviewFileHistory %<cr>", { desc = "Diffview file history (current file)" })
+end, { desc = "Diff working tree (toggle)" })
+vim.keymap.set("n", "<leader>gV", "<cmd>DiffviewFileHistory %<cr>", { desc = "File history (current file)" })

@@ -12,10 +12,11 @@ require("which-key").setup({
     { "<leader>s", group = "split" },
     { "<leader>u", group = "ui/toggles" },
     { "<leader>x", group = "diagnostics" },
+    { "<leader>y", group = "yank to clipboard" },
     { "gs", group = "surround" },
   },
 })
 
 vim.keymap.set("n", "<leader>?", function()
   require("which-key").show({ global = false })
-end, { desc = "Buffer Local Keymaps (which-key)" })
+end, { desc = "Buffer-local keymaps" })

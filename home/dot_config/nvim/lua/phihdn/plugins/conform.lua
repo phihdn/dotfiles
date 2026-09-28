@@ -58,4 +58,4 @@ require("conform").setup({
 
 vim.keymap.set("", "<leader>cf", function()
   require("conform").format({ lsp_format = "fallback", async = true })
-end, { desc = "[C]ode [F]ormat buffer" })
+end, { desc = "Format buffer/selection" })

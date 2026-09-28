@@ -1,6 +1,36 @@
 vim.pack.add({ "https://github.com/lewis6991/gitsigns.nvim" })
 
 require("gitsigns").setup({
+  -- hunk keymaps, only in buffers gitsigns tracks: ]h/[h move, <leader>g acts,
+  -- ih selects (dih deletes a hunk, vih selects it)
+  on_attach = function(bufnr)
+    local gs = require("gitsigns")
+    local map = function(mode, lhs, rhs, desc)
+      vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+    end
+    -- ]c / [c stay nvim's own in diff mode (diffview); ]h / [h everywhere
+    map("n", "]h", function()
+      gs.nav_hunk("next")
+    end, "Next hunk")
+    map("n", "[h", function()
+      gs.nav_hunk("prev")
+    end, "Previous hunk")
+    map("n", "<leader>gp", gs.preview_hunk_inline, "Preview hunk")
+    map("n", "<leader>ga", gs.stage_hunk, "Stage/unstage hunk")
+    map("n", "<leader>gr", gs.reset_hunk, "Reset hunk")
+    map("x", "<leader>ga", function()
+      gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+    end, "Stage/unstage selected lines")
+    map("x", "<leader>gr", function()
+      gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+    end, "Reset selected lines")
+    map("n", "<leader>gA", gs.stage_buffer, "Stage buffer")
+    map("n", "<leader>gR", gs.reset_buffer, "Reset buffer")
+    map("n", "<leader>gb", function()
+      gs.blame_line({ full = true })
+    end, "Blame line (full commit)")
+    map({ "o", "x" }, "ih", gs.select_hunk, "Inside hunk")
+  end,
   signs = {
     add = {
       text = "▎",

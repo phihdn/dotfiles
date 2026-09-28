@@ -39,11 +39,9 @@ require("oil").setup({
 
 require("oil-git-status").setup({ show_ignored = false })
 
--- Open parent directory in current window
-vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
-
--- Open parent directory in floating window
-vim.keymap.set("n", "<leader>-", require("oil").toggle_float, { desc = "Toggle Oil float" })
+-- `-` opens the parent directory in place (vim-vinegar style); `\` in a float
+vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Parent directory (oil)" })
+vim.keymap.set("n", "\\", require("oil").toggle_float, { desc = "Parent directory (oil float)" })
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "oil", -- Adjust if Oil uses a specific file type identifier

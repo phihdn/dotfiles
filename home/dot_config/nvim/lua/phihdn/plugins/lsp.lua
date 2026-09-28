@@ -26,13 +26,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- gd/gD plus the nvim 0.11 builtin gr*/gO lhs, rebound to fzf-lua
     -- pickers for a better UI than the default quickfix. grn (rename) and
     -- gra (code action) stay on the builtin implementations.
-    map("gd", fzf("lsp_definitions"), "[G]oto [D]efinition")
-    map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-    map("grr", fzf("lsp_references"), "[G]oto [R]eferences")
-    map("gri", fzf("lsp_implementations"), "[G]oto [I]mplementation")
-    map("grt", fzf("lsp_typedefs"), "[G]oto [T]ype definition")
-    map("gO", fzf("lsp_document_symbols"), "Document Symbols")
-    map("gW", fzf("lsp_live_workspace_symbols"), "Workspace Symbols")
+    map("gd", fzf("lsp_definitions"), "Definition")
+    map("gD", vim.lsp.buf.declaration, "Declaration")
+    map("grr", fzf("lsp_references"), "References")
+    map("gri", fzf("lsp_implementations"), "Implementations")
+    map("grt", fzf("lsp_typedefs"), "Type definition")
+    map("gO", fzf("lsp_document_symbols"), "Document symbols")
+    map("gW", fzf("lsp_live_workspace_symbols"), "Workspace symbols")
 
     local client = vim.lsp.get_client_by_id(event.data.client_id)
 
@@ -61,7 +61,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
       map("<leader>uh", function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
-      end, "Toggle inlay [h]ints")
+      end, "Toggle inlay hints")
     end
   end,
 })
