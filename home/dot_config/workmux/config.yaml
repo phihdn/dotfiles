@@ -30,13 +30,13 @@ window_prefix: "{project}/wm-"
 # ~/.config/tmux/tmux.conf places #{@workmux_status} inside the tab instead.
 status_format: false
 
-# A Nerd Font hourglass (nf-md-timer_sand) instead of the default robot: a
-# font glyph takes the tab's colour, an emoji keeps its own. Static, since
-# workmux takes a fixed string. waiting/done keep workmux's defaults.
+# Nerd Font glyphs instead of workmux's emoji (robot / speech bubble / check):
+# a font glyph takes the tab's colour, an emoji keeps its own. Static, since
+# workmux takes fixed strings.
 status_icons:
-  working: "󰔟"
-  waiting: "💬"
-  done: "✅"
+  working: "󰔟" # nf-md-timer_sand
+  waiting: "" # nf-fa-commenting
+  done: "" # nf-fa-check
 
 #------------------------------------------------------------------------------
 # Agents
