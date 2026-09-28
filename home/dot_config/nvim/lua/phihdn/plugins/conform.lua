@@ -24,35 +24,9 @@ return {
         or filetype == "javascriptreact"
         or filetype == "typescriptreact"
       then
-        -- Find git root directory
-        local git_root = nil
-        local current_dir = vim.fn.fnamemodify(bufname, ":p:h")
-
-        -- Function to find git root
-        local function find_git_root(dir)
-          local git_dir = dir .. "/.git"
-          if vim.fn.isdirectory(git_dir) == 1 then
-            return dir
-          end
-
-          -- Go up one directory
-          local parent = vim.fn.fnamemodify(dir, ":h")
-          if parent == dir then
-            -- We've reached the filesystem root
-            return nil
-          end
-
-          return find_git_root(parent)
-        end
-
-        git_root = find_git_root(current_dir)
-
-        -- Check for .prettierrc.json in git root if we found a git root
-        if git_root then
-          local prettier_path = git_root .. "/.prettierrc.json"
-          if vim.fn.filereadable(prettier_path) == 1 then
-            return { timeout_ms = 1000, lsp_fallback = true }
-          end
+        local git_root = vim.fs.root(bufnr, ".git")
+        if git_root and vim.uv.fs_stat(git_root .. "/.prettierrc.json") then
+          return { timeout_ms = 1000, lsp_format = "fallback" }
         end
 
         -- Don't format JS/TS if no .prettierrc.json found in git root
@@ -60,7 +34,7 @@ return {
       end
 
       -- For all other filetypes
-      return { timeout_ms = 1000, lsp_fallback = true }
+      return { timeout_ms = 1000, lsp_format = "fallback" }
     end,
     formatters_by_ft = {
       graphql = { "prettier" },
@@ -87,7 +61,7 @@ return {
       "<leader>cf",
       function()
         require("conform").format({
-          lsp_fallback = true,
+          lsp_format = "fallback",
           async = true,
         })
       end,

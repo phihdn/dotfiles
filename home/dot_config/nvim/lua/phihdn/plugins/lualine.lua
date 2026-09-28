@@ -172,7 +172,7 @@ return {
           { autoformatOff, color = { fg = colors.red, gui = "bold" } },
           {
             "fancy_diagnostics",
-            sources = { "nvim_lsp" },
+            sources = { "nvim_diagnostic" },
             symbols = {
               error = icons.diagnostics.BoldError .. " ",
               warn = icons.diagnostics.BoldWarning .. " ",

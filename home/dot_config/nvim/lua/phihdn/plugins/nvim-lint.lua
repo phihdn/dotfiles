@@ -23,8 +23,8 @@ return {
     -- plugin: config runs during BufReadPost, before the filetype is set
     vim.api.nvim_create_autocmd({ "FileType", "BufWritePost", "InsertLeave" }, {
       group = vim.api.nvim_create_augroup("phihdn-nvim-lint", { clear = true }),
-      callback = function()
-        if vim.b.bigfile then
+      callback = function(args)
+        if vim.b[args.buf].bigfile then
           return
         end
         require("lint").try_lint(nil, { ignore_errors = true })

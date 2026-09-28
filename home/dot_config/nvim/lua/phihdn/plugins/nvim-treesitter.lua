@@ -33,6 +33,11 @@ return {
         "terraform",
         "proto",
         "regex",
+        "python",
+        "sql",
+        "toml",
+        "diff",
+        "gitcommit",
       })
 
       -- main branch enables highlighting/indentation per buffer instead of globally;

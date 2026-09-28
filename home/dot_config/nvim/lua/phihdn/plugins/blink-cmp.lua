@@ -49,15 +49,20 @@ return {
         nerd_font_variant = "mono",
       },
 
-      -- (Default) Only show the documentation popup when manually triggered
+      -- show the documentation popup automatically (default: only on <C-space>)
       completion = { documentation = { auto_show = true } },
       signature = { enabled = true },
 
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { "lsp", "path", "snippets", "buffer", "emoji", "sql" },
+        default = { "lazydev", "lsp", "path", "snippets", "buffer", "emoji", "sql" },
         providers = {
+          lazydev = {
+            name = "LazyDev",
+            module = "lazydev.integrations.blink",
+            score_offset = 100, -- above lsp, whose items lazydev refines
+          },
           emoji = {
             module = "blink-emoji",
             name = "Emoji",
@@ -85,13 +90,9 @@ return {
             --
             -- this is NOT the same as the opts in a plugin's lazy.nvim spec
             opts = {},
+            -- only offer SQL keywords in sql buffers
             should_show_items = function()
-              return vim.tbl_contains(
-                -- Enable emoji completion only for git commits and markdown.
-                -- By default, enabled for all file-types.
-                { "sql" },
-                vim.o.filetype
-              )
+              return vim.o.filetype == "sql"
             end,
           },
         },

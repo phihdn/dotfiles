@@ -1,6 +1,6 @@
 return {
   {
-    "echasnovski/mini.nvim",
+    "nvim-mini/mini.nvim",
     version = false,
     config = function()
       local nmap = function(keys, func, desc)
@@ -10,7 +10,9 @@ return {
         vim.keymap.set("n", keys, func, { desc = desc })
       end
 
-      require("mini.indentscope").setup({
+      local indentscope = require("mini.indentscope")
+      indentscope.setup({
+        draw = { animation = indentscope.gen_animation.none() },
         -- symbol = "▏",
         symbol = "│",
         options = {
@@ -23,7 +25,6 @@ return {
         },
       })
 
-      require("mini.indentscope").gen_animation.none()
       require("mini.cursorword").setup()
       vim.cmd("hi! MiniCursorwordCurrent guifg=NONE guibg=NONE gui=NONE cterm=NONE") -- disable highlight of the word under the cursor
 
