@@ -89,6 +89,8 @@ keybind = super+t=text:\x02\x63
 keybind = super+w=text:\x02\x78
 # <perfix>+u (open url)
 keybind = super+o=text:\x02\x75
+# <perfix>+A (open workmux dashboard popup; replaces select-all)
+keybind = super+a=text:\x02\x41
 
 # sesh
 # <perfix>+k (open sesh picker)
