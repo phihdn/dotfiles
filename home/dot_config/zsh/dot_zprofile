@@ -1,11 +1,12 @@
 # ~/.config/zsh/.zprofile — sourced for login shells only.
 #
 # On macOS, /etc/zprofile runs `path_helper`, which rebuilds PATH *after*
-# .zshenv and pushes system dirs (e.g. /usr/local/bin) ahead of ours. Because
-# .zprofile is sourced after /etc/zprofile, re-prepend nvm's node here so login
-# shells use the same node as every other shell.
+# .zshenv and pushes system dirs (/usr/bin, /bin, ...) ahead of ours, so e.g.
+# `bash` resolved to macOS's 3.2 instead of Homebrew's. Because .zprofile is
+# sourced after /etc/zprofile, re-prepend the .zshenv entries (user bins, nvm
+# node, Homebrew) so login shells resolve commands like every other shell.
 #
-# _zsh_nvm_node_bin is computed in .zshenv (same shell process, so it is still
+# _zsh_path_prepend is computed in .zshenv (same shell process, so it is still
 # visible here). `path` was declared `typeset -U` in .zshenv, so this prepend
 # de-duplicates automatically.
-[[ -n "$_zsh_nvm_node_bin" ]] && path=("$_zsh_nvm_node_bin" $path)
+(( ${#_zsh_path_prepend} )) && path=($_zsh_path_prepend $path)

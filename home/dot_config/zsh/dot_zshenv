@@ -30,8 +30,6 @@ export KUBECONFIG="$HOME/.kube/config:$HOME/.kube/config-k3s-homelab"
 # Put nvm's default node/npm/npx on PATH for EVERY shell — interactive and
 # non-interactive (scripts, editors, Claude Code, etc.) — so they all use the
 # same node as the interactive shell. `nvm` itself stays lazy-loaded in .zshrc.
-# _zsh_nvm_node_bin is left set (not exported) so .zprofile can re-prepend it
-# after macOS path_helper reorders PATH in login shells.
 export NVM_DIR="$HOME/.config/nvm"
 _zsh_nvm_node_bin=""
 if [[ -d "$NVM_DIR/versions/node" ]]; then
@@ -67,7 +65,9 @@ unset _brew_prefix
 # Deduplicate automatically (keeps the first occurrence).
 typeset -U path PATH
 
-path=(
+# _zsh_path_prepend is left set (not exported) so .zprofile can re-prepend it
+# after macOS path_helper reorders PATH in login shells.
+_zsh_path_prepend=(
   "$HOME/.local/bin"                                   # user scripts
   "$HOME/.rd/bin"                                      # Rancher Desktop
   ${_zsh_nvm_node_bin:+"$_zsh_nvm_node_bin"}           # nvm default node
@@ -77,6 +77,6 @@ path=(
   ${HOMEBREW_PREFIX:+"$HOMEBREW_PREFIX/bin"}                           # Homebrew
   ${HOMEBREW_PREFIX:+"$HOMEBREW_PREFIX/sbin"}
   "$HOME/.bun/bin"                                      # Bun
-  $path
 )
+path=($_zsh_path_prepend $path)
 export PATH
