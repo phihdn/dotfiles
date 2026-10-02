@@ -22,6 +22,7 @@ end
 
 # Essential CLI Tools
 # -----------------------------------------------------------------------------
+brew "bash"  # Bash 5.x (macOS ships 3.2)
 brew "git"
 brew "curl"
 brew "wget"
@@ -121,7 +122,7 @@ if OS.mac?
 
   # Development
   cask "visual-studio-code"
-  cask "claude-code" # Claude Code assistant
+  cask "claude-code@latest" # Claude Code assistant (latest channel, ahead of stable)
   # cask "docker-desktop"
   cask "rancher"
   cask "postman"     # API testing
