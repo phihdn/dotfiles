@@ -13,6 +13,7 @@
 #       daemon wins). Every status-interval it stores:
 #         @status_sysinfo  global   tmux-sysinfo output (cpu + mem segments)
 #         @status_uptime   global   tmux-uptime output
+#         @status_caffeinate global "on" while a caffeinate process runs, else ""
 #         @status_git      session  gitmux for the session's active pane path
 #         @win_icon        window   `icons` glyph for the window's command
 #       Style strings are passed through to tmux-sysinfo/tmux-uptime so the
@@ -102,6 +103,10 @@ tick() {
     "$(tmux-sysinfo "$sysinfo_accent" "$sysinfo_value" "$sysinfo_alert")" 2> /dev/null || true
   tmux set-option -g @status_uptime \
     "$(tmux-uptime "$uptime_normal" "$uptime_alert")" 2> /dev/null || true
+  # No caffeinate on Linux, so pgrep finds nothing and the widget stays hidden.
+  local caf=""
+  pgrep -x caffeinate > /dev/null 2>&1 && caf=on
+  tmux set-option -g @status_caffeinate "$caf" 2> /dev/null || true
   refresh_all_git
   refresh_icons
   tmux-claude-status render
