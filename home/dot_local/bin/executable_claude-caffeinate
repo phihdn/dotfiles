@@ -1,0 +1,78 @@
+#!/bin/sh
+# Keep the Mac awake while a Claude Code session still has background work
+# running after its turn ended.
+#
+# Claude Code already holds its own `caffeinate -i -t 300` while a turn is
+# active, but drops it once the turn ends, even when a background shell or a
+# background subagent is still running. This script covers that gap.
+#
+# Wired as Claude Code hooks (~/.claude/settings.json):
+#   SubagentStart -> claude-caffeinate agent-start   (record the agent)
+#   SubagentStop  -> claude-caffeinate agent-stop    (forget it)
+#   Stop          -> claude-caffeinate keep          (start the keeper if work is pending)
+#
+# The keeper holds `caffeinate -i -w <claude pid>` and polls every 15s until no
+# background work is left, then exits, dropping the assertion. `-w` ties it to
+# the claude process, so it never outlives the session.
+#
+# Claude runs hooks via `sh -c`, so $PPID is the claude process itself.
+# -i blocks idle system sleep only: the display may still sleep, and closing the
+# lid on battery still sleeps the machine. No-op on Linux (no caffeinate).
+
+command -v caffeinate >/dev/null 2>&1 || exit 0
+
+mode=${1:-}
+claude_pid=${2:-$PPID}
+state="${TMPDIR:-/tmp}/claude-caffeinate.$(id -u)/$claude_pid"
+agents="$state/agents"
+
+# Agent id from the hook's JSON on stdin.
+agent_id() {
+  if command -v jq >/dev/null 2>&1; then
+    jq -r '.agent_id // empty'
+  else
+    sed -n 's/.*"agent_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'
+  fi
+}
+
+# Background work = a subagent that started but has not stopped (files older
+# than 3h are treated as lost SubagentStop events), or a Bash-tool shell still
+# running under claude. Bash-tool shells are `zsh -c source .../shell-snapshots/...`;
+# hook shells and MCP servers don't match that.
+pending() {
+  [ -d "$agents" ] && find "$agents" -type f -mmin -180 2>/dev/null | grep -q . && return 0
+  pgrep -P "$claude_pid" -f 'shell-snapshots/snapshot-' >/dev/null 2>&1
+}
+
+keeper() {
+  # Singleton per claude process: mkdir is atomic.
+  mkdir -p "$state" && mkdir "$state/keeper" 2>/dev/null || exit 0
+  caffeinate -i -w "$claude_pid" &
+  caf=$!
+  # rmdir only removes empty dirs, so a recorded agent's file survives.
+  trap 'kill "$caf" 2>/dev/null; rmdir "$state/keeper" "$agents" "$state" 2>/dev/null' EXIT
+  trap 'exit 0' TERM INT
+  while kill -0 "$claude_pid" 2>/dev/null && pending; do
+    sleep 15
+  done
+  kill -0 "$claude_pid" 2>/dev/null || { kill "$caf" 2>/dev/null; rm -rf "$state"; }
+}
+
+case "$mode" in
+  agent-start)
+    id=$(agent_id)
+    [ -n "$id" ] && mkdir -p "$agents" && : > "$agents/$id"
+    ;;
+  agent-stop)
+    id=$(agent_id)
+    [ -n "$id" ] && rm -f "$agents/$id"
+    ;;
+  keep)
+    pending || exit 0
+    nohup "$0" keeper "$claude_pid" >/dev/null 2>&1 &
+    ;;
+  keeper)
+    keeper
+    ;;
+esac
+exit 0
