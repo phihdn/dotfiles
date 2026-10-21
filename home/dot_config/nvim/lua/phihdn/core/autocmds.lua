@@ -64,3 +64,16 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
+
+-- Tab-indented filetypes: gofmt and make require real tabs, so the global
+-- `»` tab marker is noise here. Show tabs 4 columns wide instead of 2.
+vim.api.nvim_create_autocmd("FileType", {
+  desc = "Hide tab markers and use 4-wide tabs in Go and Makefiles",
+  group = vim.api.nvim_create_augroup("phihdn-tab-indent", { clear = true }),
+  pattern = { "go", "gomod", "make" },
+  callback = function()
+    vim.opt_local.listchars:append({ tab = "  " })
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+  end,
+})
