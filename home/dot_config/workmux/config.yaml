@@ -60,6 +60,20 @@ agents:
 agent: cc-work
 
 #------------------------------------------------------------------------------
+# Dashboard (prefix+A / Cmd+A popup)
+#------------------------------------------------------------------------------
+
+# Light/dark is otherwise auto-detected from the terminal, which can't be
+# queried inside a tmux popup — it guessed light and painted a grey background.
+# Pinning dark keeps the popup matching the dark terminal.
+theme:
+  scheme: graphite-code
+  mode: dark
+
+dashboard:
+  preview_size: 40
+
+#------------------------------------------------------------------------------
 # Panes
 #------------------------------------------------------------------------------
 
