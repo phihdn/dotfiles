@@ -16,6 +16,7 @@ tap "arl/arl", trusted: true  # for gitmux
 tap "jorgerojas26/lazysql", trusted: true # Lazysql
 tap "oven-sh/bun", trusted: true  # Bun JavaScript runtime
 tap "charmbracelet/tap", trusted: true
+tap "atlassian/homebrew-acli", trusted: true  # Atlassian CLI (acli)
 if OS.mac?
   tap "nikitabobko/tap", trusted: true # AeroSpace
 end
@@ -35,6 +36,7 @@ brew "jq"    # JSON processor
 brew "yq"    # YAML processor
 brew "gh"    # GitHub CLI
 brew "glab"  # GitLab CLI
+brew "acli"  # Atlassian CLI (Jira) — fallback when the Atlassian MCP is down
 brew "htop"  # Process viewer
 brew "neofetch"  # System info
 
@@ -59,7 +61,6 @@ brew "difftastic"  # Structural language-aware diffs (lazygit alt pager, cycle w
 brew "tuicr"       # Code review TUI — local diffs + GitLab MRs via glab (self-hosted OK)
 brew "lazydocker"
 brew "lazysql"
-brew "charmbracelet/tap/crush"
 
 # Shell & Terminal
 # -----------------------------------------------------------------------------
