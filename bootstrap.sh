@@ -332,20 +332,20 @@ else
   log_warn "Could not clone $CLAUDE_BACKUP_REPO (check SSH/gh auth). If a partial ~/.claude was left behind, run: rm -rf ~/.claude && re-run bootstrap"
 fi
 
-# Refresh the AgentKit layer to the latest release. `ak kit refresh` overwrites
-# ak-owned files but skips files you modified (unless --force). No-op if ak is
-# absent — the cloned snapshot still works until ak is installed.
+# Bring the AgentKit layer to the latest release. ak v3 has no `core` kit and
+# `ak kit refresh` only works on a kit ak itself installed, so a fresh machine
+# needs `kit init` (--force overwrites the adapter dir; a recovery snapshot is
+# saved first). Needs `ak login` once. No-op if ak is absent — the cloned
+# snapshot still works until ak is installed.
 if command -v ak &>/dev/null; then
-  log_step "Refreshing AgentKit kits to latest (core, engineer, marketing)"
-  for kit in core engineer marketing; do
-    if ak kit refresh "$kit" --yes >/dev/null; then
-      log_success "ak kit refresh $kit"
-    else
-      log_warn "ak kit refresh $kit failed (see stderr above; kit not installed / auth / network?)"
-    fi
-  done
+  log_step "Installing AgentKit engineer kit to ~/.claude"
+  if env -u CLAUDE_CONFIG_DIR ak kit init engineer --target claude-code --global --yes --force >/dev/null; then
+    log_success "ak kit init engineer"
+  else
+    log_warn "ak kit init engineer failed (see stderr above; not logged in? run: ak login --email <you>)"
+  fi
 else
-  log_info "ak not found; skipping AgentKit refresh (install ak, then run: ak kit refresh <kit> --yes)"
+  log_info "ak not found; skipping AgentKit install (install ak, then run: ak kit init engineer --target claude-code --global --yes --force)"
 fi
 
 # Two Claude Code accounts (work + personal) via separate CLAUDE_CONFIG_DIRs.

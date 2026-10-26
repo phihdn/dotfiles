@@ -410,7 +410,7 @@ workmux setup
 Two things to know before answering its prompts:
 
 - It also writes to **other** agents it detects, without asking per-agent: `~/.gemini/settings.json`, `~/.gemini/config/hooks.json`, and `~/.config/opencode/plugins/workmux-status.ts`. None of those are managed by this repo; delete them to undo.
-- Its bundled skills (`merge`, `rebase`, `worktree`, `coordinator`, `open-pr`, `workmux`) install into `~/.claude/skills/` without a `phi-` prefix, so `ak kit refresh` may remove them. Re-run `workmux setup --skills` if they disappear.
+- Its bundled skills (`merge`, `rebase`, `worktree`, `coordinator`, `open-pr`, `workmux`) install into `~/.claude/skills/` without a `phi-` prefix, so `ak kit init --force` may remove them. Re-run `workmux setup --skills` if they disappear.
 
 ### Daily commands
 
@@ -469,10 +469,11 @@ Cautions: don't run `ak` from inside a `claude-work`/`claude-personal` session (
 
 ```bash
 git clone git@github.com:phihdn/dotfiles-claude.git ~/.claude
-ak kit refresh core --yes && ak kit refresh engineer --yes && ak kit refresh marketing --yes
+ak login --email <you>   # once; the kit registry needs auth
+ak kit init engineer --target claude-code --global --yes --force
 ```
 
-Back it up by committing from `~/.claude` (`git -C ~/.claude add -A && git -C ~/.claude commit -m "chore: update claude config" && git -C ~/.claude push`). Anything you author yourself gets a `phi-` prefix (`skills/phi-*`, `hooks/phi-*.cjs`) so it stands apart from ak content and survives `ak kit refresh`.
+Back it up by committing from `~/.claude` (`git -C ~/.claude add -A && git -C ~/.claude commit -m "chore: update claude config" && git -C ~/.claude push`). Anything you author yourself gets a `phi-` prefix (`skills/phi-*`, `hooks/phi-*.cjs`) so it stands apart from ak content and survives `ak kit init --force`.
 
 ## 🔄 Day-to-day chezmoi
 
