@@ -60,6 +60,9 @@ alias wm="workmux"
 alias claude-work="CLAUDE_CONFIG_DIR=\"\$HOME/.claude-work\" claude"
 alias claude-personal="CLAUDE_CONFIG_DIR=\"\$HOME/.claude-personal\" claude"
 
+# Machine-local aliases (untracked, not managed by chezmoi)
+[[ -f "$ZDOTDIR/aliases.local.zsh" ]] && source "$ZDOTDIR/aliases.local.zsh"
+
 # =========================================================
 # Git
 # =========================================================
