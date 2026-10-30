@@ -1,6 +1,7 @@
 # Aliases - for commands that need arguments or complex behavior
 
 alias v nvim
+alias md "glow -p" # Render markdown in a less-style pager
 alias grep "grep --color"
 alias please sudo
 
