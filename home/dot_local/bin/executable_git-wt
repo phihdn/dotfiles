@@ -15,7 +15,8 @@ Commands:
   init <repo-url> [branch...]   Bare-clone a repo into a directory derived from
                                 the URL (like plain 'git clone') and create
                                 locked "fixed" worktrees for long-lived branches
-                                (default: develop prod; missing ones skipped).
+                                (default: develop main prod; missing ones skipped).
+                                Also installs the branch guard (see 'guard').
   new <branch> [base-ref]       Ephemeral worktree for a branch. Dir name is
                                 the last path segment (feature/BE-1234 -> BE-1234).
                                 If origin/<branch> already exists and no
@@ -30,6 +31,10 @@ Commands:
   prune                         Bulk-remove all clean detached (review) worktrees
                                 after confirmation; keeps dirty ones. Also clears
                                 stale worktree admin entries.
+  guard                         Install the hook that stops locked (fixed)
+                                worktrees from switching branches. Run once in
+                                repos created before it existed. Override a
+                                single command with GIT_WT_ALLOW=1.
   ls                            List all worktrees.
 
 Options:
@@ -115,12 +120,51 @@ copy_env_files() {
   done
 }
 
+# 'git worktree lock' only blocks removal, not 'git switch' inside the worktree.
+# A reference-transaction hook sees every HEAD update before it lands, so it can
+# veto any move off the branch a locked (fixed) worktree is named after. The hook
+# lives in the shared hooks dir but acts only on locked worktrees, so ephemeral
+# ones and the bare root are untouched. GIT_WT_ALLOW=1 bypasses it (e.g. a
+# rebase, which detaches HEAD).
+GUARD_MARKER="# git-wt-guard"
+install_guard() {
+  local hook
+  hook="$(git rev-parse --path-format=absolute --git-common-dir)/hooks/reference-transaction"
+  if [[ -e "$hook" ]] && ! grep -qF "$GUARD_MARKER" "$hook"; then
+    die "A different reference-transaction hook already exists: $hook"
+  fi
+  mkdir -p "$(dirname "$hook")"
+  cat > "$hook" << 'HOOK'
+#!/usr/bin/env bash
+# git-wt-guard
+[[ "$1" == prepared ]] || exit 0
+[[ -z "${GIT_WT_ALLOW-}" ]] || exit 0
+gitdir=$(git rev-parse --git-dir 2>/dev/null) || exit 0
+[[ -f "$gitdir/locked" ]] || exit 0
+wt=$(basename "$(git rev-parse --show-toplevel)")
+while read -r _ new ref; do
+  [[ "$ref" == HEAD ]] || continue
+  if [[ "$new" != "ref:refs/heads/$wt" ]]; then
+    echo "git wt: '$wt/' is a fixed worktree locked to branch '$wt'. Use 'git wt new <branch>' (or GIT_WT_ALLOW=1 to override)." >&2
+    exit 1
+  fi
+done
+HOOK
+  chmod +x "$hook"
+}
+
+cmd_guard() {
+  repo_root
+  install_guard
+  msg "${GREEN}Branch guard installed: locked worktrees can't switch branches.${NOFORMAT}"
+}
+
 cmd_init() {
   [[ $# -ge 1 ]] || die "Usage: git wt init <repo-url> [branch...]"
   local url=$1
   shift
   local branches=("${@:-}")
-  [[ -n "${branches[0]}" ]] || branches=(develop prod)
+  [[ -n "${branches[0]}" ]] || branches=(develop main prod)
 
   command -v git-bare-clone > /dev/null || die "git-bare-clone not found on PATH."
   # git-bare-clone derives the project dir from the URL (my-repo.git -> my-repo/)
@@ -134,6 +178,7 @@ cmd_init() {
   git bare-clone "$url"
   cd "$dir"
   git fetch origin
+  install_guard
 
   local b
   for b in "${branches[@]}"; do
@@ -278,6 +323,7 @@ case "${1-}" in
   review) shift; cmd_review "$@" ;;
   done) shift; cmd_done "$@" ;;
   prune) shift; cmd_prune "$@" ;;
+  guard) shift; cmd_guard "$@" ;;
   ls) shift; git worktree list ;;
   *) die "Unknown command: $1 (see git wt --help)" ;;
 esac

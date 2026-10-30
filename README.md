@@ -287,14 +287,15 @@ What `bare-clone` does: creates the project directory, clones **bare** into `.ba
 
 `~/.local/bin/git-wt` automates the day-to-day on top of it, with two classes of worktrees:
 
-- **Fixed** — one per long-lived branch, dir name == branch name (`develop/`, `prod/`). Created locked so `git worktree remove` refuses; treat as read-mostly and branch off for changes.
+- **Fixed** — one per long-lived branch, dir name == branch name (`develop/`, `main/`, `prod/`). Created locked so `git worktree remove` refuses, and a `reference-transaction` hook (installed by `git wt init`/`git wt guard` into `.bare/hooks/`) rejects any `git switch`/`checkout` away from the branch, so a fixed dir can't drift onto another branch. Set `GIT_WT_ALLOW=1` to override one command (e.g. a rebase, which detaches HEAD). Treat as read-mostly and branch off for changes.
 - **Ephemeral** — one per task (feature, hotfix, MR review). Created on demand, removed when merged.
 
 ```bash
 # One-time per repo: bare-clone into my-repo/ + locked fixed worktrees
-# (default: develop prod) — then cd my-repo
+# (default: develop main prod; missing ones skipped) — then cd my-repo
 git wt init git@gitlab.example.com:group/my-repo.git
-git wt init <url> main            # explicit fixed branches; missing ones skipped
+git wt init <url> main            # explicit fixed branches
+git wt guard                      # install the branch guard in a repo created before it existed
 
 # Task worktrees — dir = last branch segment (feature/BE-1234 → BE-1234/),
 # base defaults to origin/develop|main|master; copies .env* from a fixed worktree.
@@ -318,6 +319,7 @@ my-repo/
 ├── .git             # file: "gitdir: ./.bare"
 ├── .bare/           # the actual repository (objects, refs, config)
 ├── develop/         # FIXED  — latest integration code (locked)
+├── main/            # FIXED  — if the repo has a main branch (locked)
 ├── prod/            # FIXED  — reproduce production issues (locked)
 ├── BE-1234/         # ephemeral — feature/BE-1234, removed after merge
 └── review-BE-1290/  # ephemeral — detached MR review

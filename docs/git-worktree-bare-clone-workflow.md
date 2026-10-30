@@ -79,7 +79,7 @@ Now there is no "primary" checkout competing for a branch — the bare repo has 
 This repo automates both halves:
 
 - `git bare-clone <url>` (`home/dot_local/bin/executable_git-bare-clone`) — does the bare clone + `.git` file setup, generically, for any repo.
-- `git wt` (`home/dot_local/bin/executable_git-wt`) — the day-to-day layer on top: `git wt init` chains `git bare-clone` and adds **locked "fixed" worktrees** for long-lived branches (`develop`, `prod`), and `git wt new`/`review`/`done` manage **ephemeral worktrees** per task (one dir per feature/hotfix/PR-review, removed when finished).
+- `git wt` (`home/dot_local/bin/executable_git-wt`) — the day-to-day layer on top: `git wt init` chains `git bare-clone` and adds **locked "fixed" worktrees** for long-lived branches (`develop`, `main`, `prod`) — `git worktree lock` only blocks removal, so `init` also installs a `reference-transaction` hook in `.bare/hooks/` that aborts any HEAD move off a locked worktree's own branch (`GIT_WT_ALLOW=1` overrides; `git wt guard` retrofits older repos) — and `git wt new`/`review`/`done` manage **ephemeral worktrees** per task (one dir per feature/hotfix/PR-review, removed when finished).
 
 Full command reference and gotchas (`.env*` copying, `node_modules` being per-worktree, etc.) are in `README.md` → "Git worktree workflow (`git-bare-clone`)" — this doc is the conceptual "why", that section is the practical "how".
 
