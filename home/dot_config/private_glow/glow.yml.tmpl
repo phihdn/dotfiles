@@ -1,0 +1,39 @@
+# Glow config — ~/.config/glow/glow.yml (edit here, then `chezmoi apply`)
+# Every option is listed. Uncommented = active. Command-line flags override this file.
+
+# Color theme: "auto" (picks dark/light from the terminal), "dark", "light",
+# "notty", "dracula", "tokyo-night", "pink", "ascii", or an absolute path to a custom JSON style file.
+# Currently the Kanagawa Dragon theme (kanagawa-dragon.json, next to this file). Glow does not
+# expand "~" in this path (it hangs), so this file is a chezmoi template that fills in the home dir.
+# Flag: -s, --style
+style: "{{ .chezmoi.homeDir }}/.config/glow/kanagawa-dragon.json"
+
+# Word-wrap column for rendered output. 0 disables wrapping.
+# Flag: -w, --width
+width: 100
+
+# Display rendered markdown in a less-style pager instead of printing it.
+# Flag: -p, --pager
+pager: false
+
+# Open the TUI file browser instead of rendering to stdout.
+# Flag: -t, --tui
+# tui: false
+
+# Mouse support in the TUI (scroll, click).
+mouse: true
+
+# Show system/hidden/ignored files and directories in the TUI.
+# Flag: -a, --all
+all: false
+
+# Show line numbers (TUI mode only).
+# Flag: -l, --line-numbers
+showLineNumbers: false
+
+# Keep single newlines in paragraphs instead of joining them into one line.
+# Flag: -n, --preserve-new-lines
+preserveNewLines: false
+
+# Only look for markdown files in the current directory tree (TUI mode).
+local: false
