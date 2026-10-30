@@ -30,6 +30,7 @@ alias grep='rg --color=auto'
 alias diff='diff --color=auto'
 alias df='df -h'
 alias v='nvim'
+alias md='glow -p'  # Render markdown in a less-style pager
 alias -- -='cd -'  # `-- ` stops - being read as a flag; `cd -` jumps to previous dir
 
 # =========================================================
