@@ -32,6 +32,7 @@ brew "fzf"   # Fuzzy finder
 brew "ripgrep"  # Fast grep alternative
 brew "bat"   # Better cat
 brew "glow"  # Markdown renderer for the terminal
+brew "vhs"   # Record terminal GIFs from a script (pulls in ffmpeg + ttyd)
 brew "fd"    # Better find
 brew "jq"    # JSON processor
 brew "yq"    # YAML processor
